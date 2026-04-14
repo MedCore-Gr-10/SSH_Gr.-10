@@ -6,7 +6,7 @@ CREATE TABLE roles(
 );
 
 INSERT INTO roles (role_name)
-VALUES ('superuser'),('director'),('patient'),('doctor'),('nurse'),('janitor');
+VALUES ('superuser'),('director'),('patient'),('doctor'),('nurse');
 
 CREATE TABLE users(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -197,3 +197,12 @@ CREATE TABLE reviews(
     comment TEXT,
     UNIQUE(patient_id, doctor_id)
 );
+
+
+--CREATE TABLE logs(
+--    id SERIAL PRIMARY KEY,
+--    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+--    action TEXT NOT NULL,
+--   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    reason TEXT
+--);

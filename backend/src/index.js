@@ -1,20 +1,20 @@
 import prisma from './prisma.js';
 
 async function createone() {
-  const user = await prisma.user.create({
+  const users = await prisma.users.create({
     data: {
       email: "test@exampleeee.com",
     },
   });
 
-  console.log(user);
+  console.log(users);
   console.log("Done!");
   console.log("Done!");
 
 }
 
 async function readall() {
-    const users = await prisma.user.findMany();
+    const users = await prisma.users.findMany();
   console.log(users);
 }
 
