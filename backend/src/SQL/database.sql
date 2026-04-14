@@ -21,15 +21,15 @@ CREATE TABLE profiles(
     first_name VARCHAR(50),
     last_surname VARCHAR(50),
     birth DATE,
-    gender TEXT CHECK (gender IN ('male', 'female')),
-    personal_no TEXT UNIQUE CHECK (personal_no ~ '^[0-9]{10}$'),
-    phone_number TEXT CHECK (phone_number ~ '^\+[1-9][0-9]{7,14}$')
+    gender TEXT ,
+    personal_no TEXT UNIQUE ,
+    phone_number TEXT 
 );
 
 CREATE TABLE users_profiles(
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    email TEXT UNIQUE NOT NULL CHECK (email = LOWER(email)),
+    email TEXT UNIQUE NOT NULL,
     PRIMARY KEY (user_id, profile_id)
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE emergency_contacts(
     patient_id UUID REFERENCES users(id) ON DELETE CASCADE,
     contact_name VARCHAR(100) NOT NULL,
     relationship VARCHAR(50),
-    phone_number TEXT CHECK (phone_number ~ '^\+[1-9][0-9]{7,14}$'),
+    phone_number TEXT,
     UNIQUE (patient_id, phone_number)
 );
 
@@ -46,7 +46,7 @@ CREATE TABLE hospitals(
     id SERIAL PRIMARY KEY,
     hospital_name VARCHAR(50),
     hospital_address TEXT,
-    email TEXT UNIQUE NOT NULL CHECK (email = LOWER(email)),
+    email TEXT UNIQUE NOT NULL,
     UNIQUE(hospital_name, hospital_address)
 );
 
@@ -115,7 +115,7 @@ CREATE TABLE staff_working_schedules(
     staff_id UUID,
     hospital_id INTEGER,
     department_id INTEGER,
-    day_of_week VARCHAR(10) CHECK (day_of_week IN ('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')),
+    day_of_week VARCHAR(10),
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -130,7 +130,7 @@ CREATE TABLE appointments_templates(
     staff_id UUID,
     hospital_id INTEGER,
     department_id INTEGER,
-    day_of_week VARCHAR(10) CHECK (day_of_week IN ('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')),
+    day_of_week VARCHAR(10) ,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     active_appointment_template BOOLEAN DEFAULT true,
@@ -193,16 +193,16 @@ CREATE TABLE reviews(
     id SERIAL PRIMARY KEY,
     patient_id UUID REFERENCES users(id) ON DELETE CASCADE,
     doctor_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+    rating INTEGER,
     comment TEXT,
     UNIQUE(patient_id, doctor_id)
 );
 
 
---CREATE TABLE logs(
---    id SERIAL PRIMARY KEY,
---    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
---    action TEXT NOT NULL,
---   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---    reason TEXT
---);
+CREATE TABLE logs(
+   id SERIAL PRIMARY KEY,
+   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+   action TEXT NOT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   reason TEXT
+);
