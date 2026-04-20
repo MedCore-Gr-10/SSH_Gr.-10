@@ -1,22 +1,33 @@
-import prisma from './prisma.js';
+import prisma from "./prisma.js";
+import express from "express";
+import authRoutes from "./routes/auth.routes.js";
 
-async function createone() {
-  const users = await prisma.users.create({
-    data: {
-      email: "test@exampleeee.com",
-    },
-  });
+const app = express();
 
-  console.log(users);
-  console.log("Done!");
-  console.log("Done!");
+app.use(express.json());
 
-}
+app.use("/api/auth", authRoutes);
 
-async function readall() {
-    const users = await prisma.users.findMany();
-  console.log(users);
-}
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
 
-readall();
-  console.log("Done!");
+// async function createone() {
+//   const users = await prisma.users.create({
+//     data: {
+//       email: "test@exampleeee.com",
+//     },
+//   });
+
+//   console.log(users);
+//   console.log("Done!");
+//   console.log("Done!");
+// }
+
+// async function readall() {
+//   const users = await prisma.users.findMany();
+//   console.log(users);
+// }
+
+// readall();
+// console.log("Done!");
