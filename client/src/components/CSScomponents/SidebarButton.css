@@ -1,0 +1,17 @@
+.sidebar-button{
+    background-color: #FFFFFF;
+    color: #1E293B;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    width: 100%;
+    box-shadow: 0px 4px 6px #1E293B;
+    font-size: 1rem; /* Adjusts icon size */
+         border: 1px solid #FFFFFF;
+
+}
+.sidebar-button:hover {
+    background-color: #5B65DC;
+    color: #FFFFFF;
+    cursor: pointer;
+}
