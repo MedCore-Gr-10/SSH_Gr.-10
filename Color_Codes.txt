@@ -2,6 +2,9 @@ Colors
 
 General Theme:
 #4B70F5   --> blue
+#5B65DC   -->buttons on sidebar and header when hovering
+#784bf5   -->Color for the pressed buttons
+#EEEFFD   -->background color on App
 #FFFFFF   --> white
 #C85BC5   --> pink
 #1E293B   --> dark blue
