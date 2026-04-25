@@ -9,8 +9,6 @@ import {
   IconEye,
   IconEyeOff,
   IconArrowRight,
-  IconGoogle,
-  IconHeartPulse,
 } from "./AuthIcons.jsx";
 import "./auth.css";
 
@@ -22,6 +20,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  console.log("Login form state:", form);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,10 +32,10 @@ export default function Login() {
         setError(res.error);
         return;
       }
-      const result = login(res);
-      if (result === "DASHBOARD") {
+      const ok = login(res);
+      if (ok) {
         navigate("/dashboard");
-      } else if (result === "ERROR") {
+      } else {
         setError("Could not sign you in. Please try again.");
       }
     } finally {

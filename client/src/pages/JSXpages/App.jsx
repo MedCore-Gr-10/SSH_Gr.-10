@@ -1,28 +1,15 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import Header from "../../components/layout/Header.jsx";
-import Footer from "../../components/layout/Footer.jsx";
+import Sidebar from "../../components/layout/Sidebar.jsx";
 import Home from "./Home.jsx";
 import About from "./About.jsx";
 import Contact from "./Contact.jsx";
-import Sidebar from "../../components/layout/Sidebar.jsx";
+import Login from "../auth/login.jsx";
+import Register from "../auth/register.jsx";
+import Dashboard from "../patient/Dashboard.jsx";
 import "../CSSpages/App.css";
 
-{
-  /* <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter> */
-}
-
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "../auth/login";
-import Register from "../auth/register";
-import Dashboard from "../patient/Dashboard";
-
-export default function App() {
+function MainLayout() {
   return (
     <div className="App">
       <div className="sidebar-container">
@@ -34,11 +21,7 @@ export default function App() {
         </div>
         <div className="content-container">
           <div className="content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
+            <Outlet />
           </div>
         </div>
       </div>
@@ -46,4 +29,17 @@ export default function App() {
   );
 }
 
-// export default App
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/main" element={<MainLayout />}>
+        <Route index element={<Home />} />
+        <Route path="about" element={<About />} />
+        <Route path="contact" element={<Contact />} />
+        <Route path="dashboard" element={<Dashboard />} />
+      </Route>
+    </Routes>
+  );
+}

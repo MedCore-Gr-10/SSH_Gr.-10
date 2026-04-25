@@ -78,7 +78,7 @@ export default function Register() {
         setError(data.error || "Registration failed.");
         return;
       }
-      navigate("/");
+      navigate("/login");
     } catch {
       setError("Network error. Please try again.");
     } finally {
