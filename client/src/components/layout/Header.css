@@ -1,15 +1,53 @@
-nav{
-    background-color: #333;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.nav-links {
+ display: flex;
+  flex-direction: row;
+  width: 100%; /* Changed from 90% to 100% to fill the bubble */
+    justify-content: space-around; /* Distributes space evenly around items */
+  flex-wrap: wrap; /* This is the magic line */
+  align-items: center;
+  gap: 20px; /* Added 'px' here */
+  padding: 0 10px;
 }
-header a{
-    color: white;
-    text-decoration: none;
-    font-size: 24px;
-    font-weight: bold;  
-    margin-right: 40px;
-    margin-left: 40px;
+
+.nav-links a {
+  display: flex;
+  align-items: center; /* Vertically aligns icon and text */
+  text-decoration: none;
+  color: #1E293B;
+  gap: 8px; /* Space between the icon and the word */
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #FFFFFF; /* Matches your sidebar color */
+  background-color: #5B65DC;
+  box-shadow: 0px 1px 8px #122056;
+}
+.nav-links a.active {
+  background-color: #784bf5; /* Your sidebar blue */
+  color: #FFFFFF;
+}
+
+.nav-icon {
+  font-size: 1.9rem; /* Adjusts icon size */
+}
+
+.header-bubble{
+ width: 100%; /* Force the header to match the container width */
+  background-color: #FFFFFF;
+  border: 1px solid #4B70F5;
+  border-radius: 20px;
+  display: flex;
+  align-items: center; /* Centers header content vertically */
+  padding: 10px 10px 10px 20px;
+  flex-shrink: 0; /* ADD THIS: Prevents the header from being compressed */
+}
+
+.header-button{
+  background-color: #FFFFFF;
+  border: 1px solid #FFFFFF;
+  border-radius: 30px;
+  width:14%;
+  padding : 10px 20px;
 }
