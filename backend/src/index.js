@@ -1,6 +1,6 @@
 import prisma from "./prisma.js";
 import express from "express";
-import authRoutes from "./routes/auth.routes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
