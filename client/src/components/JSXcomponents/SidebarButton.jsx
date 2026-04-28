@@ -1,11 +1,12 @@
+// src/components/JSXcomponents/SidebarButton.jsx
 import React from 'react';
 import '../CSScomponents/SidebarButton.css';
 
-function SidebarButton({ label, onClick }) {
+function SidebarButton({ label }) {
   return (
-    <button className="sidebar-button" onClick={onClick}>
+    <div className="sidebar-button">
       {label}
-    </button>
+    </div>
   );
 }
 

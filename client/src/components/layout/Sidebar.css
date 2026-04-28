@@ -11,20 +11,59 @@
 
 ul {
   list-style: none;
-  padding: 0;
+  padding: 20px 0px 0px 0px;
     width:100%;
 
 }
 
 li {
-  padding: 10px 0;
+  padding: 5px 5px 10px 5px;
   width:100%;
+}
+
+/* Link wrapper */
+.sidebar-link {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+/* Active state (THIS is the magic) */
+.sidebar-link.active .sidebar-button {
+  background-color: #784bf5;
+  color: #FFFFFF;
+}
+
+/* Optional hover */
+.sidebar-link:hover .sidebar-button {
+  background-color: #5B65DC;
+  color: #FFFFFF;
 }
 
 .sidebar-logo {
   width: 300px;
-  height: 80px;
+  height: 70px;
   object-fit: cover;   
   object-position: center; 
-  padding: 10px 15px 20px 0px;
+  padding: 0px 10px 10px 0px;
+}
+
+.sidebar-user-role{
+  text-align: center;
+  color: #784bf5;
+    font-weight: bold;
+
+}
+.sidebar-username{
+  text-align: center;
+  font-weight: bold;
+}
+
+.sidebar-userrole-username-bubble{
+    background-color: #FFFFFF;
+  z-index: 1000; /* Ensures it stays on top of other content */
+  border-radius: 20px;
+  border: 1px solid #4B70F5;
+  overflow: hidden; /* This clips the "inside part" to match the border radius */
+  padding: 10px;
 }
