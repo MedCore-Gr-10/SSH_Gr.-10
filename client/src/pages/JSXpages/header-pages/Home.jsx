@@ -1,3 +1,4 @@
+import '../../CSSpages/header-pages/Home.css';
 
 function Home() {
   return (

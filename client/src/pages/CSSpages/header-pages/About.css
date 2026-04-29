@@ -1,0 +1,54 @@
+.about-container {
+ width: 80%;
+ height: 80%;
+  /* Remove margin: 40px auto; as Flexbox handles this now */
+  padding: 5% 5% 5% 5%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0px 20px 10px rgba(0, 0, 0, 0.05);
+}
+
+.about-container h1 {
+  color: #FFFFFF; /* Navy */
+  background-color: #4B70F5;
+  font-size: 2.5rem;
+  border: 3px solid #FFFFFF; /* Teal Accent */
+  display: inline-block;
+  margin-bottom: 20px;
+  margin-top: 0px;
+  border-radius: 30px;
+  padding: 1% ;
+  box-shadow: 0px 10px 15px #4B70F5;
+
+}
+
+.about-container h2, .about-container h3 {
+  color: #2b6cb0; /* Medical Blue */
+  margin-top: 30px;
+}
+
+.about-container p {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: #4a5568;
+}
+
+.about-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.about-container li {
+  background: #f7fafc;
+  margin: 10px 0;
+  padding: 15px;
+  border-left: 5px solid #2b6cb0;
+  border-radius: 4px;
+  transition: transform 0.2s;
+}
+
+.about-container li:hover {
+  transform: translateX(10px);
+  background: #edf2f7;
+}
+
