@@ -1,8 +1,7 @@
+import { useEffect, useState } from "react";
+import "../../CSSpages/sidebar-pages/Users.css";
+import SuperuserUsers from "../../superuser/Users.jsx";
 export default function Users() {
-  return (
-    <div>
-      <h1>Users</h1>
-      <p>This page displays user information.</p>
-    </div>
-  );
+  
+  return <SuperuserUsers />;
 }
