@@ -1,0 +1,106 @@
+.page-container {
+  display: flex;
+  flex-direction: column; 
+  height: 100vh;          
+  width:100%;
+  gap:10px;
+}
+
+.menu{
+  width: 100%;
+  display: flex;
+  align-items: center; 
+  flex-shrink: 0; 
+  gap:10px
+}
+
+.menu-bubble-information-buttons{
+    width: 100%; 
+    height: 80px;
+    background-color: #FFFFFF;
+    border: 1px solid #4B70F5;
+    border-radius: 20px;
+    display: flex;
+    align-items: center; 
+    padding: 10px 10px 10px 20px;
+}
+
+.menu-information{
+    width: 200px; 
+    background-color: #FFFFFF;
+}
+
+.menu-search-button{
+    width: 100%; 
+    display: flex;
+    align-items: center; 
+    gap:10px
+}
+
+.search-users{
+    width: 100%;           
+    max-width: 100%;      
+    background-color: #FFFFFF;
+    padding: 8px 12px;     
+    border: 1px solid #ddd;
+    border-radius: 20px;   
+    font-size: 14px;
+    outline: none;        
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-users:hover {
+    border-color: #4A90E2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+    max-width: 100%;      
+    background-color: #FFFFFF;
+    padding: 8px 12px;     
+    border: 1px solid #ddd;
+    border-radius: 20px;   
+    font-size: 14px;
+    outline: none;        
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-users:focus {
+    border-color: #4A90E2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+}
+
+.content-area {
+  width: 100%; 
+    height: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid #4B70F5;
+    border-radius: 20px;
+    padding: 10px 10px 10px 20px;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden; /* Clips corners to radius */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.profile-table th {
+    background-color: #f8f9fa;
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 2px solid #eee;
+    color: #666;
+    font-weight: 600;
+}
+
+.profile-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+.profile-table tr:hover {
+    background-color: #f1f7ff; /* Light highlight on hover */
+}
