@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model allergies {
   id           Int     @id @default(autoincrement())
   patient_id   String? @db.Uuid
@@ -39,7 +38,6 @@ model appointments_made {
   prescriptions               prescriptions[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model appointments_templates {
   id                          Int                          @id @default(autoincrement())
   staff_id                    String?                      @db.Uuid
@@ -55,23 +53,10 @@ model appointments_templates {
   @@unique([staff_id, hospital_id, department_id, day_of_week, start_time])
 }
 
-model bed_assignments {
-  id         Int       @id @default(autoincrement())
-  patient_id String?   @db.Uuid
-  room_id    Int?
-  start_date DateTime  @db.Date
-  end_date   DateTime? @db.Date
-  active     Boolean?  @default(true)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  users      users?    @relation(fields: [patient_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  rooms      rooms?    @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
 model departments {
   id                    Int                     @id @default(autoincrement())
   department_name       String                  @unique @db.VarChar(50)
   hospitals_departments hospitals_departments[]
-  rooms                 rooms[]
 }
 
 model diagnoses {
@@ -82,7 +67,6 @@ model diagnoses {
   appointments_made   appointments_made? @relation(fields: [appointment_made_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model emergency_contacts {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   patient_id   String? @db.Uuid
@@ -94,7 +78,6 @@ model emergency_contacts {
   @@unique([patient_id, phone_number])
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model hospitals {
   id                    Int                     @id @default(autoincrement())
   hospital_name         String?                 @db.VarChar(50)
@@ -102,7 +85,6 @@ model hospitals {
   email                 String                  @unique
   hospitals_departments hospitals_departments[]
   patients_hospitals    patients_hospitals[]
-  rooms                 rooms[]
 
   @@unique([hospital_name, hospital_address])
 }
@@ -110,8 +92,8 @@ model hospitals {
 model hospitals_departments {
   hospital_id                 Int
   department_id               Int
-  departments                 departments                   @relation(fields: [department_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  hospitals                   hospitals                     @relation(fields: [hospital_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  departments                 departments                 @relation(fields: [department_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  hospitals                   hospitals                   @relation(fields: [hospital_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   staff_hospitals_departments staff_hospitals_departments[]
 
   @@id([hospital_id, department_id])
@@ -147,11 +129,10 @@ model prescriptions {
   appointments_made   appointments_made? @relation(fields: [appointment_made_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model profiles {
   id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   first_name     String?          @db.VarChar(50)
-  last_name   String?          @db.VarChar(50)
+  last_name      String?          @db.VarChar(50)
   birth          DateTime?        @db.Date
   gender         String?
   personal_no    String?          @unique
@@ -159,7 +140,6 @@ model profiles {
   users_profiles users_profiles[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model reviews {
   id                              Int     @id @default(autoincrement())
   patient_id                      String? @db.Uuid
@@ -176,18 +156,6 @@ model roles {
   id        Int     @id @default(autoincrement())
   role_name String  @unique @db.VarChar(50)
   users     users[]
-}
-
-model rooms {
-  id              Int               @id @default(autoincrement())
-  hospital_id     Int?
-  department_id   Int?
-  room_number     String            @db.VarChar(20)
-  bed_assignments bed_assignments[]
-  departments     departments?      @relation(fields: [department_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  hospitals       hospitals?        @relation(fields: [hospital_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@unique([hospital_id, department_id, room_number])
 }
 
 model specializations {
@@ -220,7 +188,6 @@ model staff_specializations {
   @@id([staff_id, hospital_id, department_id, specialization_id])
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model staff_working_schedules {
   id                          Int                          @id @default(autoincrement())
   staff_id                    String?                      @db.Uuid
@@ -240,10 +207,10 @@ model users {
   hash_password                     String
   salt                              String?
   role_id                           Int?
+  is_active                         Boolean                       @default(true)
   allergies                         allergies[]
   appointments_booking_slots        appointments_booking_slots[]
   appointments_made                 appointments_made[]
-  bed_assignments                   bed_assignments[]
   emergency_contacts                emergency_contacts[]
   insurance                         insurance[]
   patients_hospitals                patients_hospitals[]
@@ -252,11 +219,11 @@ model users {
   staff_hospitals_departments       staff_hospitals_departments[]
   roles                             roles?                        @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users_profiles                    users_profiles[]
-  is_active     Boolean  @default(true)
-  logs logs[]
+  logs                              logs[]
+  sent_requests                     requests[]                    @relation("SentRequests")
+  received_requests                 requests[]                    @relation("ReceivedRequests")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model users_profiles {
   user_id    String   @db.Uuid
   profile_id String   @db.Uuid
@@ -273,7 +240,15 @@ model logs {
   action    String
   timestamp DateTime @default(now())
   reason    String?
+  user      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
 
-  // relation
-  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model requests {
+  id          Int      @id @default(autoincrement())
+  sender_id   String   @db.Uuid
+  receiver_id String   @db.Uuid
+  message     String   @db.Text
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  sender      users    @relation("SentRequests", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver    users    @relation("ReceivedRequests", fields: [receiver_id], references: [id], onDelete: Cascade)
 }
