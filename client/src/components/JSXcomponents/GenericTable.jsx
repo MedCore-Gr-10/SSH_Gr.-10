@@ -1,8 +1,6 @@
 import React from "react";
 import "./../CSScomponents/GenericTable.css";
-// columns: array me objekte { header: "Emri", key: "fusha_ne_db" }
-// data: array me të dhënat (profiles ose users)
-// onMoreClick: funksioni që ekzekutohet kur shtypet butoni "More"
+
 export default function GenericTable({ columns, data, onMoreClick }) {
   return (
     <table className="profile-table">
@@ -10,23 +8,20 @@ export default function GenericTable({ columns, data, onMoreClick }) {
         <tr>
           {columns.map((col, index) => (
             <th key={index}>{col.header}</th>
-          ))}
-          <th>More</th> {/* Kolona për butonin More */}
+          ))}<th>More</th>{/* Kjo kllapë është ngjitur me <th> për të shmangur whitespace error */}
         </tr>
       </thead>
       <tbody>
-        {data.length > 0 ? (
+        {data && data.length > 0 ? (
           data.map((item) => (
             <tr key={item.id}>
               {columns.map((col, index) => (
                 <td key={index}>
-                  {/* Nëse është datë, e konvertojmë, përndryshe e shfaqim si tekst */}
-                  {col.key.includes("date") 
-                    ? new Date(item[col.key]).toLocaleDateString() 
-                    : item[col.key]}
+                  {col.key.includes("date") && item[col.key]
+                    ? new Date(item[col.key]).toLocaleDateString()
+                    : (item[col.key] ?? "-")}
                 </td>
-              ))}
-              <td>
+              ))}<td>
                 <button 
                   className="more-button" 
                   onClick={() => onMoreClick(item)}

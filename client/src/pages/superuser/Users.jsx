@@ -7,7 +7,9 @@ export default function Users() {
   const [users, setUsers] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showProfiles, setShowProfiles] = useState(false);
+  
+  // Përdorim viewMode për të dritur çfarë po shohim: 'none', 'users', ose 'profiles'
+  const [viewMode, setViewMode] = useState('none'); 
 
   // Fetch Users
   useEffect(() => {
@@ -15,7 +17,8 @@ export default function Users() {
       try {
         const res = await fetch("http://localhost:3000/api/users");
         const data = await res.json();
-        setUsers(data.data || []);
+        // Kontrollo strukturen e data.data ose data nese vjen direkt
+        setUsers(data.data || data || []);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -29,7 +32,7 @@ export default function Users() {
       try {
         const res = await fetch("http://localhost:3000/api/profiles");
         const data = await res.json();
-        setProfiles(data.data || []);
+        setProfiles(data.data || data || []);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching profiles:", error);
@@ -39,6 +42,14 @@ export default function Users() {
     fetchProfiles();
   }, []);
 
+  // Kolonat për Modelin e User-it (bazuar në skemën tënde)
+  const userColumns = [
+    { header: "UUID", key: "id" },
+    { header: "Username", key: "username" },
+    { header: "Role ID", key: "role_id" },
+    { header: "Status", key: "is_active", render: (val) => (val ? "✅ Active" : "❌ Inactive") },
+  ];
+
   const profileColumns = [
     { header: "ID", key: "id" },
     { header: "First Name", key: "first_name" },
@@ -46,11 +57,10 @@ export default function Users() {
     { header: "Gender", key: "gender" },
     { header: "Phone", key: "phone_number" },
     { header: "Personal No.", key: "personal_no" },
-    { header: "Birth Date", key: "birth_date" },
   ];
 
   const handleMore = (item) => {
-    alert("U zgjodh ID: " + item.id);
+    alert("Zgjodhët elementin me ID: " + item.id);
   };
 
   return (
@@ -60,14 +70,17 @@ export default function Users() {
         <div className="menu-bubble-information-buttons">
           <div className="menu-information">
             <p>Total Users: {users.length}</p>
-            <p>Active Users: {users.filter((user) => user.active).length}</p>
-            <p>Inactive Users: {users.filter((user) => !user.active).length}</p>
+            {/* Kujdes: modeli yt perdor is_active, jo active */}
+            <p>Active: {users.filter((u) => u.is_active).length}</p>
+            <p>Inactive: {users.filter((u) => !u.is_active).length}</p>
           </div>
           <div className="menu-search-button">
             <input type="text" placeholder="Search users..." className="search-users" />
             <div className="buttons-list">
               <button className="menu-buttons">New User</button>
-              <button className="menu-buttons">All Users</button>
+              <button className="menu-buttons" onClick={() => setViewMode('users')}>
+                All Users
+              </button>
             </div>
           </div>
         </div>
@@ -81,7 +94,7 @@ export default function Users() {
             <input type="text" placeholder="Search profiles..." className="search-users" />
             <div className="buttons-list">
               <button className="menu-buttons">New Profile</button>
-              <button className="menu-buttons" onClick={() => setShowProfiles(true)}>
+              <button className="menu-buttons" onClick={() => setViewMode('profiles')}>
                 All Profiles
               </button>
             </div>
@@ -90,19 +103,27 @@ export default function Users() {
       </div>
 
       <div className="content-area">
-        {showProfiles ? (
+        {viewMode === 'users' && (
+          <>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h1>User Accounts</h1>
+              <button className="more-button" onClick={() => setViewMode('none')}>Close X</button>
+            </div>
+            <GenericTable columns={userColumns} data={users} onMoreClick={handleMore} />
+          </>
+        )}
+
+        {viewMode === 'profiles' && (
           <>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h1>Profiles</h1>
-
+              <button className="more-button" onClick={() => setViewMode('none')}>Close X</button>
             </div>
-            <GenericTable 
-              columns={profileColumns} 
-              data={profiles} 
-              onMoreClick={handleMore} 
-            />
+            <GenericTable columns={profileColumns} data={profiles} onMoreClick={handleMore} />
           </>
-        ) : (
+        )}
+
+        {viewMode === 'none' && (
           <div style={{ 
               display: 'flex', 
               justifyContent: 'center', 
@@ -110,10 +131,10 @@ export default function Users() {
               height: '100%', 
               textAlign: 'center' 
           }}>
-            <p>Select One of the Options</p>
+            <p>Select One of the Options from the menu to display data.</p>
           </div>
         )}
       </div>
-    </div> // Kjo div mbyllese mungonte ne kodin tend!
+    </div>
   );
 }
