@@ -19,3 +19,103 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName =  .env
 5. per te ekzekutuar client
     •	cd client
     •	npm run dev
+
+---
+# 🏥 MedCore
+
+**MedCore** është një platformë gjithëpërfshirëse për menaxhimin e shëndetësisë, e krijuar për të lidhur pacientët me ofruesit e shërbimeve mjekësore. Qëllimi ynë është të thjeshtojmë procesin e rezervimit të termineve dhe ta bëjmë kujdesin shëndetësor më të aksesueshëm për të gjithë.
+
+---
+
+# Shërbimet tona
+
+### 👤 Për pacientët
+- Shfletoni një listë të kuruar të spitaleve dhe qendrave mjekësore më të vlerësuara  
+- Zgjidhni specialistin e duhur sipas nevojës suaj  
+- Rezervoni termine shpejt dhe lehtë, me vetëm disa klikime  
+
+### 🏥 Për spitalet
+- Menaxhoni oraret e mjekëve dhe stafit  
+- Organizoni dhe monitoroni rezervimet e pacientëve  
+- Përdorni një dashboard të integruar për administrim efikas  
+
+---
+
+## ⭐ Pse MedCore?
+
+Ne besojmë se rezervimi i një vizite mjekësore nuk duhet të jetë stresues.  
+Duke centralizuar:
+- listën e spitaleve  
+- disponueshmërinë në kohë reale  
+
+MedCore ju ndihmon të kaloni më pak kohë duke pritur dhe më shumë kohë duke marrë kujdesin që meritoni.
+
+---
+
+## 🌍 Vizioni ynë
+
+Të bëhemi baza digjitale e industrisë së shëndetësisë, duke krijuar një ambient:
+- transparent  
+- efikas  
+- të besueshëm  
+
+për profesionistët mjekësorë dhe komunitetet që ata shërbejnë.
+
+---
+
+## ⚙️ Arkitektura & Specifikimet Teknike
+
+### 🧩 Arkitektura
+- Sistem i ndërtuar mbi **arkitekturë klient-server**, ku frontend dhe backend janë të pavarur  
+- Komunikimi realizohet vetëm përmes **API-ve REST**
+- Implementim sipas paradigmës **OOP (Object-Oriented Programming)**
+- **Multi-Tenancy** për ndarjen e të dhënave sipas spitaleve
+- Ndërtuar me **React**
+- Menaxhim i state me **Context API** 
+
+### 🔗 API & Backend
+-  **20 endpoint-e të strukturuara mirë**
+- Ndërtuar me framework modern si:
+  - Node.js
+- Dokumentim i plotë me **Swagger UI**
+
+### 🗄️ Databaza & ORM
+- Përdorimi i Prisma si **ORM** për ndërveprim me databazën  
+- Mbi **20 modele**
+- Mbështetje për **migrime**
+
+### 🔐 Siguria
+- Sistem i plotë **autentikimi (login/register)**  
+- **Role-based authorization** (p.sh. pacient, superuser, doctor, nurse, director)  
+- Middleware për:
+  - autentikim  
+  - logging  
+
+### 🧪 Testimi & DevOps
+- Implementim i:
+  - unit testeve  
+  - API testeve  
+- Integrim me **CI/CD pipelines**
+
+### 🤖 Integrimi AI
+- Modul i integruar me **OpenAI API**
+- Endpoint-e për:
+  - chatbot  
+  - analiza teksti  
+
+### ⚡ Performanca
+- Implementim i **caching** (p.sh. Redis)  
+- Përmirësim i performancës për kërkesa të shpeshta  
+
+### 🔄 Background Jobs
+- Detyra asinkrone si:
+  - dërgimi i email-eve  
+  - përpunimi i të dhënave  
+  - thirrje ndaj API-ve të jashtme   
+
+### 📊 Menaxhimi i Projektit
+- Përdorimi i Jira  
+- Versionim me **Git**
+- Përdorimi i:
+  - Pull Requests  
+  - Code Reviews  
