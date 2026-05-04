@@ -3,14 +3,14 @@ import "../../CSSpages/header-pages/About.css";
 export default function About() {
   return (
     <div className="about-container">
-      <h1>About MedCore</h1>
+      <h3>MedCore</h3>
       <p>
-        <strong >MedCore</strong> is a comprehensive healthcare management platform designed to 
+         is a comprehensive healthcare management platform designed to 
         bridge the gap between patients and healthcare providers. Our mission is to 
         streamline the medical appointment process and make healthcare accessible to everyone.
       </p>
 
-      <h2>Our Services</h2>
+      <h3>Our Services</h3>
       <ul>
         <li>
           <strong>For Patients:</strong> Easily browse through a curated list of top-rated 
@@ -23,14 +23,12 @@ export default function About() {
         </li>
       </ul>
 
-      <h2>Why MedCore?</h2>
+      <h3>Why MedCore?</h3>
       <p>
         We believe that scheduling a doctor's visit should be stress-free. By centralizing 
         hospital listings and real-time availability, MedCore ensures that you spend less 
         time waiting and more time receiving the care you deserve.
       </p>
-
-      <hr />
       
       <h3>Our Vision</h3>
       <p>
