@@ -50,41 +50,45 @@
 }
 
 .content {
-  background-color: #FFFFFF;
+ background-color: #FFFFFF;
   border: 1px solid #4B70F5;
   border-radius: 20px;
-  padding: 10px;
+  padding: 20px; /* E rritëm pak për hapësirë më të mirë brenda */
+  
+  /* Përmasat Fikse */
   width: 100%;
-  min-height: 100%; /* Ensures the white box fills the area even if empty */
-  max-height: 100%; /* Ensures the white box fills the area even if empty */
-  overflow-y: auto;  /* THIS is where the scrollbar happens */
-    margin: auto;
+  height: 100%;    /* Detyron lartësinë të jetë sa prindi */
+  box-sizing: border-box; /* SHUMË E RËNDËSISHME: përfshin padding dhe border brenda lartësisë */
+
+  /* Ndalon Overflow dhe Scroll */
+  overflow: hidden; 
+  
+  margin: auto;
   display: flex;
-  flex-direction: column; /* Stack text vertically */
-  align-items: center;    /* Center text horizontally */
-  justify-content: center; /* Center text vertically */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(75, 112, 245, 0.4) transparent;
+  flex-direction: column; 
+  align-items: center;    
+  justify-content: center;
 }
 
 /* Scrollbar width */
-.content::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 /* Track (background) */
-.content::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 20px; /* match container */
 }
 
 /* Thumb (the draggable part) */
-.content::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: rgba(75, 112, 245, 0.4);
   border-radius: 20px;
 }
 
 /* Hover effect */
-.content::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: rgba(75, 112, 245, 0.7);
 }

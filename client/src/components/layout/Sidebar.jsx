@@ -66,7 +66,7 @@ const Sidebar = () => {
         <h3 className="sidebar-username">Username here</h3>
       </div>
 
-      <nav>
+      <nav className="buttons-list">
         <ul>
           {buttons.map((btn, index) => (
             <li key={index}>

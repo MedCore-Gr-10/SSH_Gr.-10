@@ -1,11 +1,11 @@
 .about-container {
- width: 80%;
- height: 80%;
-  /* Remove margin: 40px auto; as Flexbox handles this now */
+ width: 95%;
+ height: 95%;
   padding: 5% 5% 5% 5%;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 0px 20px 10px rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
 }
 
 .about-container h1 {

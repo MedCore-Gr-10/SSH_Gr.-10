@@ -7,13 +7,13 @@
   border: 1px solid #4B70F5;
   overflow: hidden; /* This clips the "inside part" to match the border radius */
   padding: 10px;
+  overflow-y: auto;
 }
 
 ul {
   list-style: none;
   padding: 20px 0px 0px 0px;
     width:100%;
-
 }
 
 li {
