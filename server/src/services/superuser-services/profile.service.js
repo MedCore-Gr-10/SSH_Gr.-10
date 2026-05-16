@@ -1,12 +1,9 @@
-import ProfileRepository from "../repositories/profile.repository.js";
+import profileRepository from "../../repositories/profile.repository.js";
 
 class ProfileService {
-  constructor() {
-    this.profileRepository = new ProfileRepository();
-  }
 
   async getAllProfiles() {
-    const profiles = await this.profileRepository.findAll();
+    const profiles = await profileRepository.findAll();
 
     return profiles.map(profile => ({
       id: profile.id,
@@ -20,7 +17,7 @@ class ProfileService {
   }
 
   async getProfileById(id) {
-    return await this.profileRepository.findById(id);
+    return await profileRepository.findById(id);
   }
 }
 

@@ -1,4 +1,4 @@
-import ProfileService from "../services/profile.service.js";
+import ProfileService from "../../services/superuser-services/profile.service.js";
 
 class ProfileController {
   constructor() {
