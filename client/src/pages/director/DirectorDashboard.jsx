@@ -1,6 +1,8 @@
 import React from "react";
 import "./DirectorDashboard.css";
 
+//fields might change... there are only placeholders
+
 export default function DirectorDashboard() {
 	return (
 		<div className="director-dashboard">
