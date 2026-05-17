@@ -70,7 +70,7 @@ const Sidebar = () => {
         <ul>
           {buttons.map((btn, index) => (
             <li key={index}>
-              <NavLink to={btn.path} className="sidebar-link">
+              <NavLink to={btn.path} state={{ role }} className="sidebar-link">
                 <SidebarButton label={btn.label} />
               </NavLink>
             </li>

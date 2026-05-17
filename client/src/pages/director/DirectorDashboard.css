@@ -1,0 +1,72 @@
+/* Styles for Director Dashboard */
+.director-dashboard {
+  padding: 20px;
+  color: #222;
+}
+
+.dd-header {
+  margin-bottom: 18px;
+}
+
+.dd-header h1 {
+  margin: 0 0 6px 0;
+  font-size: 28px;
+}
+
+.dd-sub {
+  margin: 0;
+  color: #666;
+}
+
+.dd-cards {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0 24px 0;
+}
+
+.dd-card {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  padding: 16px;
+  width: 220px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.dd-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.dd-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111;
+}
+
+.dd-section {
+  margin-top: 8px;
+}
+
+.dd-section h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.dd-activities {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #555;
+}
+
+.dd-activities li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+@media (max-width: 700px) {
+  .dd-cards { flex-direction: column; }
+  .dd-card { width: 100%; }
+}
