@@ -1,5 +1,7 @@
 import React from "react";
 
+//fields only as placeholders...
+
 export default function DirectorStaff() {
   return (
     <div className="director-page-wrapper">
