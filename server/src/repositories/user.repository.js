@@ -30,7 +30,8 @@ class UsersRepository {
             profiles: true
           }
         },
-        patients_hospitals: true
+        patients_hospitals: true,
+        staff_hospitals_departments: true
       }
     });
   }
@@ -112,6 +113,32 @@ class UsersRepository {
       },
       include: {
         roles: true,
+        staff_hospitals_departments: true
+      }
+    });
+  }
+
+  async findHospitalStaff(hospitalId) {
+    return prisma.users.findMany({
+      where: {
+        staff_hospitals_departments: {
+          some: {
+            hospital_id: hospitalId
+          }
+        },
+        roles: {
+          role_name: {
+            in: ["doctor", "DOCTOR", "nurse", "NURSE"]
+          }
+        }
+      },
+      include: {
+        roles: true,
+        users_profiles: {
+          include: {
+            profiles: true
+          }
+        },
         staff_hospitals_departments: true
       }
     });
