@@ -1,0 +1,240 @@
+.director-staff-schedule-page {
+  padding: 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+  height: auto;
+}
+
+.director-staff-schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.director-staff-schedule-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.director-staff-schedule-header p {
+  margin: 8px 0 0;
+  color: #4b5563;
+}
+
+.director-schedule-overview {
+  margin-top: 28px;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.overview-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.overview-card span {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.overview-card strong {
+  font-size: 1.4rem;
+  color: #111827;
+}
+
+.director-staff-schedule-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.director-staff-schedule-table-section,
+.director-staff-schedule-form-section {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 230px);
+}
+
+.director-staff-schedule-table-section h2,
+.director-staff-schedule-form-section h2 {
+  margin-top: 0;
+}
+
+.director-staff-schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  table-layout: fixed;
+}
+
+.director-staff-schedule-table th,
+.director-staff-schedule-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.director-staff-schedule-table th {
+  font-weight: 700;
+  color: #111827;
+}
+
+.director-staff-schedule-table td {
+  color: #374151;
+  word-break: break-word;
+}
+
+.director-staff-schedule-table td button {
+  margin-right: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button.edit-button {
+  background: #2563eb;
+  color: white;
+}
+
+button.delete-button {
+  background: #ef4444;
+  color: white;
+}
+
+.director-staff-schedule-form label {
+  display: block;
+  margin-bottom: 14px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.director-staff-schedule-form input,
+.director-staff-schedule-form select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.director-staff-schedule-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.director-staff-schedule-actions button {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.director-staff-schedule-actions button.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.director-staff-schedule-actions button.secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.director-message {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+
+.director-message.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.director-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.content-scroll {
+  overflow-y: auto;
+}
+
+@media screen and (max-width: 1050px) {
+  .director-staff-schedule-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .overview-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .director-staff-schedule-table,
+  .director-staff-schedule-table thead,
+  .director-staff-schedule-table tbody,
+  .director-staff-schedule-table th,
+  .director-staff-schedule-table td,
+  .director-staff-schedule-table tr {
+    display: block;
+  }
+
+  .director-staff-schedule-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .director-staff-schedule-table tr {
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .director-staff-schedule-table td {
+    border: none;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .director-staff-schedule-table td:before {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: 700;
+    content: attr(data-label);
+  }
+}
