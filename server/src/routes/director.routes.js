@@ -6,6 +6,7 @@ import { RoleMiddleware } from "../middlewares/roleMiddleware.js";
 import PatientController from "../controllers/director-controllers/patient.controller.js";
 import StaffController from "../controllers/director-controllers/staff.controller.js";
 import StaffScheduleController from "../controllers/director-controllers/staffSchedule.controller.js";
+import AppointmentsController from "../controllers/director-controllers/appointments.controller.js";
 
 const router = express.Router();
 const jwtService = new JwtService();
@@ -15,6 +16,7 @@ const roleMiddleware = new RoleMiddleware("director", "DIRECTOR");
 const patientController = new PatientController();
 const staffController = new StaffController();
 const staffScheduleController = new StaffScheduleController();
+const appointmentsController = new AppointmentsController();
 
 router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => hospitalMiddleware.handle(req, res, next));
@@ -34,5 +36,10 @@ router.get("/staff-schedules", (req, res, next) => staffScheduleController.getSt
 router.post("/staff-schedules", (req, res, next) => staffScheduleController.createStaffSchedule(req, res, next));
 router.put("/staff-schedules/:id", (req, res, next) => staffScheduleController.updateStaffSchedule(req, res, next));
 router.delete("/staff-schedules/:id", (req, res, next) => staffScheduleController.deleteStaffSchedule(req, res, next));
+
+router.get("/appointments", (req, res, next) => appointmentsController.getAppointments(req, res, next));
+router.get("/appointments/slots", (req, res, next) => appointmentsController.getAppointmentSlots(req, res, next));
+router.put("/appointments/:id", (req, res, next) => appointmentsController.updateAppointment(req, res, next));
+router.delete("/appointments/:id", (req, res, next) => appointmentsController.deleteAppointment(req, res, next));
 
 export default router;

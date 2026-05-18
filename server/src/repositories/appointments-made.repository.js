@@ -14,7 +14,12 @@ class AppointmentsMadeRepository {
       include: {
         diagnoses: true,
         prescriptions: true,
-        users: true
+        users: true,
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: true
+          }
+        }
       }
     });
   }
@@ -24,6 +29,51 @@ class AppointmentsMadeRepository {
       where: {
         patient_id: patientId
       }
+    });
+  }
+
+  async findHospitalAppointments(hospitalId) {
+    return prisma.appointments_made.findMany({
+      where: {
+        appointments_booking_slots: {
+          appointments_templates: {
+            hospital_id: hospitalId
+          }
+        }
+      },
+      include: {
+        users: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true
+              }
+            }
+          }
+        },
+        appointments_booking_slots: {
+          include: {
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true
+                  }
+                },
+                roles: true
+              }
+            },
+            appointments_templates: true
+          }
+        }
+      }
+    });
+  }
+
+  async update(id, data) {
+    return prisma.appointments_made.update({
+      where: { id },
+      data
     });
   }
 
