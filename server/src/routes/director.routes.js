@@ -7,6 +7,7 @@ import PatientController from "../controllers/director-controllers/patient.contr
 import StaffController from "../controllers/director-controllers/staff.controller.js";
 import StaffScheduleController from "../controllers/director-controllers/staffSchedule.controller.js";
 import AppointmentsController from "../controllers/director-controllers/appointments.controller.js";
+import DepartmentsController from "../controllers/director-controllers/departments.controller.js";
 
 const router = express.Router();
 const jwtService = new JwtService();
@@ -17,6 +18,7 @@ const patientController = new PatientController();
 const staffController = new StaffController();
 const staffScheduleController = new StaffScheduleController();
 const appointmentsController = new AppointmentsController();
+const departmentsController = new DepartmentsController();
 
 router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => hospitalMiddleware.handle(req, res, next));
@@ -41,5 +43,10 @@ router.get("/appointments", (req, res, next) => appointmentsController.getAppoin
 router.get("/appointments/slots", (req, res, next) => appointmentsController.getAppointmentSlots(req, res, next));
 router.put("/appointments/:id", (req, res, next) => appointmentsController.updateAppointment(req, res, next));
 router.delete("/appointments/:id", (req, res, next) => appointmentsController.deleteAppointment(req, res, next));
+
+router.get("/departments", (req, res, next) => departmentsController.getDepartments(req, res, next));
+router.post("/departments", (req, res, next) => departmentsController.createDepartment(req, res, next));
+router.put("/departments/:id", (req, res, next) => departmentsController.updateDepartment(req, res, next));
+router.delete("/departments/:id", (req, res, next) => departmentsController.deleteDepartment(req, res, next));
 
 export default router;

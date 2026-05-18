@@ -78,6 +78,12 @@ export default function DirectorAppointments() {
     setMessage(null);
 
     try {
+      if (selectedSlotId === String(selectedAppointment.appointment_booking_slot_id)) {
+        setError("Selected slot is the same as the current slot.");
+        setIsSubmitting(false);
+        return;
+      }
+
       await updateDirectorAppointment(selectedAppointment.id, {
         appointment_booking_slot_id: selectedSlotId,
       });
@@ -91,6 +97,8 @@ export default function DirectorAppointments() {
       setIsSubmitting(false);
     }
   };
+
+  const canSave = !!selectedAppointment && !!selectedSlotId && selectedSlotId !== String(selectedAppointment.appointment_booking_slot_id);
 
   const handleCancel = async () => {
     if (!selectedAppointment) {
