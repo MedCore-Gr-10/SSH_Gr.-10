@@ -15,7 +15,7 @@ export default function Users() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/users");
+        const res = await fetch("/api/users");
         const data = await res.json();
         // Kontrollo strukturen e data.data ose data nese vjen direkt
         setUsers(data.data || data || []);
@@ -30,7 +30,7 @@ export default function Users() {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/profiles");
+        const res = await fetch("/api/profiles");
         const data = await res.json();
         setProfiles(data.data || data || []);
         setLoading(false);
