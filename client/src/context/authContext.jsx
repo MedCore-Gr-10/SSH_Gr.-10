@@ -2,12 +2,19 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
+const safeParse = (value) => {
+  if (!value) return null;
+  try {
+    return JSON.parse(value);
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [user, setUser] = useState(() => safeParse(localStorage.getItem("user")));
 
   const login = (data) => {
     if (!data.token || !data.user) return false;
@@ -32,9 +39,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleStorageChange = () => {
       setToken(localStorage.getItem("token"));
-
-      const storedUser = localStorage.getItem("user");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
+      setUser(safeParse(localStorage.getItem("user")));
     };
 
     window.addEventListener("storage", handleStorageChange);

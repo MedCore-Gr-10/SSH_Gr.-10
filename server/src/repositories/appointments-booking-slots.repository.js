@@ -35,6 +35,30 @@ class AppointmentsBookingSlotsRepository {
     });
   }
 
+  async findHospitalSlots(hospitalId) {
+    return prisma.appointments_booking_slots.findMany({
+      where: {
+        appointments_templates: {
+          hospital_id: hospitalId
+        },
+        active_appointment_booking_slot: true
+      },
+      include: {
+        users: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true
+              }
+            },
+            roles: true
+          }
+        },
+        appointments_templates: true
+      }
+    });
+  }
+
   async update(id, data) {
     return prisma.appointments_booking_slots.update({
       where: { id },
