@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
 
-  const role = "superuser"; // change for testing
+  const role = "director"; // change for testing
 
   const sidebarConfig = {
     superuser: [
@@ -70,7 +70,7 @@ const Sidebar = () => {
         <ul>
           {buttons.map((btn, index) => (
             <li key={index}>
-              <NavLink to={btn.path} className="sidebar-link">
+              <NavLink to={btn.path} state={{ role }} className="sidebar-link">
                 <SidebarButton label={btn.label} />
               </NavLink>
             </li>
