@@ -18,6 +18,16 @@ class RolesRepository {
     });
   }
 
+  async findByName(roleNames) {
+    return prisma.roles.findFirst({
+      where: {
+        role_name: {
+          in: roleNames,
+        },
+      },
+    });
+  }
+
 }
 
 export default new RolesRepository();
