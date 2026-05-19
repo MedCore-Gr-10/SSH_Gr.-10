@@ -86,6 +86,39 @@ class AppointmentsMadeRepository {
     });
   }
 
+  async findDoctorPatientProfiles(doctorId) {
+  const appointments = await prisma.appointments_made.findMany({
+    where: {
+      appointments_booking_slots: {
+        doctor_id: doctorId
+      }
+    },
+    include: {
+      users: {
+        include: {
+          users_profiles: {
+            include: {
+              profiles: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const map = new Map();
+
+  for (const appointment of appointments) {
+    const profile = appointment.users?.users_profiles?.[0]?.profiles;
+
+    if (profile) {
+      map.set(profile.id, profile);
+    }
+  }
+
+  return Array.from(map.values());
+}
+
 }
 
 export default new AppointmentsMadeRepository();
