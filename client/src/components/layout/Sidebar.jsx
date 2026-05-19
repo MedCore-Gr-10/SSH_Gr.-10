@@ -3,10 +3,11 @@ import React from "react";
 import "./Sidebar.css";
 import SidebarButton from "../JSXcomponents/SidebarButton.jsx";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/authContext.jsx";
 
 const Sidebar = () => {
-
-  const role = "director"; // change for testing
+  const { user } = useAuth();
+  const role = user?.role || "patient";
 
   const sidebarConfig = {
     superuser: [
