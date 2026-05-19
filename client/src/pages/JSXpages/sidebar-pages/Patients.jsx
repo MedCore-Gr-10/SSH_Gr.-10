@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authContext.jsx";
 import DirectorPatients from "../../director/DirectorPatients.jsx";
+import DoctorPatients from "../../doctor/DoctorPatients.jsx";
 
 export default function Patients() {
   const location = useLocation();
@@ -10,6 +11,8 @@ export default function Patients() {
 
   if (role === "director") {
     return <DirectorPatients />;
+  }if (role === "doctor"){
+    return <DoctorPatients />;
   }
 
   return (
