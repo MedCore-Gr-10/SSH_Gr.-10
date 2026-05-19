@@ -9,12 +9,20 @@ class ManageSpecializationsController {
    * GET /specializations
    * Lists all specializations
    */
-  async getAll(req, res) {
+ async getAll(req, res) {
     try {
       const specializations = await this.manageSpecializationsService.listSpecializations();
+      
+      // Map the array to cleanly display the doctor count field if structured via Prisma aggregates
+      const formattedData = specializations.map(spec => ({
+        id: spec.id,
+        specialization_name: spec.specialization_name,
+        total_doctors: spec._count?.staff_specializations ?? 0 // Safely extracts the count number
+      }));
+
       return res.status(200).json({
         success: true,
-        data: specializations,
+        data: formattedData,
       });
     } catch (error) {
       return res.status(500).json({

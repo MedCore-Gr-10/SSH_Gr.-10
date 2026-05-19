@@ -1,0 +1,12 @@
+.page-container {
+  display: flex;
+  flex-direction: column; 
+  height: 100vh;          
+  width:100%;
+  gap:10px;
+  width: 100%;
+  height: 100%;    /* Detyron lartësinë të jetë sa prindi */
+  box-sizing: border-box; 
+  overflow-x: auto;
+
+}

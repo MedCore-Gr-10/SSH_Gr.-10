@@ -68,6 +68,23 @@ class ManageSpecializationsService {
 
     return await specializationsRepository.update(id, updatedData);
   }
+
+  async getDoctorCountBySpecialization(specializationId) {
+    // 1. Optional: Check if the specialization even exists first
+    const specialization = await SpecializationsRepository.findById(specializationId);
+    if (!specialization) {
+      throw new Error(`Specialization with ID ${specializationId} not found.`);
+    }
+
+    // 2. Fetch the aggregate count from the repository
+    const count = await SpecializationsRepository.countDoctors(specializationId);
+    
+    return {
+      specialization_id: specialization.id,
+      specialization_name: specialization.specialization_name,
+      total_doctors: count
+    };
+  }
 }
 
 export default ManageSpecializationsService;

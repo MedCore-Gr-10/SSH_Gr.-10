@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GenericTable from "../../components/JSXcomponents/GenericTable.jsx";
+import "./../CSSpages/superuser/ManageSpecializatoins.css";
 
 export default function ManageSpecialization() {
   // Data and structural states
@@ -12,10 +13,11 @@ export default function ManageSpecialization() {
   const [selectedItem, setSelectedItem] = useState(null); // Track item being edited
   const [isEditing, setIsEditing] = useState(false);
 
-  // 1. Table structure mapping to match your schema keys
+  // 1. Updated Table structure mapping to match your new API response data structure 🌟
   const columns = [
     { header: "ID", key: "id" },
     { header: "Specialization Name", key: "specialization_name" },
+    { header: "Total Doctors Assigned", key: "total_doctors" }, 
   ];
 
   // 2. Fetch all specializations on component mount
@@ -86,7 +88,7 @@ export default function ManageSpecialization() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+    <div className="page-container">  
       <h2>Manage Specializations</h2>
       <p style={{ color: "gray" }}>View, add, and modify hospital department specializations.</p>
 
