@@ -8,6 +8,7 @@ import StaffController from "../controllers/director-controllers/staff.controlle
 import StaffScheduleController from "../controllers/director-controllers/staffSchedule.controller.js";
 import AppointmentsController from "../controllers/director-controllers/appointments.controller.js";
 import DepartmentsController from "../controllers/director-controllers/departments.controller.js";
+import SystemOverviewController from "../controllers/director-controllers/systemOverview.controller.js";
 
 const router = express.Router();
 const jwtService = new JwtService();
@@ -19,6 +20,7 @@ const staffController = new StaffController();
 const staffScheduleController = new StaffScheduleController();
 const appointmentsController = new AppointmentsController();
 const departmentsController = new DepartmentsController();
+const systemOverviewController = new SystemOverviewController();
 
 router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => hospitalMiddleware.handle(req, res, next));
@@ -48,5 +50,7 @@ router.get("/departments", (req, res, next) => departmentsController.getDepartme
 router.post("/departments", (req, res, next) => departmentsController.createDepartment(req, res, next));
 router.put("/departments/:id", (req, res, next) => departmentsController.updateDepartment(req, res, next));
 router.delete("/departments/:id", (req, res, next) => departmentsController.deleteDepartment(req, res, next));
+
+router.get("/system-overview", (req, res, next) => systemOverviewController.getSystemOverview(req, res, next));
 
 export default router;
