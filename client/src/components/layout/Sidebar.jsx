@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
 
-  const role = "superuser"; // change for testing
+  const role = "doctor"; // change for testing
 
   const sidebarConfig = {
     superuser: [
