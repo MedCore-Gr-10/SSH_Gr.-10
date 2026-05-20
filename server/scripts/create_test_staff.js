@@ -7,7 +7,7 @@ async function main() {
   const username = "dev_doctor";
   const email = "dev_doctor@example.test";
   const password = "devpassword";
-  const roleName = "DOCTOR";
+  const roleName = "doctor";
 
   let role = await prisma.roles.findFirst({ where: { role_name: roleName } });
   if (!role) {

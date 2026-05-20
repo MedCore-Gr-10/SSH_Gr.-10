@@ -6,7 +6,7 @@ async function main() {
   const seedId = "00000000-0000-0000-0000-000000000001";
   const username = "dev_director";
   const email = "dev_director@example.test";
-  const roleName = "DIRECTOR";
+  const roleName = "director";
 
   // ensure roles exist
   let role = await prisma.roles.findFirst({ where: { role_name: roleName } });
