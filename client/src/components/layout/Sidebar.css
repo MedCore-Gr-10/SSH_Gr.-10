@@ -68,6 +68,13 @@ li {
   width: 100%;
 }
 
+.sidebar-link:focus,
+.sidebar-link:focus-visible,
+.sidebar-link .sidebar-button:focus,
+.sidebar-link .sidebar-button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
 
 .sidebar-link .sidebar-button,
 .sidebar-link:hover .sidebar-button,
