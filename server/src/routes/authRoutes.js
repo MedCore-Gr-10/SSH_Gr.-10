@@ -21,6 +21,8 @@ const authController = new AuthController(authService);
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.post("/forgot-password", authController.forgotPassword);
+router.post("/reset-password", authController.resetPassword);
 
 // Dev-only: create a mock JWT for frontend testing when backend runs in non-production
 if (process.env.NODE_ENV !== "production") {

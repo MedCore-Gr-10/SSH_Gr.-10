@@ -21,9 +21,15 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(
-    location.state?.registered ? "Account created. You can sign in now." : "",
-  );
+  const [success, setSuccess] = useState(() => {
+    if (location.state?.passwordReset) {
+      return "Password updated. You can sign in with your new password.";
+    }
+    if (location.state?.registered) {
+      return "Account created. You can sign in now.";
+    }
+    return "";
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -131,18 +137,9 @@ export default function Login() {
         </form>
 
         <div className="mc-link-row">
-          <a
-            href="#"
-            className="mc-link-muted"
-            onClick={(e) => {
-              e.preventDefault();
-              window.alert(
-                "Password recovery is not set up yet. Contact support if you need help.",
-              );
-            }}
-          >
+          <Link to="/forgot-password" className="mc-link-muted">
             Forgot password?
-          </a>
+          </Link>
         </div>
         <p className="mc-footer-link">
           Don&apos;t have an account? <Link to="/register">Sign Up</Link>
