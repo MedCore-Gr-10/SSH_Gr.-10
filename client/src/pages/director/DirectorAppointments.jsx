@@ -5,6 +5,8 @@ import {
   updateDirectorAppointment,
   cancelDirectorAppointment,
 } from "../../services/directorAppointmentsApi";
+import { getDirectorStaff } from "../../services/directorStaffApi";
+import { getTemplates, createTemplate, deleteTemplate } from "../../services/directorTemplatesApi";
 import "./DirectorAppointments.css";
 
 const formatTime = (value) => {
@@ -37,6 +39,9 @@ export default function DirectorAppointments() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [staff, setStaff] = useState([]);
+  const [templates, setTemplates] = useState([]);
+  const [templateForm, setTemplateForm] = useState({ staff_id: "", department_id: "", day_of_week: "Monday", start_time: "09:00", end_time: "17:00" });
 
   const loadData = async () => {
     try {
@@ -46,6 +51,10 @@ export default function DirectorAppointments() {
       ]);
       setAppointments(appointmentData);
       setSlots(slotData);
+      // load staff and templates
+      const [staffData, templatesData] = await Promise.all([getDirectorStaff(), getTemplates()]);
+      setStaff(staffData);
+      setTemplates(templatesData);
     } catch (err) {
       setError(err.message);
     }
@@ -127,6 +136,42 @@ export default function DirectorAppointments() {
     }
   };
 
+  const handleTemplateChange = (field, value) => {
+    setTemplateForm((s) => ({ ...s, [field]: value }));
+    if (field === "staff_id") {
+      const selected = staff.find((x) => x.id === value);
+      const link = selected?.staff_hospitals_departments?.[0];
+      if (link) setTemplateForm((s) => ({ ...s, department_id: link.department_id }));
+    }
+  };
+
+  const handleCreateTemplate = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await createTemplate(templateForm);
+      const newList = await getTemplates();
+      setTemplates(newList);
+      setMessage("Template created");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteTemplate = async (id) => {
+    if (!window.confirm("Delete this template?")) return;
+    try {
+      await deleteTemplate(id);
+      setTemplates((t) => t.filter((x) => x.id !== id));
+      setMessage("Template deleted");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const renderSlotLabel = (slot) => {
     const doctor = getName(slot.users);
     const template = slot.appointments_templates;
@@ -202,6 +247,70 @@ export default function DirectorAppointments() {
                     </tr>
                   );
                 }))}
+            </tbody>
+          </table>
+        </section>
+
+        <section className="director-appointments-section content-scroll">
+          <h2>Appointment Templates</h2>
+          <form className="director-appointments-form" onSubmit={handleCreateTemplate}>
+            <label>
+              Staff (doctor/nurse)
+              <select value={templateForm.staff_id} onChange={(e) => handleTemplateChange("staff_id", e.target.value)}>
+                <option value="">Select staff</option>
+                {staff.map((s) => (
+                  <option key={s.id} value={s.id}>{`${s.users_profiles?.[0]?.profiles?.first_name || s.username} ${s.users_profiles?.[0]?.profiles?.last_name || ""}`.trim()}</option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Day of week
+              <select value={templateForm.day_of_week} onChange={(e) => handleTemplateChange("day_of_week", e.target.value)}>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+                <option>Sunday</option>
+              </select>
+            </label>
+
+            <label>
+              Start time
+              <input type="time" value={templateForm.start_time} onChange={(e) => handleTemplateChange("start_time", e.target.value)} />
+            </label>
+
+            <label>
+              End time
+              <input type="time" value={templateForm.end_time} onChange={(e) => handleTemplateChange("end_time", e.target.value)} />
+            </label>
+
+            <div className="director-appointments-actions">
+              <button className="primary" type="submit" disabled={isSubmitting}>Create template</button>
+            </div>
+          </form>
+
+          <h3>Existing templates</h3>
+          <table className="director-appointments-table">
+            <thead>
+              <tr><th>Staff</th><th>Day</th><th>Time</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {templates.length === 0 ? (
+                <tr><td colSpan="4">No templates</td></tr>
+              ) : templates.map((t) => {
+                const staffName = t.staff_hospitals_departments?.users?.users_profiles?.[0]?.profiles ? `${t.staff_hospitals_departments.users.users_profiles[0].profiles.first_name} ${t.staff_hospitals_departments.users.users_profiles[0].profiles.last_name}` : (t.staff_id||'Unknown');
+                return (
+                  <tr key={t.id}>
+                    <td>{staffName}</td>
+                    <td>{t.day_of_week}</td>
+                    <td>{`${t.start_time} - ${t.end_time}`}</td>
+                    <td><button className="danger" onClick={() => handleDeleteTemplate(t.id)}>Delete</button></td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </section>
