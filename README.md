@@ -8,6 +8,7 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName =  .env
 1. Fillimisht krijoni nje databaze ----------TE ZBRAZET------ tek postgreSQL me emrin "ssh"
 2. tek file server/.env rregulloni user , password-in dhe portin sipas posgreSQL tuaj
     DATABASE_URL="postgresql://postgres:123@localhost:5432/ssh"
+    JWT_SECRET="your-secret-key-at-least-32-chars"
     123- ky eshte passwordi im ( vendose passin tend)
 3. permes command prompt shko tek server dhe beje run (rregullimi i prisma)
     •	cd server
@@ -85,7 +86,8 @@ për profesionistët mjekësorë dhe komunitetet që ata shërbejnë.
 - Mbështetje për **migrime**
 
 ### 🔐 Siguria
-- Sistem i plotë **autentikimi (login/register)**  
+- Sistem i plotë **autentikimi (login/register)** përmes `POST /api/auth/login` dhe `POST /api/auth/register` (regjistrim vetëm për pacientë)
+- Frontend: `/` (login), `/register`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
 - **Role-based authorization** (p.sh. pacient, superuser, doctor, nurse, director)  
 - Middleware për:
   - autentikim  

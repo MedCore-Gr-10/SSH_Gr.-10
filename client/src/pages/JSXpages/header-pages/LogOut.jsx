@@ -1,12 +1,15 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/authContext.jsx";
 
-function LogOut() {
-  return (
-    <div>
-      <h1 style={{ color: "green" }}>LogOut Page</h1>
-      <p>This is the LogOut page of our React application.</p>
+export default function LogOut() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-    </div>
-  );
+  useEffect(() => {
+    logout();
+    navigate("/", { replace: true });
+  }, [logout, navigate]);
+
+  return <p>Signing out…</p>;
 }
-
-export default LogOut; 

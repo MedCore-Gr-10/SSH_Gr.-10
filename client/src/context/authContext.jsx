@@ -14,16 +14,30 @@ const safeParse = (value) => {
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [user, setUser] = useState(() => safeParse(localStorage.getItem("user")));
+  const [user, setUser] = useState(() =>
+    safeParse(localStorage.getItem("user")),
+  );
 
   const login = (data) => {
-    if (!data.token || !data.user) return false;
+    if (!data?.token) return false;
+
+    const authUser =
+      data.user ??
+      (data.role
+        ? {
+            id: data.user_id ?? data.id,
+            role: data.role,
+            hospital_id: data.hospital_id ?? null,
+          }
+        : null);
+
+    if (!authUser?.role) return false;
 
     setToken(data.token);
-    setUser(data.user);
+    setUser(authUser);
 
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("user", JSON.stringify(authUser));
 
     return true;
   };
