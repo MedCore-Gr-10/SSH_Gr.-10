@@ -4,7 +4,7 @@
     margin-top: 20px;
     background: white;
     border-radius: 8px;
-    overflow: hidden; /* Clips corners to radius */
+    overflow: hidden; 
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     min-width: 1000px;
 
@@ -26,7 +26,7 @@
 }
 
 .profile-table tr:hover {
-    background-color: #f1f7ff; /* Light highlight on hover */
+    background-color: #f1f7ff; 
 }
 
 .more-button{
