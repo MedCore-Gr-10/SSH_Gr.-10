@@ -1,40 +1,44 @@
+
 .fixed-sidebar {
   width: 300px;
   height: 100vh;
   background-color: #FFFFFF;
+  border: 1px solid #edf2f7; 
   z-index: 1000;
   padding: 24px 16px;
   box-sizing: border-box;
+  border-radius: 20px;
   overflow-y: auto;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   display: flex;
   flex-direction: column;
 }
 
-/* Sidebar Logo Styling */
-/* Sidebar Logo Styling - Adjusted for clean prominence */
+
 .sidebar-logo {
-  width: 100%;             /* Allows the logo to fill the available horizontal width */
-  max-width: 400px;        /* Limits the width so it doesn't get awkwardly massive */
-  height: auto;            /* Maintains your logo's original, undistorted aspect ratio */
-  max-height: 160px;        /* Doubled the height clearance so text/graphics display clearly */
-  object-fit: contain;     /* Ensures the image content fits cleanly inside its bounds */
+  width: 100%;             
+  max-width: 200px;        
+  height: auto;            
+  max-height: 80px;        
+  object-fit: contain;     
+  display: block;          
+  margin: 0 auto 16px 12px; 
 }
 
-/* User Info Section (Now clean, stable, and rendering at the top) */
+
 .sidebar-userrole-username-bubble {
   padding: 12px 12px 24px 12px;
-  border-bottom: 1px solid #edf2f7; /* Gives a clean separation line below the name */
+  border-bottom: 1px solid #edf2f7; 
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 16px; /* Creates a gap before your navigation links start */
+  margin-bottom: 16px; 
 }
 
 .sidebar-user-role {
   font-size: 11px;
   font-weight: 700;
-  color: #5c5cd6; /* Uses your explicit theme color tag */
+  color: #5c5cd6; 
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -45,6 +49,7 @@
   color: #1a202c;
 }
 
+
 ul {
   list-style: none;
   padding: 0;
@@ -53,27 +58,45 @@ ul {
 }
 
 li {
-  padding: 4px 0; /* Adds slight space between each button so they don't look stacked */
+  padding: 4px 0; 
   width: 100%;
 }
 
-/* Base Link Wrapper */
 .sidebar-link {
   text-decoration: none;
   display: block;
   width: 100%;
 }
 
-/* Clickable menu item button */
+
+.sidebar-link .sidebar-button,
+.sidebar-link:hover .sidebar-button,
+.sidebar-link.active .sidebar-button {
+  
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  
+  
+  border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  
+  
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+
+
 .sidebar-button {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 12px 20px; /* Increased horizontal padding for better inner alignment */
+  padding: 12px 20px; 
   box-sizing: border-box;
-  background: transparent;
-  border: none;
-  /* Creates the beautiful, clean pill shape seen in modern dashboards */
+  background-color: transparent !important; 
   border-radius: 24px; 
   font-size: 15px;
   font-weight: 500;
@@ -83,15 +106,15 @@ li {
   transition: all 0.15s ease;
 }
 
-/* Active State (Matches your beautiful light-blue active view) */
+
 .sidebar-link.active .sidebar-button {
-  background-color: #e0f2fe; 
-  color: #0284c7; 
+  background-color: #e0f2fe !important; 
+  color: #0284c7 !important; 
   font-weight: 600;
 }
 
-/* Hover State - Gentle background highlight */
+
 .sidebar-link:hover:not(.active) .sidebar-button {
-  background-color: #f7fafc;
-  color: #1a202c;
+  background-color: #f7fafc !important;
+  color: #1a202c !important;
 }

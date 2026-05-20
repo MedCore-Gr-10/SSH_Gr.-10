@@ -65,7 +65,7 @@ const Sidebar = () => {
 
       <div className="sidebar-userrole-username-bubble">
         <h3 className="sidebar-user-role">{role}</h3>
-        <h3 className="sidebar-username">Username here</h3>
+        <h3 className="sidebar-username">{user?.username}</h3>
       </div>
 
       <nav className="buttons-list">
