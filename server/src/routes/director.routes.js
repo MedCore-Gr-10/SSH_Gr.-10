@@ -7,6 +7,7 @@ import PatientController from "../controllers/director-controllers/patient.contr
 import StaffController from "../controllers/director-controllers/staff.controller.js";
 import StaffScheduleController from "../controllers/director-controllers/staffSchedule.controller.js";
 import AppointmentsController from "../controllers/director-controllers/appointments.controller.js";
+import AppointmentsTemplatesController from "../controllers/director-controllers/appointmentsTemplates.controller.js";
 import DepartmentsController from "../controllers/director-controllers/departments.controller.js";
 import SystemOverviewController from "../controllers/director-controllers/systemOverview.controller.js";
 import RequestsController from "../controllers/director-controllers/requests.controller.js";
@@ -20,6 +21,7 @@ const patientController = new PatientController();
 const staffController = new StaffController();
 const staffScheduleController = new StaffScheduleController();
 const appointmentsController = new AppointmentsController();
+const appointmentsTemplatesController = new AppointmentsTemplatesController();
 const departmentsController = new DepartmentsController();
 const systemOverviewController = new SystemOverviewController();
 const requestsController = new RequestsController();
@@ -47,6 +49,11 @@ router.get("/appointments", (req, res, next) => appointmentsController.getAppoin
 router.get("/appointments/slots", (req, res, next) => appointmentsController.getAppointmentSlots(req, res, next));
 router.put("/appointments/:id", (req, res, next) => appointmentsController.updateAppointment(req, res, next));
 router.delete("/appointments/:id", (req, res, next) => appointmentsController.deleteAppointment(req, res, next));
+
+router.get("/appointments/templates", (req, res, next) => appointmentsTemplatesController.listTemplates(req, res, next));
+router.post("/appointments/templates", (req, res, next) => appointmentsTemplatesController.createTemplate(req, res, next));
+router.put("/appointments/templates/:id", (req, res, next) => appointmentsTemplatesController.updateTemplate(req, res, next));
+router.delete("/appointments/templates/:id", (req, res, next) => appointmentsTemplatesController.deleteTemplate(req, res, next));
 
 router.get("/departments", (req, res, next) => departmentsController.getDepartments(req, res, next));
 router.post("/departments", (req, res, next) => departmentsController.createDepartment(req, res, next));

@@ -7,7 +7,7 @@ import { useAuth } from "../../context/authContext.jsx";
 
 const Sidebar = () => {
   const { user } = useAuth();
-  const role = user?.role || "patient";
+  const role = user?.role || "director";
 
   const sidebarConfig = {
     superuser: [
