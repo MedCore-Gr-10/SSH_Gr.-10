@@ -21,6 +21,10 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName =  .env
     •	cd client
     •	npm run dev
 
+6. ne .env file (qe gjendet brenda gitignore) --> DATABASE_URL="secili setup-in e vet te nderlidhjes me databaze"
+JWT_SECRET=your-super-secret-key-min-32-chars-recommended
+NODE_ENV=development
+
 ---
 # 🏥 MedCore
 
