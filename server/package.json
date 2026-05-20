@@ -7,6 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "create-superuser": "node scripts/create_superuser.js",
+    "create-director": "node scripts/create_test_director.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

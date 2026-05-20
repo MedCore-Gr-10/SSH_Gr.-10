@@ -30,6 +30,9 @@ npm run create-superuser
 -->ne browser login me kredencialet: 
 Username: superuser
 Password: superuser123
+8. Per krijimin e director (meqe ne superuser nuk eshte funksionale yet), run this ne terminal:
+cd server
+npm run create-director
 
 
 ---

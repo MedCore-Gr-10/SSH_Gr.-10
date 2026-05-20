@@ -48,15 +48,16 @@ export class AuthService {
     const role = user.roles?.role_name;
     if (!role) throw new Error("Invalid role");
 
+    const normalizedRole = role.toLowerCase();
     let hospital_id = null;
 
-    if (role === "superuser") {
-      const token = this.jwt.generateToken({ user_id: user.id, role });
-      const authUser = await this.#buildAuthUser(user, role);
-      return { token, role, user: authUser };
+    if (normalizedRole === "superuser") {
+      const token = this.jwt.generateToken({ user_id: user.id, role: normalizedRole });
+      const authUser = await this.#buildAuthUser(user, normalizedRole);
+      return { token, role: normalizedRole, user: authUser };
     }
 
-    if (["doctor", "nurse", "director"].includes(role)) {
+    if (["doctor", "nurse", "director"].includes(normalizedRole)) {
       const fullUser = await this.users.findById(user.id);
       const staff = fullUser?.staff_hospitals_departments?.[0];
 
@@ -68,18 +69,18 @@ export class AuthService {
 
       const token = this.jwt.generateToken({
         user_id: user.id,
-        role,
+        role: normalizedRole,
         hospital_id,
       });
 
-      const authUser = await this.#buildAuthUser(user, role, hospital_id);
-      return { token, role, user: authUser };
+      const authUser = await this.#buildAuthUser(user, normalizedRole, hospital_id);
+      return { token, role: normalizedRole, user: authUser };
     }
 
-    if (role === "patient") {
-      const token = this.jwt.generateToken({ user_id: user.id, role });
-      const authUser = await this.#buildAuthUser(user, role);
-      return { token, role, user: authUser };
+    if (normalizedRole === "patient") {
+      const token = this.jwt.generateToken({ user_id: user.id, role: normalizedRole });
+      const authUser = await this.#buildAuthUser(user, normalizedRole);
+      return { token, role: normalizedRole, user: authUser };
     }
 
     throw new Error("Invalid role");

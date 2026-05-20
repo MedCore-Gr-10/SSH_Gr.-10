@@ -1,11 +1,12 @@
 #!/usr/bin/env node
+import bcrypt from "bcrypt";
 import prisma from "../src/prisma.js";
-import { JwtService } from "../src/utils/jwt.js";
 
 async function main() {
   const seedId = "00000000-0000-0000-0000-000000000001";
   const username = "dev_director";
   const email = "dev_director@example.test";
+  const password = "devdirector123";
   const roleName = "director";
 
   // ensure roles exist
@@ -24,19 +25,24 @@ async function main() {
 
   // create or find user
   let user = await prisma.users.findUnique({ where: { username } });
+  const hash_password = await bcrypt.hash(password, 10);
   if (!user) {
     user = await prisma.users.create({
       data: {
         id: seedId,
         username,
-        hash_password: "dev", // not used for tests
+        hash_password,
         role_id: role.id,
         is_active: true,
       }
     });
     console.log("Created user:", username);
   } else {
-    console.log("User exists:", username);
+    user = await prisma.users.update({
+      where: { id: user.id },
+      data: { hash_password },
+    });
+    console.log("User exists, password reset for:", username);
   }
 
   // attach a profile and email if missing
@@ -73,11 +79,10 @@ async function main() {
     console.log("Linked user to hospital and department");
   }
 
-  // generate token
-  const jwtService = new JwtService(process.env.JWT_SECRET || "devsecret");
-  const token = jwtService.generateToken({ user_id: user.id, hospital_id: hospital.id, role: "director" });
-
-  console.log("\nCOPY THIS TOKEN into your browser localStorage under key 'token':\n\n" + token + "\n");
+  console.log("\nDirector credentials:");
+  console.log(`Username: ${username}`);
+  console.log(`Password: ${password}`);
+  console.log("Sign in via /auth/login using these credentials.");
 
   await prisma.$disconnect();
 }
