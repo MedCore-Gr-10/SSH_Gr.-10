@@ -32,7 +32,7 @@ const Sidebar = () => {
     ],
     patient: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Staff Schedule", path: "/main/staff-schedule" },
+      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
       { label: "My Records", path: "/main/records" },
       { label: "Appointments", path: "/main/appointments" },
       { label: "My Insurance", path: "/main/insurance" },
