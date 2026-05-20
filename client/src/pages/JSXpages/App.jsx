@@ -10,6 +10,7 @@ import LogOut from "./header-pages/LogOut.jsx";
 
 import Login from "../auth/login.jsx";
 import Register from "../auth/register.jsx";
+import ProtectedRoute from "../../components/auth/ProtectedRoute.jsx";
 import "../CSSpages/App.css";
 
 import Dashboard from "./sidebar-pages/Dashboard";
@@ -59,66 +60,63 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/main" element={<MainLayout />}>
-
-        {/* ===================== HEADER (ALL USERS) ===================== */}
-        <Route path="home" element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="notifications" element={<Notifications />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="logout" element={<LogOut />} />
-
-
-        // SIDE BAR-------------------------------------------------------------------
-        {/* ===================== SUPERUSER ===================== */}
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="hospitals" element={<Hospitals />} />
-        <Route path="users" element={<Users />} />
-        <Route path="booked-appointments" element={<BookedAppointments />} />
-        <Route path="manage-departments" element={<ManageDepartments />} />
-        <Route path="manage-specializations" element={<ManageSpecialization />} />
-        <Route path="system-overview" element={<SystemOverview />} />
-        <Route path="system-logs" element={<SystemLogs />} />
-
-
-        {/* ===================== DIRECTOR ===================== */}
-        {/* <Route path="dashboard" element={<Dashboard />} /> */}
-        <Route path="staff-schedule" element={<StaffSchedule />} />
-        <Route path="staff" element={<Staff />} />
-        <Route path="patients" element={<Patients />} />
-        {/* <Route path="booked-appointments" element={<BookedAppointments />} /> */}
-        {/* <Route path="manage-departments" element={<ManageDepartments />} /> */}
-        {/* <Route path="system-overview" element={<SystemOverview />} /> */}
-        <Route path="make-request" element={<MakeRequest />} />
-
-
-        {/* ===================== PATIENT ===================== */}
-        {/* <Route path="dashboard" element={<Dashboard />} /> */}
-        <Route path="records" element={<Records />} />
-        <Route path="appointments" element={<Appointments />} />
-        <Route path="insurance" element={<Insurance />} />
-        <Route path="allergies" element={<Allergies />} />
-        <Route path="leave-review" element={<LeaveReview />} />
-        {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
-        {/* <Route path="make-request" element={<MakeRequest />} /> */}
-
-
-        {/* ===================== DOCTOR ===================== */}
-        {/* <Route path="dashboard" element={<Dashboard />} /> */}
-        {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
-        <Route path="patients" element={<Patients />} />
-        <Route path="appointments-schedule" element={<AppointmentsSchedule />} />
-        <Route path="booked-appointments" element={<BookedAppointments />} />
-        <Route path="make-request" element={<MakeRequest />} />
-
-
-        {/* ===================== NURSE ===================== */}
-        {/* <Route path="dashboard" element={<Dashboard />} /> */}
-        {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
-        {/* <Route path="patients" element={<Patients />} /> */}
-
-        <Route path="make-request" element={<MakeRequest />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/main" element={<MainLayout />}>
+          {/* ===================== HEADER (ALL USERS) ===================== */}
+          <Route path="home" element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="logout" element={<LogOut />} />
+          // SIDE
+          BAR-------------------------------------------------------------------
+          {/* ===================== SUPERUSER ===================== */}
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="hospitals" element={<Hospitals />} />
+          <Route path="users" element={<Users />} />
+          <Route path="booked-appointments" element={<BookedAppointments />} />
+          <Route path="manage-departments" element={<ManageDepartments />} />
+          <Route
+            path="manage-specializations"
+            element={<ManageSpecialization />}
+          />
+          <Route path="system-overview" element={<SystemOverview />} />
+          <Route path="system-logs" element={<SystemLogs />} />
+          {/* ===================== DIRECTOR ===================== */}
+          {/* <Route path="dashboard" element={<Dashboard />} /> */}
+          <Route path="staff-schedule" element={<StaffSchedule />} />
+          <Route path="staff" element={<Staff />} />
+          <Route path="patients" element={<Patients />} />
+          {/* <Route path="booked-appointments" element={<BookedAppointments />} /> */}
+          {/* <Route path="manage-departments" element={<ManageDepartments />} /> */}
+          {/* <Route path="system-overview" element={<SystemOverview />} /> */}
+          <Route path="make-request" element={<MakeRequest />} />
+          {/* ===================== PATIENT ===================== */}
+          {/* <Route path="dashboard" element={<Dashboard />} /> */}
+          <Route path="records" element={<Records />} />
+          <Route path="appointments" element={<Appointments />} />
+          <Route path="insurance" element={<Insurance />} />
+          <Route path="allergies" element={<Allergies />} />
+          <Route path="leave-review" element={<LeaveReview />} />
+          {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
+          {/* <Route path="make-request" element={<MakeRequest />} /> */}
+          {/* ===================== DOCTOR ===================== */}
+          {/* <Route path="dashboard" element={<Dashboard />} /> */}
+          {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
+          <Route path="patients" element={<Patients />} />
+          <Route
+            path="appointments-schedule"
+            element={<AppointmentsSchedule />}
+          />
+          <Route path="booked-appointments" element={<BookedAppointments />} />
+          <Route path="make-request" element={<MakeRequest />} />
+          {/* ===================== NURSE ===================== */}
+          {/* <Route path="dashboard" element={<Dashboard />} /> */}
+          {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
+          {/* <Route path="patients" element={<Patients />} /> */}
+          <Route path="make-request" element={<MakeRequest />} />
+        </Route>
       </Route>
     </Routes>
   );
