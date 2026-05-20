@@ -33,6 +33,9 @@ Password: superuser123
 8. Per krijimin e director (meqe ne superuser nuk eshte funksionale yet), run this ne terminal:
 cd server
 npm run create-director
+-->ne browser login me kredencialet:
+Username: dev_director
+Password: devdirector123
 
 
 ---
