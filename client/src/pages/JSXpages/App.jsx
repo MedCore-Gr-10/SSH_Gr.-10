@@ -62,6 +62,7 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/main" element={<MainLayout />}>
+          <Route index element={<Home />} />
           {/* ===================== HEADER (ALL USERS) ===================== */}
           <Route path="home" element={<Home />} />
           <Route path="about" element={<About />} />

@@ -27,7 +27,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/main/dashboard", { replace: true });
+      navigate("/main/home", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -43,7 +43,7 @@ export default function Login() {
       }
       const ok = login(res);
       if (ok) {
-        navigate("/main/dashboard", { replace: true });
+        navigate("/main/home", { replace: true });
       } else {
         setError("Could not sign you in. Please try again.");
       }
