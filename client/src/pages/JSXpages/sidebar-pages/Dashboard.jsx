@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authContext.jsx";
 import DirectorDashboard from "../../director/DirectorDashboard.jsx";
 import DoctorDashboard from "../../doctor/DoctorDashboard.jsx";
+import PatientDashboard from "../../patient/PatientDashboard.jsx";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -13,8 +14,12 @@ export default function Dashboard() {
 
   if (role === "director") {
     return <DirectorDashboard />;
-  }if(role === "doctor"){
+  }
+  if (role === "doctor") {
     return <DoctorDashboard />;
+  }
+  if (role === "patient") {
+    return <PatientDashboard />;
   }
 
   return (
