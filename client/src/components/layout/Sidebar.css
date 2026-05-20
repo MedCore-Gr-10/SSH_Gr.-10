@@ -1,69 +1,97 @@
 .fixed-sidebar {
-  width: 300px; /* Set your desired sidebar width */
-  height: 100vh; /* Full screen height */
+  width: 300px;
+  height: 100vh;
   background-color: #FFFFFF;
-  z-index: 1000; /* Ensures it stays on top of other content */
-  border-radius: 20px;
-  border: 1px solid #4B70F5;
-  overflow: hidden; /* This clips the "inside part" to match the border radius */
-  padding: 10px;
+  z-index: 1000;
+  padding: 24px 16px;
+  box-sizing: border-box;
   overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar Logo Styling */
+/* Sidebar Logo Styling - Adjusted for clean prominence */
+.sidebar-logo {
+  width: 100%;             /* Allows the logo to fill the available horizontal width */
+  max-width: 400px;        /* Limits the width so it doesn't get awkwardly massive */
+  height: auto;            /* Maintains your logo's original, undistorted aspect ratio */
+  max-height: 160px;        /* Doubled the height clearance so text/graphics display clearly */
+  object-fit: contain;     /* Ensures the image content fits cleanly inside its bounds */
+}
+
+/* User Info Section (Now clean, stable, and rendering at the top) */
+.sidebar-userrole-username-bubble {
+  padding: 12px 12px 24px 12px;
+  border-bottom: 1px solid #edf2f7; /* Gives a clean separation line below the name */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px; /* Creates a gap before your navigation links start */
+}
+
+.sidebar-user-role {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5c5cd6; /* Uses your explicit theme color tag */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-username {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a202c;
 }
 
 ul {
   list-style: none;
-  padding: 20px 0px 0px 0px;
-    width:100%;
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
 li {
-  padding: 5px 5px 10px 5px;
-  width:100%;
+  padding: 4px 0; /* Adds slight space between each button so they don't look stacked */
+  width: 100%;
 }
 
-/* Link wrapper */
+/* Base Link Wrapper */
 .sidebar-link {
   text-decoration: none;
   display: block;
   width: 100%;
 }
 
-/* Active state (THIS is the magic) */
+/* Clickable menu item button */
+.sidebar-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 20px; /* Increased horizontal padding for better inner alignment */
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  /* Creates the beautiful, clean pill shape seen in modern dashboards */
+  border-radius: 24px; 
+  font-size: 15px;
+  font-weight: 500;
+  color: #2d3748; 
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* Active State (Matches your beautiful light-blue active view) */
 .sidebar-link.active .sidebar-button {
-  background-color: #784bf5;
-  color: #FFFFFF;
+  background-color: #e0f2fe; 
+  color: #0284c7; 
+  font-weight: 600;
 }
 
-/* Optional hover */
-.sidebar-link:hover .sidebar-button {
-  background-color: #5B65DC;
-  color: #FFFFFF;
-}
-
-.sidebar-logo {
-  width: 300px;
-  height: 70px;
-  object-fit: cover;   
-  object-position: center; 
-  padding: 0px 10px 10px 0px;
-}
-
-.sidebar-user-role{
-  text-align: center;
-  color: #784bf5;
-    font-weight: bold;
-
-}
-.sidebar-username{
-  text-align: center;
-  font-weight: bold;
-}
-
-.sidebar-userrole-username-bubble{
-    background-color: #FFFFFF;
-  z-index: 1000; /* Ensures it stays on top of other content */
-  border-radius: 20px;
-  border: 1px solid #4B70F5;
-  overflow: hidden; /* This clips the "inside part" to match the border radius */
-  padding: 10px;
+/* Hover State - Gentle background highlight */
+.sidebar-link:hover:not(.active) .sidebar-button {
+  background-color: #f7fafc;
+  color: #1a202c;
 }

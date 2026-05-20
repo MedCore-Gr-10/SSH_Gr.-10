@@ -4,6 +4,7 @@ import "./Sidebar.css";
 import SidebarButton from "../JSXcomponents/SidebarButton.jsx";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/authContext.jsx";
+import MedCoreLogo2 from "../../assets/MedCoreLogo-2.png";
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -60,7 +61,7 @@ const Sidebar = () => {
 
   return (
     <div className="fixed-sidebar">
-      <img src="/LOGO_final.png" alt="Logo" className="sidebar-logo" />
+      <img src={MedCoreLogo2} alt="Logo" className="sidebar-logo" />
 
       <div className="sidebar-userrole-username-bubble">
         <h3 className="sidebar-user-role">{role}</h3>
