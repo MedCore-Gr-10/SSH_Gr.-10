@@ -21,15 +21,17 @@ model appointments_booking_slots {
   doctor_id                       String?                 @db.Uuid
   appointment_template_id         Int?
   appointment_date                DateTime                @db.Date
+  slot_start_time                 DateTime                @db.Time(6)
+  slot_end_time                   DateTime                @db.Time(6)
   active_appointment_booking_slot Boolean?                @default(true)
   appointments_templates          appointments_templates? @relation(fields: [appointment_template_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users                           users?                  @relation(fields: [doctor_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  appointments_made               appointments_made[]
+  appointments_made               appointments_made[] 
 }
 
 model appointments_made {
   id                          Int                         @id @default(autoincrement())
-  appointment_booking_slot_id Int?
+  appointment_booking_slot_id Int?                        @unique
   patient_id                  String?                     @db.Uuid
   active_appointment_made     Boolean?                    @default(true)
   appointments_booking_slots  appointments_booking_slots? @relation(fields: [appointment_booking_slot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
