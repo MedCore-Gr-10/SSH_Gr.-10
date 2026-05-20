@@ -1,11 +1,12 @@
 #!/usr/bin/env node
+import bcrypt from "bcrypt";
 import prisma from "../src/prisma.js";
-import { JwtService } from "../src/utils/jwt.js";
 
 async function main() {
   const seedId = "00000000-0000-0000-0000-000000000002";
   const username = "dev_patient";
   const email = "dev_patient@example.test";
+  const password = "dev";
   const roleName = "patient";
 
   // ensure role exists
@@ -17,17 +18,35 @@ async function main() {
 
   // create or find user
   let user = await prisma.users.findUnique({ where: { username } });
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   if (!user) {
-    user = await prisma.users.create({
-      data: {
-        id: seedId,
-        username,
-        hash_password: "dev",
-        role_id: role.id,
-        is_active: true,
+    try {
+      user = await prisma.users.create({
+        data: {
+          id: seedId,
+          username,
+          hash_password: hashedPassword,
+          role_id: role.id,
+          is_active: true,
+        },
+      });
+      console.log("Created user:", username);
+    } catch (err) {
+      if (err.code === "P2002" && err.meta?.target?.includes("id")) {
+        user = await prisma.users.create({
+          data: {
+            username,
+            hash_password: hashedPassword,
+            role_id: role.id,
+            is_active: true,
+          },
+        });
+        console.log("Created user with a generated UUID because the hardcoded seed ID already existed:", username);
+      } else {
+        throw err;
       }
-    });
-    console.log("Created user:", username);
+    }
   } else {
     console.log("User exists:", username);
   }
@@ -53,13 +72,16 @@ async function main() {
     console.log("Linked patient to hospital");
   }
 
-  // generate token
-  const jwtService = new JwtService(process.env.JWT_SECRET || "devsecret");
-  const token = jwtService.generateToken({ user_id: user.id, hospital_id: hospital.id, role: "patient" });
-
-  console.log("\nCOPY THIS TOKEN into your browser localStorage under key 'token':\n\n" + token + "\n");
+  console.log("\nPatient test credentials:");
+  console.log(`Username: ${username}`);
+  console.log(`Password: ${password}`);
+  console.log("You can now sign in with username/password at /auth/login.");
 
   await prisma.$disconnect();
 }
 
-main().catch(async (e) => { console.error(e); await prisma.$disconnect(); process.exit(1); });
+main().catch(async (e) => {
+  console.error(e);
+  await prisma.$disconnect();
+  process.exit(1);
+});
