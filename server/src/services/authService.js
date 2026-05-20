@@ -36,6 +36,24 @@ export class AuthService {
     };
   }
 
+  #validatePassword(password) {
+    if (!password || password.length < 8) {
+      throw new Error(
+        "Password must be at least 8 characters and include a number and a symbol",
+      );
+    }
+    if (!/\d/.test(password)) {
+      throw new Error(
+        "Password must be at least 8 characters and include a number and a symbol",
+      );
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      throw new Error(
+        "Password must be at least 8 characters and include a number and a symbol",
+      );
+    }
+  }
+
   async login(username, password) {
     const user = await this.users.findByUsername(username);
 
@@ -104,6 +122,7 @@ export class AuthService {
     if (!username || !password || !email || !first_name || !resolvedLastName) {
       throw new Error("Missing required registration fields");
     }
+    this.#validatePassword(password);
 
     const existingUser = await this.users.findByUsername(username);
     if (existingUser) throw new Error("Username already exists");
@@ -156,6 +175,58 @@ export class AuthService {
       user_id: result.id,
     };
   }
+
+  async requestPasswordReset(email) {
+    if (!email?.trim()) {
+      throw new Error("Email is required");
+    }
+
+    const user = await this.users.findByEmail(email.trim());
+
+    const genericMessage =
+      "If an account exists for this email, password reset instructions have been sent.";
+
+    if (!user || user.is_active === false) {
+      return { message: genericMessage };
+    }
+
+    const resetToken = this.jwt.generatePasswordResetToken(user.id);
+    const clientOrigin = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetLink = `${clientOrigin}/reset-password?token=${encodeURIComponent(resetToken)}`;
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log("[dev] Password reset link:", resetLink);
+      return {
+        message: genericMessage,
+        reset_link: resetLink,
+      };
+    }
+
+    // Production: integrate email provider here (e.g. nodemailer).
+    return { message: genericMessage };
+  }
+
+  async resetPassword(token, password) {
+    if (!token) throw new Error("Reset token is required");
+
+    this.#validatePassword(password);
+
+    let payload;
+    try {
+      payload = this.jwt.verifyPasswordResetToken(token);
+    } catch {
+      throw new Error("Invalid or expired reset link");
+    }
+
+    const user = await this.users.findById(payload.user_id);
+    if (!user) throw new Error("User not found");
+    if (user.is_active === false) throw new Error("Account is disabled");
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await this.users.updatePassword(user.id, hashedPassword);
+
+    return { message: "Password updated successfully. You can sign in now." };
+  }
 }
 
 const defaultAuthService = new AuthService(
@@ -172,4 +243,12 @@ export function loginUser(username, password) {
 
 export function registerPatient(data) {
   return defaultAuthService.registerPatient(data);
+}
+
+export function requestPasswordReset(email) {
+  return defaultAuthService.requestPasswordReset(email);
+}
+
+export function resetPassword(token, password) {
+  return defaultAuthService.resetPassword(token, password);
 }
