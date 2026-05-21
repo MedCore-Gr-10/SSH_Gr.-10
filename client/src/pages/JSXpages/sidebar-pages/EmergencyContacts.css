@@ -61,6 +61,22 @@
   box-shadow: 0 14px 30px rgba(92, 92, 214, 0.18);
 }
 
+.remove-button {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.remove-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(217, 70, 72, 0.12);
+}
+
 .success-message,
 .error-message {
   padding: 1rem;

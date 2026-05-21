@@ -23,6 +23,7 @@ export default function EmergencyContacts() {
     },
   ]);
   const [showModal, setShowModal] = useState(false);
+  const [pendingRemoval, setPendingRemoval] = useState(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -71,6 +72,23 @@ export default function EmergencyContacts() {
     closeModal();
   };
 
+  const openRemoveConfirm = (contact) => {
+    setPendingRemoval(contact);
+    setError("");
+    setSuccess("");
+  };
+
+  const cancelRemoval = () => {
+    setPendingRemoval(null);
+  };
+
+  const confirmRemoval = () => {
+    if (!pendingRemoval) return;
+    setContacts((current) => current.filter((contact) => contact.id !== pendingRemoval.id));
+    setSuccess("Emergency contact removed successfully.");
+    setPendingRemoval(null);
+  };
+
   return (
     <div className="emergency-contacts-container">
       <div className="emergency-contacts-card">
@@ -96,6 +114,7 @@ export default function EmergencyContacts() {
                 <th>Last name</th>
                 <th>Email</th>
                 <th>Phone number</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -105,6 +124,11 @@ export default function EmergencyContacts() {
                   <td>{contact.lastName}</td>
                   <td>{contact.email}</td>
                   <td>{contact.phoneNumber}</td>
+                  <td>
+                    <button type="button" className="remove-button" onClick={() => openRemoveConfirm(contact)}>
+                      Remove
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -215,6 +239,34 @@ export default function EmergencyContacts() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {pendingRemoval && (
+        <div className="modal-backdrop" onClick={cancelRemoval}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Remove emergency contact</h2>
+              <button type="button" className="modal-close" onClick={cancelRemoval}>
+                ×
+              </button>
+            </div>
+
+            <div className="confirmation-copy">
+              <p>
+                Are you sure you want to remove <strong>{pendingRemoval.firstName} {pendingRemoval.lastName}</strong> from your emergency contacts?
+              </p>
+            </div>
+
+            <div className="modal-actions">
+              <button type="button" className="modal-secondary" onClick={cancelRemoval}>
+                No, keep contact
+              </button>
+              <button type="button" className="modal-primary" onClick={confirmRemoval}>
+                Yes, remove
+              </button>
+            </div>
           </div>
         </div>
       )}
