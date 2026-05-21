@@ -104,7 +104,8 @@ për profesionistët mjekësorë dhe komunitetet që ata shërbejnë.
 
 ### 🔐 Siguria
 - Sistem i plotë **autentikimi (login/register)** përmes `POST /api/auth/login` dhe `POST /api/auth/register` (regjistrim vetëm për pacientë)
-- Frontend: `/` (login), `/register`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
+- Frontend: `/` (login), `/register`, `/forgot-password`, `/reset-password?token=...`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
+- Rivendosja e fjalëkalimit: `POST /api/auth/forgot-password` (email), `POST /api/auth/reset-password` (token + password). Në dev, linku kthehet në përgjigje dhe shfaqet në UI.
 - **Role-based authorization** (p.sh. pacient, superuser, doctor, nurse, director)  
 - Middleware për:
   - autentikim  

@@ -4,10 +4,27 @@ import logsRepository from "../../repositories/logs.repository.js";
 
 class DirectorStaffScheduleService {
   normalizeTime(value) {
-    if (!value) return value;
-    if (typeof value !== "string") return value;
-    if (value.length === 5) return `${value}:00`;
-    return value;
+    if (!value) return null;
+    let hour = 0;
+    let minute = 0;
+    let second = 0;
+
+    if (/^\d{1,2}:\d{2}$/.test(value)) {
+      [hour, minute] = value.split(":").map(Number);
+    } else if (/^\d{1,2}:\d{2}:\d{2}$/.test(value)) {
+      [hour, minute, second] = value.split(":").map(Number);
+    } else {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        throw new Error("Invalid time format");
+      }
+      hour = parsed.getUTCHours();
+      minute = parsed.getUTCMinutes();
+      second = parsed.getUTCSeconds();
+    }
+
+    const isoString = new Date(Date.UTC(1970, 0, 1, hour, minute, second)).toISOString();
+    return isoString;
   }
 
   async getHospitalSchedules(hospitalId, currentUserId) {
@@ -24,6 +41,30 @@ class DirectorStaffScheduleService {
     });
 
     return schedules;
+  }
+
+  async getRelevantSchedules(userId, hospitalId, role, currentUserId) {
+    if (!hospitalId) {
+      throw new Error("Hospital ID is required to list schedules");
+    }
+
+    if (role === "director") {
+      return this.getHospitalSchedules(hospitalId, currentUserId);
+    }
+
+    if (role === "doctor" || role === "nurse") {
+      const schedules = await staffScheduleRepository.findStaffSchedule(userId, hospitalId);
+
+      await logsRepository.create({
+        user_id: currentUserId,
+        action: "view own schedule",
+        reason: "Staff member viewed own working schedule",
+      });
+
+      return schedules;
+    }
+
+    throw new Error("Insufficient permissions to view schedules");
   }
 
   async createSchedule(data, hospitalId, currentUserId) {

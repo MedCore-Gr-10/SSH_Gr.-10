@@ -56,10 +56,28 @@ class StaffWorkingSchedulesRepository {
     });
   }
 
-  async findStaffSchedule(staffId) {
+  async findStaffSchedule(staffId, hospitalId = null) {
     return prisma.staff_working_schedules.findMany({
       where: {
-        staff_id: staffId
+        staff_id: staffId,
+        ...(hospitalId ? { hospital_id: hospitalId } : {}),
+      },
+      include: {
+        staff_hospitals_departments: {
+          include: {
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true
+                  }
+                },
+                roles: true
+              }
+            },
+            hospitals_departments: true
+          }
+        }
       }
     });
   }

@@ -10,6 +10,8 @@ import LogOut from "./header-pages/LogOut.jsx";
 
 import Login from "../auth/login.jsx";
 import Register from "../auth/register.jsx";
+import ForgotPassword from "../auth/ForgotPassword.jsx";
+import ResetPassword from "../auth/ResetPassword.jsx";
 import ProtectedRoute from "../../components/auth/ProtectedRoute.jsx";
 import "../CSSpages/App.css";
 
@@ -61,6 +63,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/main" element={<MainLayout />}>
           <Route index element={<Home />} />
