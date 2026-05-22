@@ -62,7 +62,15 @@ class UsersRepository {
           }
         },
         patients_hospitals: true,
-        staff_hospitals_departments: true
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
+          }
+        }
       }
     });
   }
@@ -171,7 +179,15 @@ class UsersRepository {
             profiles: true
           }
         },
-        staff_hospitals_departments: true
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
+          }
+        }
       }
     });
   }

@@ -8,6 +8,7 @@ async function main() {
   const email = "dev_doctor@example.test";
   const password = "devpassword";
   const roleName = "doctor";
+  const personalNo = "DEV-DOCTOR-0001";
 
   let role = await prisma.roles.findFirst({ where: { role_name: roleName } });
   if (!role) {
@@ -66,12 +67,18 @@ async function main() {
     console.log("Staff user exists:", username);
   }
 
-  const profileExists = await prisma.users_profiles.findFirst({ where: { user_id: user.id } });
+  const profileExists = await prisma.users_profiles.findFirst({
+    where: { user_id: user.id },
+    include: { profiles: true },
+  });
   if (!profileExists) {
     const profile = await prisma.profiles.create({
       data: {
         first_name: "Dev",
         last_name: "Doctor",
+        birth: new Date("1990-01-01"),
+        gender: "male",
+        personal_no: personalNo,
         phone_number: "+38300000000",
       },
     });
@@ -83,6 +90,17 @@ async function main() {
       },
     });
     console.log("Created profile for staff user");
+  } else if (!profileExists.profiles.personal_no) {
+    await prisma.profiles.update({
+      where: { id: profileExists.profile_id },
+      data: {
+        birth: profileExists.profiles.birth ?? new Date("1990-01-01"),
+        gender: profileExists.profiles.gender ?? "male",
+        personal_no: personalNo,
+        phone_number: profileExists.profiles.phone_number ?? "+38300000000",
+      },
+    });
+    console.log("Updated staff profile personal number");
   }
 
   const staffLink = await prisma.staff_hospitals_departments.findUnique({
@@ -113,6 +131,7 @@ async function main() {
   console.log(`Password: ${password}`);
   console.log(`Hospital ID: ${hospital.id}`);
   console.log(`Department ID: ${department.id}`);
+  console.log(`Personal No: ${personalNo}`);
 
   await prisma.$disconnect();
 }
