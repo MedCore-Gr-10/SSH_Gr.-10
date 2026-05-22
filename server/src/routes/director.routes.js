@@ -60,6 +60,7 @@ router.put("/departments/:id", (req, res, next) => departmentsController.updateD
 router.delete("/departments/:id", (req, res, next) => departmentsController.deleteDepartment(req, res, next));
 
 router.get("/system-overview", (req, res, next) => systemOverviewController.getSystemOverview(req, res, next));
+router.get("/requests/recipients", (req, res, next) => requestsController.getRecipients(req, res, next));
 router.get("/requests", (req, res, next) => requestsController.getRequests(req, res, next));
 router.post("/requests", (req, res, next) => requestsController.createRequest(req, res, next));
 
