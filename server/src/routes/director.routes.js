@@ -35,19 +35,84 @@ router.use((req, res, next) => roleMiddleware.handle(req, res, next));
  * /api/director/patients:
  *   get:
  *     summary: Get all patients
- *     description: Returns all patients for the director's hospital
+ *     description: Returns all patients from the director hospital
  *     tags:
- *       - Director
+ *       - Director Patients
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Patients fetched successfully
+ *         description: Patients retrieved successfully
  *       401:
  *         description: Unauthorized
  *       403:
  *         description: Forbidden
  */
 router.get("/patients", (req, res, next) => patientController.getPatients(req, res, next));
+/**
+ * @swagger
+ * /api/director/patients/{id}:
+ *   put:
+ *     summary: Update patient
+ *     tags:
+ *       - Director Patients
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Patient ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: John
+ *               lastName:
+ *                 type: string
+ *                 example: Doe
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *               phone:
+ *                 type: string
+ *                 example: "+38344111222"
+ *     responses:
+ *       200:
+ *         description: Patient updated successfully
+ *       404:
+ *         description: Patient not found
+ */
 router.put("/patients/:id", (req, res, next) => patientController.updatePatient(req, res, next));
+/**
+ * @swagger
+ * /api/director/patients/{id}:
+ *   delete:
+ *     summary: Delete patient
+ *     tags:
+ *       - Director Patients
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Patient ID
+ *     responses:
+ *       200:
+ *         description: Patient deleted successfully
+ *       404:
+ *         description: Patient not found
+ */
 router.delete("/patients/:id", (req, res, next) => patientController.deletePatient(req, res, next));
 
 router.get("/staff", (req, res, next) => staffController.getStaff(req, res, next));
