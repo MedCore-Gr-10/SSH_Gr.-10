@@ -19,4 +19,9 @@ router.put("/:id", (req, res, next) =>
   manageSpecializationsController.update(req, res, next)
 );
 
+// DELETE /api/specializations/:id
+router.delete("/:id", (req, res, next) =>
+  manageSpecializationsController.delete(req, res, next)
+);
+
 export default router;

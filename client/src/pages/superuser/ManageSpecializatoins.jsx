@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import GenericTable from "../../components/JSXcomponents/GenericTable.jsx";
-import "./../CSSpages/superuser/ManageSpecializatoins.css";
+import "./../CSSpages/superuser/ManageSpecializatoins.css"; 
 
 export default function ManageSpecialization() {
   // Data and structural states
   const [specializations, setSpecializations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Form states (handles Create, Edit, Delete)
   const [inputValue, setInputValue] = useState("");
@@ -99,7 +101,6 @@ export default function ManageSpecialization() {
     }
   };
 
-  // Funksioni që hap modalin dhe tërheq doktorët nga API 🚀
   const handleViewDoctors = async () => {
     if (!selectedItem) return;
     
@@ -108,7 +109,6 @@ export default function ManageSpecialization() {
     setDoctorsList([]);
     
     try {
-      // Ky endpoint duhet të lidhet me funksionin e ri në backend: getDoctorsBySpecialization
       const response = await fetch(`/api/specializations/${selectedItem.id}/doctors`);
       const result = await response.json();
       
@@ -136,101 +136,122 @@ export default function ManageSpecialization() {
     setIsEditing(false);
   };
 
+  const filteredSpecializations = specializations.filter((spec) =>
+    spec.specialization_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    spec.id.toString().includes(searchTerm)
+  );
+
   return (
     <div className="page-container">  
-      <h2>Manage Specializations</h2>
-      <p style={{ color: "gray" }}>View, add, and modify hospital department specializations.</p>
+      <div className="page-header">
+        <h2 className="page-title">Manage Specializations</h2>
+        <p className="page-subtitle">View, add, and modify hospital department specializations.</p>
+      </div>
 
       {error && (
-        <div style={{ color: "red", backgroundColor: "#ffe6e6", padding: "10px", borderRadius: "4px", marginBottom: "15px" }}>
+        <div className="error-banner">
           ⚠️ {error}
         </div>
       )}
 
-      {/* Formë Aksioni */}
-      <form onSubmit={handleSubmit} style={{ display: "flex", gap: "10px", marginBottom: "25px" }}>
-        <input
-          type="text"
-          placeholder="e.g. Cardiology, Pediatrics..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          style={{ padding: "8px 12px", flexGrow: 1, borderRadius: "4px", border: "1px solid #ccc" }}
-          required
-        />
-        <button type="submit" style={{ padding: "8px 16px", backgroundColor: isEditing ? "#007bff" : "#28a745", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
-          {isEditing ? "Update Name" : "Create Specialization"}
-        </button>
-        
-        {isEditing && (
-          <>
-            {/* Butoni i ri për të parë Doktorët 🩺 */}
-            <button 
-              type="button" 
-              onClick={handleViewDoctors} 
-              style={{ padding: "8px 16px", backgroundColor: "#17a2b8", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
-            >
-              👁️ View Doctors ({selectedItem.total_doctors})
+      {/* 🚀 FORMË AKSIONI DHE SEKSIONI I FILTRIMIT */}
+      <div className="controls-wrapper">
+        <form onSubmit={handleSubmit} className={`form-container ${isEditing ? "editing" : ""}`}>
+          <div className="input-group">
+            <label className="input-label">
+              {isEditing ? `Editing Specialization (ID: ${selectedItem?.id})` : "Create New Specialization"}
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Cardiology, Pediatrics..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="main-input"
+              required
+            />
+          </div>
+
+          <div className="button-group">
+            <button type="submit" className={`btn ${isEditing ? "btn-primary" : "btn-success"}`}>
+              {isEditing ? "Update Name" : "Create Specialization"}
             </button>
             
-            <button 
-              type="button" 
-              onClick={handleDelete} 
-              style={{ padding: "8px 16px", backgroundColor: "#dc3545", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
-            >
-              Delete Specialization
-            </button>
-            <button type="button" onClick={resetForm} style={{ padding: "8px 12px", backgroundColor: "#6c757d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
-              Cancel
-            </button>
-          </>
-        )}
-      </form>
+            {isEditing && (
+              <>
+                <button type="button" onClick={handleViewDoctors} className="btn btn-info">
+                  👁️ View Doctors ({selectedItem?.total_doctors})
+                </button>
+                
+                <button type="button" onClick={handleDelete} className="btn btn-danger">
+                  Delete
+                </button>
+                <button type="button" onClick={resetForm} className="btn btn-secondary">
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </form>
+
+        {/* 🔍 INPUT-I I REZULTATEVE TË KËRKIMIT */}
+        <div className="search-bar-container">
+          <span className="entries-counter">
+            Showing {filteredSpecializations.length} of {specializations.length} entries
+          </span>
+          <input
+            type="text"
+            placeholder="🔍 Search by name or ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
+      </div>
 
       {/* Tabela e të Dhënave */}
       {loading ? (
-        <p style={{ textAlign: "center" }}>Loading specializations data...</p>
+        <p className="loading-text">Loading specializations data...</p>
+      ) : filteredSpecializations.length === 0 ? (
+        <div className="no-results-card">
+          <p className="no-results-title">No results found</p>
+          <p className="no-results-desc">We couldn't find any specialization matching "{searchTerm}".</p>
+        </div>
       ) : (
         <GenericTable 
           columns={columns} 
-          data={specializations} 
+          data={filteredSpecializations} 
           onMoreClick={handleMoreClick} 
         />
       )}
 
       {/* MODAL JAVASCRIPT / JSX LAYER */}
       {isModalOpen && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-          backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: "white", padding: "25px", borderRadius: "8px", width: "500px", maxWidth: "90%",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.2)", position: "relative"
-          }}>
-            <h3 style={{ marginTop: 0, borderBottom: "1px solid #eee", paddingBottom: "10px" }}>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="modal-title-text">
               Doctors in {selectedItem?.specialization_name}
             </h3>
             
-            <div style={{ margin: "20px 0", maxHeight: "300px", overflowY: "auto" }}>
+            <div className="modal-table-container">
               {loadingDoctors ? (
-                <p style={{ textAlign: "center" }}>Loading doctors...</p>
+                <p className="modal-state-text">Loading doctors...</p>
               ) : doctorsList.length === 0 ? (
-                <p style={{ textAlign: "center", color: "gray" }}>No doctors currently assigned to this specialization.</p>
+                <p className="modal-state-text">No doctors currently assigned to this specialization.</p>
               ) : (
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                <table className="modal-table">
                   <thead>
-                    <tr style={{ backgroundColor: "#f8f9fa", borderBottom: "2px solid #dee2e6" }}>
-                      <th style={{ padding: "8px" }}>Name</th>
-                      <th style={{ padding: "8px" }}>Username</th>
-                      <th style={{ padding: "8px" }}>Phone</th>
+                    <tr>
+                      <th>Name</th>
+                      <th>Username</th>
+                      <th>Phone</th>
                     </tr>
                   </thead>
                   <tbody>
                     {doctorsList.map((doc) => (
-                      <tr key={doc.doctor_id} style={{ borderBottom: "1px solid #dee2e6" }}>
-                        <td style={{ padding: "8px" }}>{`${doc.first_name} ${doc.last_name}`}</td>
-                        <td style={{ padding: "8px", color: "#555" }}>@{doc.username}</td>
-                        <td style={{ padding: "8px", color: "gray" }}>{doc.phone_number}</td>
+                      <tr key={doc.doctor_id}>
+                        <td className="doc-name">{`${doc.first_name} ${doc.last_name}`}</td>
+                        <td className="doc-username">@{doc.username}</td>
+                        <td className="doc-phone">{doc.phone_number}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -238,11 +259,8 @@ export default function ManageSpecialization() {
               )}
             </div>
 
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                style={{ padding: "8px 16px", backgroundColor: "#6c757d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
-              >
+            <div className="modal-footer">
+              <button onClick={() => setIsModalOpen(false)} className="btn btn-close-modal">
                 Close
               </button>
             </div>

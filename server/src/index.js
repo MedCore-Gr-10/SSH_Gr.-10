@@ -8,6 +8,8 @@ import profileRoutes from "./routes/profile.routes.js";
 import directorRoutes from "./routes/director.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
 import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js";
+import manageDepartmentsRouter from "./routes/manageDepartments.routes.js"; 
+
 const app = express();
 
 app.use(
@@ -23,6 +25,7 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/specializations", manageSpecializationRoutes);
 app.use("/api/director", directorRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/departments", manageDepartmentsRouter); 
 
 app.use("/api", (req, res) => {
   res
@@ -40,23 +43,3 @@ app.use((err, req, res, next) => {
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });
-
-// async function createone() {
-//   const users = await prisma.users.create({
-//     data: {
-//       email: "test@exampleeee.com",
-//     },
-//   });
-
-//   console.log(users);
-//   console.log("Done!");
-//   console.log("Done!");
-// }
-
-// async function readall() {
-//   const users = await prisma.users.findMany();
-//   console.log(users);
-// }
-
-// readall();
-// console.log("Done!");

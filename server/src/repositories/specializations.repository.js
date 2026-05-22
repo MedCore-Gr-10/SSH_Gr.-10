@@ -70,6 +70,30 @@ class SpecializationsRepository {
 
   return count;
 }
+
+// Shtoje këtë brenda klasës SpecializationsRepository te skedari i repozitorit
+  async findDoctorsBySpecialization(specializationId) {
+    return prisma.staff_specializations.findMany({
+      where: { specialization_id: parseInt(specializationId, 10) },
+      include: {
+        staff_hospitals_departments: {
+          include: {
+            users: {
+              include: {
+                profile: true
+              }
+            }
+          }
+        }
+      }
+    }).then(records => 
+      // Rregullojmë strukturën që të përputhet me atë që pret Service (doc.user, doc.user.profile)
+      records.map(r => ({
+        id: r.staff_hospitals_departments?.users?.id,
+        user: r.staff_hospitals_departments?.users
+      }))
+    );
+  }
 }
 
 export default new SpecializationsRepository();

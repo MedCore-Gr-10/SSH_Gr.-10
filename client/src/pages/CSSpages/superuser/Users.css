@@ -145,6 +145,9 @@
   border: 1px solid #4B70F5;            
   width: 600px;                         
   max-width: 95%;                       
+  max-height: 85vh; /* E detyron modalin të mos jetë më i gjatë se 85% e ekranit */
+  display: flex;    /* Kthehet në flexbox për të menaxhuar scroll-in e brendshëm */
+  flex-direction: column;
   box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.45);
   animation: modalSlideUp 0.3s ease-out;
 }
@@ -156,6 +159,7 @@
   border-bottom: 1px solid #ddd;
   padding-bottom: 12px;
   margin-bottom: 20px;
+  flex-shrink: 0; /* Parandalon tkurrjen e header-it */
 }
 
 .modal-header h2 {
@@ -182,6 +186,27 @@
   display: flex;
   flex-direction: column;
   gap: 16px;                            
+  overflow-y: auto; /* Aktivizon scroll-in vertikal vetëm për formën dhe kutitë e tjera */
+  padding-right: 8px; /* Hapësirë që scrollbar-i mos të mbulojë inputet */
+}
+
+/* Stilim opsional për scrollbar-in e modalit që të duket më elegant */
+.modal-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-form::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-form::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 10px;
+}
+
+.modal-form::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
 }
 
 .form-group {
@@ -230,6 +255,7 @@
   margin-top: 20px;
   border-top: 1px solid #ddd;
   padding-top: 18px;
+  flex-shrink: 0; /* Parandalon që butona poshtë të fshihen ose tkurren */
 }
 
 .modal-actions-space-between {
@@ -239,6 +265,7 @@
   border-top: 1px solid #eee;
   padding-top: 15px;
   margin-top: 15px;
+  flex-shrink: 0;
 }
 
 .modal-actions-left-cluster {
