@@ -30,6 +30,22 @@ router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => hospitalMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
 
+/**
+ * @swagger
+ * /api/director/patients:
+ *   get:
+ *     summary: Get all patients
+ *     description: Returns all patients for the director's hospital
+ *     tags:
+ *       - Director
+ *     responses:
+ *       200:
+ *         description: Patients fetched successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
 router.get("/patients", (req, res, next) => patientController.getPatients(req, res, next));
 router.put("/patients/:id", (req, res, next) => patientController.updatePatient(req, res, next));
 router.delete("/patients/:id", (req, res, next) => patientController.deletePatient(req, res, next));
