@@ -77,7 +77,27 @@ class ProfileController {
     }
   }
 
-  // ✅ FIXED: Calls service layer instead of direct undefined prisma execution
+  async getDirectorByPersonalNo(req, res, next) {
+    try {
+      const { personal_no } = req.params;
+      const profile = await this.profileService.getDirectorByPersonalNo(personal_no);
+      
+      if (!profile) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Ky numër personal nuk ekziston në sistem ose nuk është Drejtor." 
+        });
+      }
+
+      return res.status(200).json({ 
+        success: true, 
+        data: profile 
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async deleteProfile(req, res, next) {
     try {
       const { id } = req.params;

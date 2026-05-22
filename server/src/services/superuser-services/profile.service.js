@@ -1,7 +1,6 @@
 import profileRepository from "../../repositories/profile.repository.js";
 
 class ProfileService {
-
   async getAllProfiles() {
     const profiles = await profileRepository.findAll();
     return profiles.map(profile => ({
@@ -33,6 +32,27 @@ class ProfileService {
       last_name: profile.last_name,
       personal_no: profile.personal_no,
       phone_number: profile.phone_number
+    };
+  }
+
+  async getDirectorByPersonalNo(personalNo) {
+    if (!personalNo || personalNo.trim() === "") {
+      throw new Error("Personal Number is required for searching.");
+    }
+
+    const profile = await profileRepository.findDirectorByPersonalNo(personalNo.trim());
+    if (!profile) return null;
+
+    // 🎯 ZGJIDHJA: Këtu nxirret saktë username nga objekti i ndërthurur i Prisma-s
+    const linkedUser = profile.users_profiles?.[0]?.users;
+
+    return {
+      id: profile.id,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      personal_no: profile.personal_no,
+      phone_number: profile.phone_number,
+      username: linkedUser?.username || "N/A" 
     };
   }
 
@@ -123,7 +143,6 @@ class ProfileService {
     };
   }
 
-  // ✅ NEW METHOD: Verifies and passes operation to repository layer
   async deleteProfile(id) {
     const existingProfile = await profileRepository.findById(id);
     if (!existingProfile) {

@@ -9,6 +9,7 @@ import directorRoutes from "./routes/director.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
 import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js";
 import manageDepartmentsRouter from "./routes/manageDepartments.routes.js"; 
+import hospitalsRoutes from "./routes/hospital.routes.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/specializations", manageSpecializationRoutes);
 app.use("/api/director", directorRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/departments", manageDepartmentsRouter); 
+app.use("/api/hospitals", hospitalsRoutes);
 
 app.use("/api", (req, res) => {
   res

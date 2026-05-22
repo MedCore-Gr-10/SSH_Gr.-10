@@ -8,6 +8,10 @@ router.get("/personal/:personal_no", (req, res, next) =>
   profileController.getByPersonalNo(req, res, next)
 );
 
+router.get("/director/:personal_no", (req, res, next) => 
+  profileController.getDirectorByPersonalNo(req, res, next)
+);
+
 // Merr të gjitha profilet -> GET /api/profiles
 router.get("/", (req, res, next) =>
   profileController.getAllProfiles(req, res, next)
