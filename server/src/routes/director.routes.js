@@ -31,7 +31,6 @@ router.use((req, res, next) => hospitalMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
 
 router.get("/patients", (req, res, next) => patientController.getPatients(req, res, next));
-router.post("/patients", (req, res, next) => patientController.createPatient(req, res, next));
 router.put("/patients/:id", (req, res, next) => patientController.updatePatient(req, res, next));
 router.delete("/patients/:id", (req, res, next) => patientController.deletePatient(req, res, next));
 
@@ -61,6 +60,7 @@ router.put("/departments/:id", (req, res, next) => departmentsController.updateD
 router.delete("/departments/:id", (req, res, next) => departmentsController.deleteDepartment(req, res, next));
 
 router.get("/system-overview", (req, res, next) => systemOverviewController.getSystemOverview(req, res, next));
+router.get("/requests/recipients", (req, res, next) => requestsController.getRecipients(req, res, next));
 router.get("/requests", (req, res, next) => requestsController.getRequests(req, res, next));
 router.post("/requests", (req, res, next) => requestsController.createRequest(req, res, next));
 

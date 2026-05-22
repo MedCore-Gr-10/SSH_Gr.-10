@@ -36,6 +36,10 @@
   margin-top: 24px;
 }
 
+.director-patients-grid--single {
+  grid-template-columns: 1fr;
+}
+
 .director-section {
   background: #ffffff;
   border-radius: 16px;
