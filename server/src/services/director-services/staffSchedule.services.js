@@ -1,8 +1,20 @@
 import userRepository from "../../repositories/user.repository.js";
 import staffScheduleRepository from "../../repositories/staff-working-schedules.repository.js";
 import logsRepository from "../../repositories/logs.repository.js";
+import hospitalsDepartmentsRepository from "../../repositories/hospitals-departments.repository.js";
 
 class DirectorStaffScheduleService {
+  async ensureHospitalDepartment(hospitalId, departmentId) {
+    const departments = await hospitalsDepartmentsRepository.findByHospital(hospitalId);
+    const belongsToHospital = departments.some(
+      (entry) => entry.department_id === Number(departmentId)
+    );
+
+    if (!belongsToHospital) {
+      throw new Error("Department does not belong to this hospital");
+    }
+  }
+
   normalizeTime(value) {
     if (!value) return null;
     let hour = 0;
@@ -79,6 +91,8 @@ class DirectorStaffScheduleService {
       throw new Error("Staff member not found");
     }
 
+    await this.ensureHospitalDepartment(hospitalId, department_id);
+
     const assignment = staff.staff_hospitals_departments?.find(
       (entry) => entry.hospital_id === hospitalId && entry.department_id === Number(department_id)
     );
@@ -115,17 +129,22 @@ class DirectorStaffScheduleService {
       throw new Error("Schedule slot does not belong to this hospital");
     }
 
-    if (data.staff_id && data.staff_id !== schedule.staff_id) {
-      const staff = await userRepository.findById(data.staff_id);
+    if (data.staff_id || data.department_id) {
+      const staff = await userRepository.findById(data.staff_id || schedule.staff_id);
       if (!staff) {
         throw new Error("Staff member not found");
       }
+      await this.ensureHospitalDepartment(hospitalId, data.department_id || schedule.department_id);
       const assignment = staff.staff_hospitals_departments?.find(
         (entry) => entry.hospital_id === hospitalId && entry.department_id === Number(data.department_id || schedule.department_id)
       );
       if (!assignment) {
         throw new Error("Staff member is not assigned to this hospital and department");
       }
+    }
+
+    if (data.department_id) {
+      await this.ensureHospitalDepartment(hospitalId, data.department_id);
     }
 
     const updateData = {};
