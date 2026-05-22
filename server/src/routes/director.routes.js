@@ -605,14 +605,222 @@ router.put("/appointments/templates/:id", (req, res, next) => appointmentsTempla
  */
 router.delete("/appointments/templates/:id", (req, res, next) => appointmentsTemplatesController.deleteTemplate(req, res, next));
 
+/**
+ * @swagger
+ * /api/director/departments:
+ *   get:
+ *     summary: Get all departments
+ *     description: Returns all departments from the director hospital
+ *     tags:
+ *       - Director Departments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Departments retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
 router.get("/departments", (req, res, next) => departmentsController.getDepartments(req, res, next));
+/**
+ * @swagger
+ * /api/director/departments:
+ *   post:
+ *     summary: Create a new department
+ *     description: Creates a new department in the hospital
+ *     tags:
+ *       - Director Departments
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Cardiology
+ *               description:
+ *                 type: string
+ *                 example: Department responsible for heart-related treatments
+ *               floor:
+ *                 type: integer
+ *                 example: 2
+ *     responses:
+ *       201:
+ *         description: Department created successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ */
 router.post("/departments", (req, res, next) => departmentsController.createDepartment(req, res, next));
+/**
+ * @swagger
+ * /api/director/departments/{id}:
+ *   put:
+ *     summary: Update department
+ *     description: Updates an existing department
+ *     tags:
+ *       - Director Departments
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Department ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Neurology
+ *               description:
+ *                 type: string
+ *                 example: Department focused on nervous system disorders
+ *               floor:
+ *                 type: integer
+ *                 example: 3
+ *     responses:
+ *       200:
+ *         description: Department updated successfully
+ *       404:
+ *         description: Department not found
+ */
 router.put("/departments/:id", (req, res, next) => departmentsController.updateDepartment(req, res, next));
+/**
+ * @swagger
+ * /api/director/departments/{id}:
+ *   delete:
+ *     summary: Delete department
+ *     description: Deletes a department from the hospital
+ *     tags:
+ *       - Director Departments
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Department ID
+ *     responses:
+ *       200:
+ *         description: Department deleted successfully
+ *       404:
+ *         description: Department not found
+ */
 router.delete("/departments/:id", (req, res, next) => departmentsController.deleteDepartment(req, res, next));
 
+/**
+ * @swagger
+ * /api/director/system-overview:
+ *   get:
+ *     summary: Get system overview
+ *     description: Returns aggregated system statistics and overview data for the director dashboard
+ *     tags:
+ *       - Director System Overview
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: System overview retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
 router.get("/system-overview", (req, res, next) => systemOverviewController.getSystemOverview(req, res, next));
+/**
+ * @swagger
+ * /api/director/requests/recipients:
+ *   get:
+ *     summary: Get request recipients
+ *     description: Returns a list of available recipients for sending requests (staff, departments, or users depending on role)
+ *     tags:
+ *       - Director Requests
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Recipients retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
 router.get("/requests/recipients", (req, res, next) => requestsController.getRecipients(req, res, next));
+/**
+ * @swagger
+ * /api/director/requests:
+ *   get:
+ *     summary: Get all requests
+ *     description: Returns all requests created within the hospital for the director view
+ *     tags:
+ *       - Director Requests
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Requests retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
 router.get("/requests", (req, res, next) => requestsController.getRequests(req, res, next));
+/**
+ * @swagger
+ * /api/director/requests:
+ *   post:
+ *     summary: Create a new request
+ *     description: Allows director to create a request to staff, departments, or system users
+ *     tags:
+ *       - Director Requests
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: Equipment request
+ *               message:
+ *                 type: string
+ *                 example: We need new MRI equipment for department 2
+ *               recipientId:
+ *                 type: integer
+ *                 example: 5
+ *               recipientType:
+ *                 type: string
+ *                 example: STAFF
+ *               priority:
+ *                 type: string
+ *                 example: HIGH
+ *     responses:
+ *       201:
+ *         description: Request created successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ */
 router.post("/requests", (req, res, next) => requestsController.createRequest(req, res, next));
 
 export default router;
