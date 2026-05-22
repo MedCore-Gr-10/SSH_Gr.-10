@@ -7,7 +7,7 @@ import userRoutes from "./routes/user.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import directorRoutes from "./routes/director.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
-
+import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js";
 const app = express();
 
 app.use(
@@ -20,6 +20,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/profiles", profileRoutes);
+app.use("/api/specializations", manageSpecializationRoutes);
 app.use("/api/director", directorRoutes);
 app.use("/api/staff", staffRoutes);
 

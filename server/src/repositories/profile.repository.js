@@ -124,12 +124,6 @@ class ProfilesRepository {
   |--------------------------------------------------------------------------
   */
 
-  async delete(id) {
-    return prisma.profiles.delete({
-      where: { id }
-    });
-  }
-
   /*
   |--------------------------------------------------------------------------
   | USER RELATIONS
@@ -263,7 +257,13 @@ class ProfilesRepository {
       }
     });
   }
-
+async delete(id) {
+  return await prisma.profile.delete({
+    where: { 
+      id: parseInt(id, 10) 
+    }
+  });
+}
 }
 
 

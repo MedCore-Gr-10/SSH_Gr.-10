@@ -47,6 +47,12 @@ class SpecializationsRepository {
     });
   }
 
+  async delete(id) {
+    return prisma.specializations.delete({
+      where: { id: parseInt(id, 10) },
+    });
+  }
+
  async countDoctors(specializationId) {
   const count = await prisma.staff_specializations.count({
     where: {
