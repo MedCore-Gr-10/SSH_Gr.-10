@@ -31,7 +31,6 @@ router.use((req, res, next) => hospitalMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
 
 router.get("/patients", (req, res, next) => patientController.getPatients(req, res, next));
-router.post("/patients", (req, res, next) => patientController.createPatient(req, res, next));
 router.put("/patients/:id", (req, res, next) => patientController.updatePatient(req, res, next));
 router.delete("/patients/:id", (req, res, next) => patientController.deletePatient(req, res, next));
 

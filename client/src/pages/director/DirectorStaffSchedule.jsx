@@ -69,8 +69,10 @@ export default function DirectorStaffSchedule() {
   const formatTime = (value) => {
     if (!value) return "";
     if (typeof value !== "string") {
-      return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return new Date(value).toISOString().slice(11, 16);
     }
+    const isoTimeMatch = value.match(/T(\d{2}:\d{2})/);
+    if (isoTimeMatch) return isoTimeMatch[1];
     return value.length >= 5 ? value.slice(0, 5) : value;
   };
 
@@ -155,7 +157,7 @@ export default function DirectorStaffSchedule() {
         setMessage("Schedule updated successfully.");
       } else {
         await createDirectorStaffSchedule(payload);
-        setMessage("Schedule slot created successfully.");
+        setMessage("Schedule shift created successfully.");
       }
 
       handleReset();
@@ -168,13 +170,13 @@ export default function DirectorStaffSchedule() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Remove this schedule slot?")) {
+    if (!window.confirm("Remove this schedule shift?")) {
       return;
     }
 
     try {
       await deleteDirectorStaffSchedule(id);
-      setMessage("Schedule slot removed.");
+      setMessage("Schedule shift removed.");
       setError(null);
       await loadData();
     } catch (err) {
@@ -197,7 +199,7 @@ export default function DirectorStaffSchedule() {
           {daySummary.map((item) => (
             <div key={item.day} className="overview-card">
               <span>{item.day}</span>
-              <strong>{item.count} slot{item.count === 1 ? "" : "s"}</strong>
+              <strong>{item.count} shift{item.count === 1 ? "" : "s"}</strong>
             </div>
           ))}
         </div>
@@ -205,7 +207,7 @@ export default function DirectorStaffSchedule() {
 
       <div className="director-staff-schedule-grid">
         <section className="director-staff-schedule-table-section content-scroll">
-          <h2>Schedule slots</h2>
+          <h2>Schedule shifts</h2>
           <table className="director-staff-schedule-table">
             <thead>
               <tr>
@@ -222,7 +224,7 @@ export default function DirectorStaffSchedule() {
             <tbody>
               {scheduleList.length === 0 ? (
                 <tr>
-                  <td colSpan="8">No schedule slots found.</td>
+                  <td colSpan="8">No schedule shifts found.</td>
                 </tr>
               ) : (
                 scheduleList.map((schedule) => (
@@ -322,7 +324,7 @@ export default function DirectorStaffSchedule() {
                 checked={formValues.active_schedule}
                 onChange={handleChange}
               />
-              Active slot
+              Active shift
             </label>
 
             <div className="director-staff-schedule-actions">
