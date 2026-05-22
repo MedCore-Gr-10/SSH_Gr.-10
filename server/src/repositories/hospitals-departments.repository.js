@@ -17,6 +17,26 @@ class HospitalsDepartmentsRepository {
     });
   }
 
+  async findByHospitalAndDepartment(hospitalId, departmentId) {
+    return prisma.hospitals_departments.findUnique({
+      where: {
+        hospital_id_department_id: {
+          hospital_id: Number(hospitalId),
+          department_id: Number(departmentId)
+        }
+      }
+    });
+  }
+
+  async countStaffAssignments(hospitalId, departmentId) {
+    return prisma.staff_hospitals_departments.count({
+      where: {
+        hospital_id: Number(hospitalId),
+        department_id: Number(departmentId)
+      }
+    });
+  }
+
   async delete(hospitalId, departmentId) {
     return prisma.hospitals_departments.delete({
       where: {
