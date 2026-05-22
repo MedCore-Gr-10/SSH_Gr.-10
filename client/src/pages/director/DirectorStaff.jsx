@@ -5,39 +5,59 @@ import {
   updateDirectorStaff,
   deleteDirectorStaff,
 } from "../../services/directorStaffApi";
+import { getDirectorDepartments } from "../../services/directorDepartmentsApi";
+import { allPasswordRulesMet, passwordRulesMet } from "../../utils/passwordRules";
 import "./DirectorStaff.css";
 
 const initialFormState = {
   username: "",
   email: "",
   password: "",
+  confirmPassword: "",
   role: "doctor",
   department_id: "",
   first_name: "",
   last_name: "",
+  birth: "",
+  gender: "",
+  personal_no: "",
   phone_number: "",
 };
 
 export default function DirectorStaff() {
   const [staffList, setStaffList] = useState([]);
+  const [departmentList, setDepartmentList] = useState([]);
   const [formValues, setFormValues] = useState(initialFormState);
   const [selectedStaffId, setSelectedStaffId] = useState(null);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const loadStaff = async () => {
+  const loadData = async () => {
     try {
-      const staff = await getDirectorStaff();
-      setStaffList(staff);
+      const [staff, departments] = await Promise.all([
+        getDirectorStaff(),
+        getDirectorDepartments(),
+      ]);
+      setStaffList(staff || []);
+      setDepartmentList(departments || []);
     } catch (err) {
       setError(err.message);
     }
   };
 
   useEffect(() => {
-    loadStaff();
+    loadData();
   }, []);
+
+  const getProfile = (staff) => staff.users_profiles?.[0]?.profiles || {};
+
+  const getEmail = (staff) => staff.users_profiles?.[0]?.email || "";
+
+  const getDepartmentName = (assignment) =>
+    assignment?.hospitals_departments?.departments?.department_name ||
+    departmentList.find((department) => department.id === assignment?.department_id)?.department_name ||
+    "—";
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -45,16 +65,20 @@ export default function DirectorStaff() {
   };
 
   const handleEdit = (staff) => {
-    const profile = staff.users_profiles?.[0] || {};
+    const profile = getProfile(staff);
     setSelectedStaffId(staff.id);
     setFormValues({
       username: staff.username || "",
-      email: profile.email || "",
+      email: getEmail(staff),
       password: "",
+      confirmPassword: "",
       role: staff.roles?.role_name?.toLowerCase() || "doctor",
       department_id: staff.staff_hospitals_departments?.[0]?.department_id || "",
       first_name: profile.first_name || "",
       last_name: profile.last_name || "",
+      birth: profile.birth ? profile.birth.slice(0, 10) : "",
+      gender: profile.gender || "",
+      personal_no: profile.personal_no || "",
       phone_number: profile.phone_number || "",
     });
     setMessage(null);
@@ -75,15 +99,26 @@ export default function DirectorStaff() {
     setMessage(null);
 
     try {
+      const isCreating = !selectedStaffId;
+      const rules = passwordRulesMet(formValues.password);
+      if (isCreating && !allPasswordRulesMet(rules)) {
+        throw new Error("Password must be at least 8 characters and include a number and a symbol");
+      }
+      if (formValues.password && formValues.password !== formValues.confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+
+      const { confirmPassword: _confirmPassword, ...payload } = formValues;
+
       if (selectedStaffId) {
-        await updateDirectorStaff(selectedStaffId, formValues);
+        await updateDirectorStaff(selectedStaffId, payload);
         setMessage("Staff member updated successfully.");
       } else {
-        await createDirectorStaff(formValues);
+        await createDirectorStaff(payload);
         setMessage("Staff member created successfully.");
       }
       handleReset();
-      await loadStaff();
+      await loadData();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -100,7 +135,7 @@ export default function DirectorStaff() {
       await deleteDirectorStaff(id);
       setMessage("Staff member removed.");
       setError(null);
-      await loadStaff();
+      await loadData();
     } catch (err) {
       setError(err.message);
     }
@@ -135,15 +170,15 @@ export default function DirectorStaff() {
                 </tr>
               ) : (
                 staffList.map((staff) => {
-                  const profile = staff.users_profiles?.[0] || {};
+                  const profile = getProfile(staff);
                   const assignment = staff.staff_hospitals_departments?.[0] || {};
 
                   return (
                     <tr key={staff.id}>
                       <td data-label="Name">{`${profile.first_name || ""} ${profile.last_name || ""}`.trim() || staff.username}</td>
-                      <td data-label="Email">{profile.email || "—"}</td>
+                      <td data-label="Email">{getEmail(staff) || "—"}</td>
                       <td data-label="Role">{staff.roles?.role_name || "—"}</td>
-                      <td data-label="Department">{assignment.department_id || "—"}</td>
+                      <td data-label="Department">{getDepartmentName(assignment)}</td>
                       <td data-label="Actions">
                         <button className="edit-button" onClick={() => handleEdit(staff)}>
                           Edit
@@ -196,6 +231,17 @@ export default function DirectorStaff() {
             </label>
 
             <label>
+              Confirm password
+              <input
+                name="confirmPassword"
+                value={formValues.confirmPassword}
+                onChange={handleChange}
+                placeholder={selectedStaffId ? "Repeat new password if changing it" : "Re-enter password"}
+                type="password"
+              />
+            </label>
+
+            <label>
               Role
               <select name="role" value={formValues.role} onChange={handleChange}>
                 <option value="doctor">Doctor</option>
@@ -204,14 +250,19 @@ export default function DirectorStaff() {
             </label>
 
             <label>
-              Department ID
-              <input
+              Department
+              <select
                 name="department_id"
                 value={formValues.department_id}
                 onChange={handleChange}
-                placeholder="Department ID"
-                type="number"
-              />
+              >
+                <option value="">Select department</option>
+                {departmentList.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.department_name}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label>
@@ -231,6 +282,35 @@ export default function DirectorStaff() {
                 value={formValues.last_name}
                 onChange={handleChange}
                 placeholder="Last name"
+              />
+            </label>
+
+            <label>
+              Date of birth
+              <input
+                name="birth"
+                value={formValues.birth}
+                onChange={handleChange}
+                type="date"
+              />
+            </label>
+
+            <label>
+              Gender
+              <select name="gender" value={formValues.gender} onChange={handleChange}>
+                <option value="">Select gender</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+              </select>
+            </label>
+
+            <label>
+              Personal number
+              <input
+                name="personal_no"
+                value={formValues.personal_no}
+                onChange={handleChange}
+                placeholder="National ID or personal number"
               />
             </label>
 

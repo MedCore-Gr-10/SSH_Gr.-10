@@ -24,7 +24,11 @@ class StaffWorkingSchedulesRepository {
                 roles: true
               }
             },
-            hospitals_departments: true
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
           }
         }
       }
@@ -49,7 +53,11 @@ class StaffWorkingSchedulesRepository {
                 roles: true
               }
             },
-            hospitals_departments: true
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
           }
         }
       }
@@ -75,7 +83,11 @@ class StaffWorkingSchedulesRepository {
                 roles: true
               }
             },
-            hospitals_departments: true
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
           }
         }
       }
