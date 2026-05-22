@@ -624,12 +624,13 @@ router.delete("/appointments/templates/:id", (req, res, next) => appointmentsTem
  *         description: Forbidden
  */
 router.get("/departments", (req, res, next) => departmentsController.getDepartments(req, res, next));
+router.get("/departments/catalog", (req, res, next) => departmentsController.getDepartmentCatalog(req, res, next));
 /**
  * @swagger
  * /api/director/departments:
  *   post:
- *     summary: Create a new department
- *     description: Creates a new department in the hospital
+ *     summary: Activate an existing department
+ *     description: Links an existing superuser-created department to the director hospital
  *     tags:
  *       - Director Departments
  *     security:
@@ -641,18 +642,12 @@ router.get("/departments", (req, res, next) => departmentsController.getDepartme
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
- *                 example: Cardiology
- *               description:
- *                 type: string
- *                 example: Department responsible for heart-related treatments
- *               floor:
+ *               department_id:
  *                 type: integer
- *                 example: 2
+ *                 example: 1
  *     responses:
- *       201:
- *         description: Department created successfully
+ *       200:
+ *         description: Department activated successfully
  *       400:
  *         description: Bad request
  *       401:
