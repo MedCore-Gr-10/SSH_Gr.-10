@@ -51,9 +51,10 @@ const Sidebar = () => {
     ],
     nurse: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Staff Schedule", path: "/main/staff-schedule" },
-      { label: "Patients", path: "/main/patients" },
-      { label: "Make a Request", path: "/main/make-request" }
+      { label: "My Schedule", path: "/main/nurse/schedule" },
+      { label: "Staff Schedules", path: "/main/nurse/staff-schedules" },
+      { label: "My Patients", path: "/main/nurse/patients" },
+      { label: "Make a Request", path: "/main/make-request" },
     ],
   };
   
