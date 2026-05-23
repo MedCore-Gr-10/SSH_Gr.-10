@@ -55,6 +55,22 @@ class DirectorStaffScheduleService {
     return schedules;
   }
 
+  async getHospitalSchedulesForStaff(hospitalId, currentUserId) {
+    if (!hospitalId) {
+      throw new Error("Hospital ID is required to list schedules");
+    }
+
+    const schedules = await staffScheduleRepository.findByHospital(hospitalId);
+
+    await logsRepository.create({
+      user_id: currentUserId,
+      action: "view hospital staff schedules",
+      reason: "Doctor viewed hospital staff working schedules",
+    });
+
+    return schedules;
+  }
+
   async getRelevantSchedules(userId, hospitalId, role, currentUserId) {
     if (!hospitalId) {
       throw new Error("Hospital ID is required to list schedules");
