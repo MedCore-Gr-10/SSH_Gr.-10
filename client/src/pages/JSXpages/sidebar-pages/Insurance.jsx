@@ -1,24 +1,78 @@
-import React, { useState } from "react";
-import "./Insurance.css";
+import React, { useEffect, useState } from "react";
+import "../../CSSpages/sidebar-pages/Insurance.css";
 
 const initialFormValues = {
   companyName: "",
   supportNumber: "",
   email: "",
-  website: "",
-  address: "",
-  policyHolderName: "",
-  policyHolderRelationship: "",
-  policyHolderDob: "",
-  policyHolderId: "",
+  policyNumber: "",
+  coveragePercent: "",
+  startDate: "",
+  endDate: "",
 };
+
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+};
+
+const readResponse = async (response) => {
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error || payload.message || `Request failed (${response.status})`);
+  }
+
+  return payload.data ?? payload;
+};
+
+const isPastDate = (value) => {
+  if (!value) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+
+  return date < today;
+};
+
+const getTodayInputValue = () => new Date().toISOString().slice(0, 10);
 
 export default function Insurance() {
   const [insurance, setInsurance] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [formValues, setFormValues] = useState(initialFormValues);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+
+  const fetchInsurance = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/patient/insurance", {
+        headers: getHeaders(),
+      });
+      const data = await readResponse(response);
+
+      setInsurance(data);
+      setError("");
+    } catch (err) {
+      setError("Failed to load insurance: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInsurance();
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -27,16 +81,16 @@ export default function Insurance() {
 
   const openModalForCreate = () => {
     setFormValues(initialFormValues);
-    setIsEditing(false);
     setShowModal(true);
     setMessage("");
+    setError("");
   };
 
   const openModalForEdit = () => {
     setFormValues({ ...insurance });
-    setIsEditing(true);
     setShowModal(true);
     setMessage("");
+    setError("");
   };
 
   const closeModal = () => {
@@ -46,25 +100,78 @@ export default function Insurance() {
     }
   };
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault();
-    setInsurance({ ...formValues });
-    setShowModal(false);
-    setMessage("Insurance details saved successfully.");
-    setTimeout(() => setMessage(""), 3000);
+
+    if (isPastDate(formValues.endDate)) {
+      setError("End date cannot be in the past. Please enter an active insurance policy.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const response = await fetch("/api/patient/insurance", {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(formValues),
+      });
+
+      const data = await readResponse(response);
+      setInsurance(data);
+      setShowModal(false);
+      setError("");
+      setMessage("Insurance details saved successfully.");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      setError("Failed to save insurance: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleRemoveInsurance = async () => {
+    if (!insurance?.id) return;
+
+    try {
+      setSaving(true);
+      const response = await fetch(`/api/patient/insurance/${insurance.id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
+
+      await readResponse(response);
+      setInsurance(null);
+      setFormValues(initialFormValues);
+      setError("");
+      setMessage("Insurance removed successfully.");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      setError("Failed to remove insurance: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const endDateIsExpired = isPastDate(formValues.endDate);
 
   return (
     <div className="insurance-container">
       <div className="insurance-card">
         <h1 className="insurance-title">Insurance Provider Information</h1>
         <p className="insurance-description">
-          Manage your insurance provider and policy holder details. If you have not set up insurance yet, open the setup modal and save your policy information.
+          Manage your insurance provider and policy details. Your identity is linked from your patient profile.
         </p>
 
         {message && <div className="success-message">{message}</div>}
+        {error && !showModal && <div className="error-message">{error}</div>}
 
-        {!insurance && (
+        {loading && (
+          <div className="empty-state">
+            <p className="empty-state-text">Loading insurance details...</p>
+          </div>
+        )}
+
+        {!loading && !insurance && (
           <div className="empty-state">
             <p className="empty-state-text">You do not have insurance set up yet. Add your provider details to continue.</p>
             <button type="button" className="primary-button" onClick={openModalForCreate}>
@@ -73,27 +180,34 @@ export default function Insurance() {
           </div>
         )}
 
-        {insurance && (
+        {!loading && insurance && (
           <div className="insurance-summary">
+            {insurance.isExpired && (
+              <div className="expired-state">
+                This insurance policy has expired. You can update the policy details or remove it from your profile.
+              </div>
+            )}
+
             <div className="insurance-summary-row">
               <div>
                 <h3>Provider details</h3>
-                <p><strong>Company:</strong> {insurance.companyName || "—"}</p>
-                <p><strong>Support:</strong> {insurance.supportNumber || "—"}</p>
-                <p><strong>Email:</strong> {insurance.email || "—"}</p>
-                <p><strong>Website:</strong> {insurance.website || "—"}</p>
-                <p><strong>Address:</strong> {insurance.address || "—"}</p>
+                <p><strong>Company:</strong> {insurance.companyName || "-"}</p>
+                <p><strong>Support:</strong> {insurance.supportNumber || "-"}</p>
+                <p><strong>Email:</strong> {insurance.email || "-"}</p>
               </div>
               <div>
-                <h3>Policy holder</h3>
-                <p><strong>Name:</strong> {insurance.policyHolderName || "—"}</p>
-                <p><strong>Relationship:</strong> {insurance.policyHolderRelationship || "—"}</p>
-                <p><strong>DOB:</strong> {insurance.policyHolderDob || "—"}</p>
-                <p><strong>ID:</strong> {insurance.policyHolderId || "—"}</p>
+                <h3>Policy details</h3>
+                <p><strong>Policy number:</strong> {insurance.policyNumber || "-"}</p>
+                <p><strong>Coverage:</strong> {insurance.coveragePercent ? `${insurance.coveragePercent}%` : "-"}</p>
+                <p><strong>Start date:</strong> {insurance.startDate || "-"}</p>
+                <p><strong>End date:</strong> {insurance.endDate || "-"}</p>
               </div>
             </div>
             <button type="button" className="primary-button" onClick={openModalForEdit}>
-              Edit insurance
+              {insurance.isExpired ? "Update insurance" : "Edit insurance"}
+            </button>
+            <button type="button" className="danger-button" onClick={handleRemoveInsurance} disabled={saving}>
+              {saving ? "Removing..." : "Remove insurance"}
             </button>
           </div>
         )}
@@ -106,7 +220,7 @@ export default function Insurance() {
               <div>
                 <h2>{insurance ? "Edit insurance details" : "Set up insurance"}</h2>
                 <p className="section-note">
-                  Enter your insurance provider and policy holder information.
+                  Enter your insurance provider and policy information.
                 </p>
               </div>
               <button type="button" className="modal-close" onClick={closeModal}>
@@ -116,7 +230,7 @@ export default function Insurance() {
 
             <form className="insurance-form" onSubmit={handleSave}>
               <div className="section-card">
-                <h3>Important provider details</h3>
+                <h3>Provider and policy details</h3>
                 <div className="form-grid">
                   <div className="form-group">
                     <label htmlFor="companyName" className="form-label">Insurance company name</label>
@@ -129,6 +243,7 @@ export default function Insurance() {
                       placeholder="Blue Cross, Aetna, UnitedHealthcare"
                     />
                   </div>
+
                   <div className="form-group">
                     <label htmlFor="supportNumber" className="form-label">Customer support number</label>
                     <input
@@ -140,6 +255,7 @@ export default function Insurance() {
                       placeholder="(800) 123-4567"
                     />
                   </div>
+
                   <div className="form-group">
                     <label htmlFor="email" className="form-label">Email</label>
                     <input
@@ -152,87 +268,72 @@ export default function Insurance() {
                       placeholder="support@example.com"
                     />
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="website" className="form-label">Website</label>
-                    <input
-                      id="website"
-                      name="website"
-                      className="form-input"
-                      value={formValues.website}
-                      onChange={handleChange}
-                      placeholder="www.example.com"
-                    />
-                  </div>
-                  <div className="form-group full-width">
-                    <label htmlFor="address" className="form-label">Address</label>
-                    <input
-                      id="address"
-                      name="address"
-                      className="form-input"
-                      value={formValues.address}
-                      onChange={handleChange}
-                      placeholder="123 Insurance Ave, City, State"
-                    />
-                  </div>
-                </div>
-              </div>
 
-              <div className="section-card">
-                <h3>Policy Holder Information</h3>
-                <div className="form-grid">
-                  <div className="form-group full-width">
-                    <label htmlFor="policyHolderName" className="form-label">Policy holder full name</label>
+                  <div className="form-group">
+                    <label htmlFor="policyNumber" className="form-label">Policy number</label>
                     <input
-                      id="policyHolderName"
-                      name="policyHolderName"
+                      id="policyNumber"
+                      name="policyNumber"
                       className="form-input"
-                      value={formValues.policyHolderName}
+                      value={formValues.policyNumber}
                       onChange={handleChange}
-                      placeholder="Parent / Spouse"
+                      placeholder="POL-123456789"
                     />
                   </div>
+
                   <div className="form-group">
-                    <label htmlFor="policyHolderRelationship" className="form-label">Relationship to patient</label>
+                    <label htmlFor="coveragePercent" className="form-label">Coverage percent</label>
                     <input
-                      id="policyHolderRelationship"
-                      name="policyHolderRelationship"
+                      id="coveragePercent"
+                      name="coveragePercent"
+                      type="number"
+                      min="0"
+                      max="100"
                       className="form-input"
-                      value={formValues.policyHolderRelationship}
+                      value={formValues.coveragePercent}
                       onChange={handleChange}
-                      placeholder="Parent, spouse, guardian"
+                      placeholder="80"
                     />
                   </div>
+
                   <div className="form-group">
-                    <label htmlFor="policyHolderDob" className="form-label">Date of birth</label>
+                    <label htmlFor="startDate" className="form-label">Start date</label>
                     <input
-                      id="policyHolderDob"
-                      name="policyHolderDob"
+                      id="startDate"
+                      name="startDate"
                       type="date"
                       className="form-input"
-                      value={formValues.policyHolderDob}
+                      value={formValues.startDate}
                       onChange={handleChange}
                     />
                   </div>
+
                   <div className="form-group">
-                    <label htmlFor="policyHolderId" className="form-label">Policy holder ID</label>
+                    <label htmlFor="endDate" className="form-label">End date</label>
                     <input
-                      id="policyHolderId"
-                      name="policyHolderId"
+                      id="endDate"
+                      name="endDate"
+                      type="date"
                       className="form-input"
-                      value={formValues.policyHolderId}
+                      value={formValues.endDate}
                       onChange={handleChange}
-                      placeholder="Policy number or member ID"
+                      min={getTodayInputValue()}
                     />
+                    {endDateIsExpired && (
+                      <p className="field-error">End date cannot be in the past.</p>
+                    )}
                   </div>
                 </div>
               </div>
 
+              {error && <div className="error-message">{error}</div>}
+
               <div className="modal-actions">
-                <button type="button" className="modal-secondary" onClick={closeModal}>
+                <button type="button" className="modal-secondary" onClick={closeModal} disabled={saving}>
                   Cancel
                 </button>
-                <button type="submit" className="modal-primary">
-                  {insurance ? "Save changes" : "Save insurance"}
+                <button type="submit" className="modal-primary" disabled={saving || endDateIsExpired}>
+                  {saving ? "Saving..." : insurance ? "Save changes" : "Save insurance"}
                 </button>
               </div>
             </form>

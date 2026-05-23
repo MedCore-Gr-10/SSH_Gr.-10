@@ -111,6 +111,21 @@ class UsersRepository {
       include: {
         roles: true,           // Merr të dhënat e rolit (përfshirë role_name)
         users_profiles: true,  // Merr tabelën ndërmjetëse ku ndodhet emaili
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                hospitals: true,
+                departments: true,
+              },
+            },
+            staff_specializations: {
+              include: {
+                specializations: true,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -119,11 +134,18 @@ class UsersRepository {
     return prisma.users.findMany({
       where: {
         roles: {
-          role_name: "DOCTOR"
+          role_name: {
+            in: ["doctor", "DOCTOR"]
+          }
         }
       },
       include: {
         roles: true,
+        users_profiles: {
+          include: {
+            profiles: true
+          }
+        },
         staff_hospitals_departments: true
       }
     });
@@ -516,6 +538,49 @@ class UsersRepository {
     });
   }
 
+  async getUserStatsSummary() {
+  const users = await prisma.users.findMany({
+    select: {
+      is_active: true,
+      roles: {
+        select: {
+          role_name: true
+        }
+      }
+    }
+  });
+
+  // Inicializojmë objektin e statistikave sipas strukturës së front-end-it
+  const summary = {
+    totalUsers: users.length,
+    activeUsers: 0,
+    inactiveUsers: 0,
+    superusers: 0,
+    directors: 0,
+    doctors: 0,
+    nurses: 0,
+    patients: 0
+  };
+
+  users.forEach(user => {
+    // 1. Llogarit statuset
+    if (user.is_active === true || user.is_active === 1) {
+      summary.activeUsers++;
+    } else {
+      summary.inactiveUsers++;
+    }
+
+    // 2. Llogarit rolet (sigurohemi që i kthejmë në uppercase për krahasim të saktë)
+    const role = user.roles?.role_name?.toUpperCase() || "";
+    if (role === "SUPERUSER" || role === "ADMIN") summary.superusers++;
+    else if (role === "DIRECTOR") summary.directors++;
+    else if (role === "DOCTOR") summary.doctors++;
+    else if (role === "NURSE") summary.nurses++;
+    else if (role === "PATIENT") summary.patients++;
+  });
+
+  return summary;
+}
 }
 
 export default new UsersRepository();

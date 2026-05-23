@@ -8,10 +8,22 @@ class EmergencyContactsRepository {
     });
   }
 
-  async findPatientContacts(patientId) {
+  async findProfileContacts(profileId) {
     return prisma.emergency_contacts.findMany({
       where: {
-        patient_id: patientId
+        profile_id: profileId
+      },
+      orderBy: {
+        first_name: "asc"
+      }
+    });
+  }
+
+  async findProfileContactById(profileId, contactId) {
+    return prisma.emergency_contacts.findFirst({
+      where: {
+        id: contactId,
+        profile_id: profileId
       }
     });
   }

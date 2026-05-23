@@ -93,6 +93,7 @@ export default function App() {
           {/* ===================== DIRECTOR ===================== */}
           {/* <Route path="dashboard" element={<Dashboard />} /> */}
           <Route path="staff-schedule" element={<StaffSchedule />} />
+          <Route path="doctor-staff-schedule" element={<StaffSchedule />} />
           <Route path="staff" element={<Staff />} />
           <Route path="patients" element={<Patients />} />
           {/* <Route path="booked-appointments" element={<BookedAppointments />} /> */}

@@ -115,7 +115,8 @@
 }
 
 .primary-button,
-.secondary-button {
+.secondary-button,
+.danger-button {
   border: none;
   border-radius: 14px;
   font-size: 1rem;
@@ -135,10 +136,22 @@
   color: #4a5568;
 }
 
+.danger-button {
+  align-self: flex-start;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
 .primary-button:hover,
-.secondary-button:hover {
+.secondary-button:hover,
+.danger-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 30px rgba(92, 92, 214, 0.18);
+}
+
+.danger-button:hover {
+  box-shadow: 0 14px 30px rgba(217, 70, 72, 0.14);
 }
 
 .empty-state {
@@ -185,14 +198,39 @@
   font-size: 0.95rem;
 }
 
-.success-message {
+.success-message,
+.error-message,
+.expired-state {
   padding: 1rem;
   border-radius: 12px;
   font-weight: 500;
+}
+
+.success-message {
   background-color: #f0fff4;
   border: 1px solid #c6f6d5;
   color: #2f855a;
   margin-bottom: 1.5rem;
+}
+
+.error-message {
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+  color: #9b2c2c;
+  margin-bottom: 1.5rem;
+}
+
+.field-error {
+  color: #9b2c2c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: -0.25rem 0 0 0;
+}
+
+.expired-state {
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
 }
 
 .modal-backdrop {
@@ -279,6 +317,14 @@
   transform: translateY(-1px);
 }
 
+.modal-secondary:disabled,
+.modal-primary:disabled,
+.danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
 @media (max-width: 768px) {
   .insurance-card {
     padding: 2rem;
@@ -300,7 +346,8 @@
   }
 
   .primary-button,
-  .secondary-button {
+  .secondary-button,
+  .danger-button {
     width: 100%;
   }
 }

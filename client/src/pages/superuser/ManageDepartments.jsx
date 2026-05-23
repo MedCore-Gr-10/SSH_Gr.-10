@@ -134,8 +134,10 @@ export default function ManageDepartments() {
   return (
     <div className="page-container">  
       <div className="page-header">
-        <h2 className="page-title">Manage Departments</h2>
-        <p className="page-subtitle">View, add, and modify hospital departments and tracks clinical structures.</p>
+        <div className="header-left">
+          <h2 className="page-title">Manage Department</h2>
+          <p className="page-subtitle">View, add, and modify hospital departments and tracks clinical structures.</p>
+        </div>
       </div>
 
       {error && (
@@ -162,7 +164,7 @@ export default function ManageDepartments() {
 
           <div className="button-group">
             <button type="submit" className={`btn ${isEditing ? "btn-primary" : "btn-success"}`}>
-              {isEditing ? "Update Name" : "Create Department"}
+              {isEditing ? "Update Name" : "+  Create Department"}
             </button>
             
             {isEditing && (

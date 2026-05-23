@@ -1,4 +1,4 @@
-.emergency-contacts-container {
+.allergies-container {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: #2d3748;
   background-color: #ffffff;
@@ -8,43 +8,69 @@
   box-sizing: border-box;
 }
 
-.emergency-contacts-card {
+.allergies-card {
   background-color: #ffffff;
   border-radius: 20px;
   border: 1px solid #edf2f7;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
   padding: 2.5rem;
-  max-width: 950px;
+  max-width: 900px;
   width: 100%;
   margin: 0 auto;
 }
 
-.emergency-contacts-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-}
-
-.emergency-contacts-title {
+.allergies-title {
   font-size: 36px;
   font-weight: 800;
   color: #1a202c;
-  margin: 0;
+  margin: 0 0 16px 0;
   letter-spacing: -0.5px;
   line-height: 1.1;
+  text-align: center;
 }
 
-.emergency-contacts-description {
+.allergies-description {
   color: #4a5568;
   font-size: 1rem;
   line-height: 1.75;
-  margin: 0.5rem 0 0 0;
+  margin: 0 0 1.75rem 0;
+  text-align: center;
 }
 
-.add-contact-button {
+.allergy-entry-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.allergy-input {
+  flex: 1;
+  min-width: 260px;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  padding: 1rem 1rem;
+  background-color: #ffffff;
+  color: #2d3748;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.allergy-input:hover,
+.add-allergy-button:hover {
+  border-color: #c3d4fd;
+  box-shadow: 0 10px 25px rgba(92, 92, 214, 0.08);
+}
+
+.allergy-input:focus {
+  outline: none;
+  border-color: #5c5cd6;
+  box-shadow: 0 0 20px rgba(92, 92, 214, 0.15);
+}
+
+.add-allergy-button {
   background: #5c5cd6;
   color: white;
   border: none;
@@ -56,12 +82,12 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.add-contact-button:hover {
+.add-allergy-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 30px rgba(92, 92, 214, 0.18);
 }
 
-.remove-button {
+.remove-allergy-button {
   background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
@@ -72,13 +98,57 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.remove-button:hover {
+.remove-allergy-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 20px rgba(217, 70, 72, 0.12);
 }
 
-.success-message,
-.error-message {
+.remove-allergy-button:disabled,
+.modal-secondary:disabled,
+.modal-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.allergies-table-wrapper {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+.allergies-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.allergies-table th,
+.allergies-table td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.allergies-table th {
+  color: #4a5568;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.allergies-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.no-results {
+  color: #718096;
+  font-weight: 600;
+  text-align: center;
+}
+
+.error-message,
+.success-message {
   padding: 1rem;
   border-radius: 12px;
   font-weight: 500;
@@ -95,36 +165,6 @@
   background-color: #f0fff4;
   border: 1px solid #c6f6d5;
   color: #2f855a;
-}
-
-.contacts-table-wrapper {
-  overflow-x: auto;
-  margin-top: 1.5rem;
-}
-
-.contacts-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 700px;
-}
-
-.contacts-table th,
-.contacts-table td {
-  padding: 1rem 0.75rem;
-  border-bottom: 1px solid #edf2f7;
-  text-align: left;
-  font-size: 0.95rem;
-}
-
-.contacts-table th {
-  color: #4a5568;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.contacts-table tbody tr:hover {
-  background-color: #f8fafc;
 }
 
 .modal-backdrop {
@@ -197,7 +237,8 @@
   text-transform: uppercase;
 }
 
-.form-input {
+.form-input,
+.form-textarea {
   border: 1px solid #edf2f7;
   border-radius: 14px;
   padding: 1rem 1rem;
@@ -207,12 +248,19 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-input:hover:not(:disabled) {
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-input:hover,
+.form-textarea:hover {
   border-color: #c3d4fd;
   box-shadow: 0 10px 25px rgba(92, 92, 214, 0.08);
 }
 
-.form-input:focus {
+.form-input:focus,
+.form-textarea:focus {
   outline: none;
   border-color: #5c5cd6;
   box-shadow: 0 0 20px rgba(92, 92, 214, 0.15);
@@ -251,11 +299,11 @@
 }
 
 @media (max-width: 768px) {
-  .emergency-contacts-card {
+  .allergies-card {
     padding: 2rem;
   }
 
-  .emergency-contacts-title {
+  .allergies-title {
     font-size: 30px;
   }
 
@@ -265,7 +313,12 @@
 }
 
 @media (max-width: 480px) {
-  .add-contact-button {
+  .allergy-entry-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-allergy-button {
     width: 100%;
   }
 
@@ -273,8 +326,11 @@
     padding: 1.5rem;
   }
 
-  .emergency-contacts-header {
-    flex-direction: column;
-    align-items: stretch;
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .allergies-table {
+    min-width: 100%;
   }
 }

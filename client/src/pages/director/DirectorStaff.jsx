@@ -15,7 +15,7 @@ const initialFormState = {
   password: "",
   confirmPassword: "",
   role: "doctor",
-  department_id: "",
+  department_ids: [],
   first_name: "",
   last_name: "",
   birth: "",
@@ -59,9 +59,29 @@ export default function DirectorStaff() {
     departmentList.find((department) => department.id === assignment?.department_id)?.department_name ||
     "—";
 
+  const getDepartmentNames = (staff) => {
+    const assignments = staff.staff_hospitals_departments || [];
+    if (!assignments.length) return "—";
+
+    return assignments.map(getDepartmentName).join(", ");
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDepartmentToggle = (departmentId) => {
+    const departmentValue = String(departmentId);
+    setFormValues((prev) => {
+      const isSelected = prev.department_ids.includes(departmentValue);
+      return {
+        ...prev,
+        department_ids: isSelected
+          ? prev.department_ids.filter((id) => id !== departmentValue)
+          : [...prev.department_ids, departmentValue],
+      };
+    });
   };
 
   const handleEdit = (staff) => {
@@ -73,7 +93,9 @@ export default function DirectorStaff() {
       password: "",
       confirmPassword: "",
       role: staff.roles?.role_name?.toLowerCase() || "doctor",
-      department_id: staff.staff_hospitals_departments?.[0]?.department_id || "",
+      department_ids: (staff.staff_hospitals_departments || []).map((assignment) =>
+        String(assignment.department_id)
+      ),
       first_name: profile.first_name || "",
       last_name: profile.last_name || "",
       birth: profile.birth ? profile.birth.slice(0, 10) : "",
@@ -107,8 +129,12 @@ export default function DirectorStaff() {
       if (formValues.password && formValues.password !== formValues.confirmPassword) {
         throw new Error("Passwords do not match");
       }
+      if (!formValues.department_ids.length) {
+        throw new Error("Select at least one department");
+      }
 
       const { confirmPassword: _confirmPassword, ...payload } = formValues;
+      payload.department_ids = payload.department_ids.map((id) => Number(id));
 
       if (selectedStaffId) {
         await updateDirectorStaff(selectedStaffId, payload);
@@ -159,7 +185,7 @@ export default function DirectorStaff() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Department</th>
+                <th>Departments</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -171,14 +197,13 @@ export default function DirectorStaff() {
               ) : (
                 staffList.map((staff) => {
                   const profile = getProfile(staff);
-                  const assignment = staff.staff_hospitals_departments?.[0] || {};
 
                   return (
                     <tr key={staff.id}>
                       <td data-label="Name">{`${profile.first_name || ""} ${profile.last_name || ""}`.trim() || staff.username}</td>
                       <td data-label="Email">{getEmail(staff) || "—"}</td>
                       <td data-label="Role">{staff.roles?.role_name || "—"}</td>
-                      <td data-label="Department">{getDepartmentName(assignment)}</td>
+                      <td data-label="Departments">{getDepartmentNames(staff)}</td>
                       <td data-label="Actions">
                         <button className="edit-button" onClick={() => handleEdit(staff)}>
                           Edit
@@ -249,21 +274,23 @@ export default function DirectorStaff() {
               </select>
             </label>
 
-            <label>
-              Department
-              <select
-                name="department_id"
-                value={formValues.department_id}
-                onChange={handleChange}
-              >
-                <option value="">Select department</option>
-                {departmentList.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.department_name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <fieldset className="department-checkboxes">
+              <legend>Departments</legend>
+              {departmentList.length ? (
+                departmentList.map((department) => (
+                  <label key={department.id} className="department-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={formValues.department_ids.includes(String(department.id))}
+                      onChange={() => handleDepartmentToggle(department.id)}
+                    />
+                    <span>{department.department_name}</span>
+                  </label>
+                ))
+              ) : (
+                <p>No active departments are available for this hospital.</p>
+              )}
+            </fieldset>
 
             <label>
               First name

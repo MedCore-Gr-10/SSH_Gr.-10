@@ -66,7 +66,7 @@ export class AuthService {
     const role = user.roles?.role_name;
     if (!role) throw new Error("Invalid role");
 
-    const normalizedRole = role.toLowerCase();
+    const normalizedRole = role.trim().toLowerCase();
     let hospital_id = null;
 
     if (normalizedRole === "superuser") {

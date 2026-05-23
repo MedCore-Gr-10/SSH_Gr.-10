@@ -43,7 +43,7 @@ const Sidebar = () => {
     ],
     doctor: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Staff Schedule", path: "/main/staff-schedule" },
+      { label: "Staff Schedule", path: "/main/doctor-staff-schedule" },
       { label: "Patients", path: "/main/patients" },
       { label: "Appointments Schedule", path: "/main/appointments-schedule" },
       { label: "Booked Appointments", path: "/main/booked-appointments" },

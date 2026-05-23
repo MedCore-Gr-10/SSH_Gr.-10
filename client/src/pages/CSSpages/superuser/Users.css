@@ -60,14 +60,6 @@
 .search-users:hover {
   border-color: #4A90E2;
   box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
-  max-width: 100%;      
-  background-color: #FFFFFF;
-  padding: 8px 12px;     
-  border: 1px solid #ddd;
-  border-radius: 20px;   
-  font-size: 14px;
-  outline: none;        
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .search-users:focus {
@@ -115,14 +107,13 @@
   background-color: #5B65DC;
   box-shadow: 0px 0px 5px #1E293B;
   color: #FFFFFF;
-  cursor: pointer;
 }
 
-/* ==========================================
-   MODAL STRUCTURAL RULES
-   ========================================== */
+/* =========================================================
+   🌟 MODAL BACKDROP & STRUCTURAL LAYOUT
+   ========================================================= */
 
-.modal-overlay {
+.modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -131,22 +122,22 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.6); 
-  backdrop-filter: blur(3px);           
+  backdrop-filter: blur(3px);          
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 99999;                       
+  z-index: 99999;                    
 }
 
-.modal-container {
+.modal-content {
   background-color: #FFFFFF;
-  padding: 35px;                        
+  padding: 30px;                        
   border-radius: 20px;                  
   border: 1px solid #4B70F5;            
-  width: 600px;                         
-  max-width: 95%;                       
-  max-height: 85vh; /* E detyron modalin të mos jetë më i gjatë se 85% e ekranit */
-  display: flex;    /* Kthehet në flexbox për të menaxhuar scroll-in e brendshëm */
+  width: 580px;                         
+  max-width: 95%;                      
+  max-height: 85vh; 
+  display: flex;    
   flex-direction: column;
   box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.45);
   animation: modalSlideUp 0.3s ease-out;
@@ -158,119 +149,138 @@
   align-items: center;
   border-bottom: 1px solid #ddd;
   padding-bottom: 12px;
-  margin-bottom: 20px;
-  flex-shrink: 0; /* Parandalon tkurrjen e header-it */
+  margin-bottom: 15px;
+  flex-shrink: 0; 
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 22px;                      
+  font-size: 20px;                      
   color: #1E293B;
 }
 
-.close-modal-btn {
+.close-x-btn {
   background: none;
   border: none;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
   cursor: pointer;
   color: #64748B;
   transition: color 0.2s;
+  line-height: 1;
 }
 
-.close-modal-btn:hover {
+.close-x-btn:hover {
   color: #EF4444;
 }
 
-.modal-form {
+.modal-form-layout {
   display: flex;
   flex-direction: column;
-  gap: 16px;                            
-  overflow-y: auto; /* Aktivizon scroll-in vertikal vetëm për formën dhe kutitë e tjera */
-  padding-right: 8px; /* Hapësirë që scrollbar-i mos të mbulojë inputet */
+  gap: 16px;                                            
+  overflow-y: auto; 
+  padding-right: 8px; 
 }
 
-/* Stilim opsional për scrollbar-in e modalit që të duket më elegant */
-.modal-form::-webkit-scrollbar {
+/* Scrollbar dizajni brenda modalit */
+.modal-form-layout::-webkit-scrollbar {
   width: 6px;
 }
 
-.modal-form::-webkit-scrollbar-track {
+.modal-form-layout::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 10px;
 }
 
-.modal-form::-webkit-scrollbar-thumb {
+.modal-form-layout::-webkit-scrollbar-thumb {
   background: #cbd5e0;
   border-radius: 10px;
 }
 
-.modal-form::-webkit-scrollbar-thumb:hover {
+.modal-form-layout::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
 }
 
-.form-group {
+/* Form Grid & Inputs */
+.form-fields-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-fields-grid h3 {
+  margin: 10px 0 5px 0;
+  font-size: 15px;
+  color: #4B70F5;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 4px;
+}
+
+.input-field-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.form-group label {
-  font-size: 14px;                      
+.input-field-group label {
+  font-size: 13px;                      
   font-weight: 600;
   color: #1E293B;
 }
 
-.form-group input, 
-.form-group select {
+.input-field-group input, 
+.input-field-group select {
   padding: 10px 14px;                   
   border: 1px solid #ddd;
   border-radius: 10px;                  
-  font-size: 15px;
+  font-size: 14px;
   outline: none;
   background-color: #FFFFFF;
   transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.form-group input:focus, 
-.form-group select:focus {
+.input-field-group input:focus, 
+.input-field-group select:focus {
   border-color: #4B70F5;                
 }
 
-.checkbox-group {
+.input-field-group input:disabled {
+  background-color: #edf2f7;
+  cursor: not-allowed;
+  color: #718096;
+}
+
+.checkbox-field-group {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  margin-top: 5px;
 }
 
-.checkbox-group label {
-  margin: 0;
+.checkbox-field-group label {
+  font-size: 13px;
   font-weight: 600;
+  color: #1E293B;
+  cursor: pointer;
 }
 
-.modal-actions {
+.checkbox-field-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Actions Buttons Row */
+.form-actions-row {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 20px;
-  border-top: 1px solid #ddd;
-  padding-top: 18px;
-  flex-shrink: 0; /* Parandalon që butona poshtë të fshihen ose tkurren */
-}
-
-.modal-actions-space-between {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  border-top: 1px solid #eee;
-  padding-top: 15px;
   margin-top: 15px;
-  flex-shrink: 0;
-}
-
-.modal-actions-left-cluster {
-  display: flex;
-  gap: 10px;
+  border-top: 1px solid #ddd;
+  padding-top: 15px;
+  flex-shrink: 0; 
 }
 
 .cancel-btn {
@@ -281,7 +291,8 @@
   border-radius: 10px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .cancel-btn:hover {
@@ -296,8 +307,9 @@
   border-radius: 10px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 14px;
   border: 1px solid #FFFFFF;
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .save-btn:hover {
@@ -305,174 +317,171 @@
   box-shadow: 0px 0px 5px #1E293B;
 }
 
-.password-trigger-btn {
-  padding: 8px 12px;
-  background-color: #f0ad4e;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-}
+/* =========================================================
+   🌟 PROFILE LINKING & VERIFICATION SUB-BLOCKS
+   ========================================================= */
 
-/* ==========================================
-   PROFILE LINKING & VERIFICATION SUB-LAYERS
-   ========================================== */
-
-.profile-verification-box {
+.profile-verification-block {
   background-color: #f4f7f9;
   padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  border-radius: 12px;
+  margin-bottom: 10px;
   border: 1px dashed #b0c4de;
 }
 
-.profile-verification-box label {
-  font-weight: 600;
-  display: block;
-  margin-bottom: 6px;
+.profile-verification-block h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
   color: #333;
 }
 
-.profile-verification-input-wrapper {
+.verification-input-row {
   display: flex;
   gap: 10px;
 }
 
-.profile-verification-input-wrapper input {
+.verification-input-row input {
   flex: 1;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
 }
 
-.profile-verify-action-btn {
-  padding: 8px 15px;
+.verify-btn {
+  padding: 10px 18px;
   background-color: #28a745;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 13px;
+  transition: background-color 0.2s;
 }
 
-.profile-verification-error {
+.verify-btn:hover {
+  background-color: #218838;
+}
+
+.verification-error {
   color: #d9534f;
   margin: 8px 0 0 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
-.profile-verification-success {
+.verification-success-card {
   margin-top: 10px;
-  padding: 8px;
+  padding: 10px;
   background-color: #e8f5e9;
   border: 1px solid #c8e6c9;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
-.profile-verification-success-text {
+.verification-success-card p {
   color: #2e7d32;
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
 }
 
-.profile-verification-success-subtext {
-  margin: 4px 0 0 0;
-  color: #444;
-  font-size: 14px;
-}
-
-.profile-readonly-box {
+.profile-verification-block.static-link {
   background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
   border: 1px solid #e2e8f0;
+  padding: 12px;
 }
 
-.profile-readonly-box h4 {
-  margin: 0 0 10px 0;
+.profile-verification-block.static-link p {
+  margin: 4px 0;
+  font-size: 13px;
   color: #4a5568;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 5px;
 }
 
-.profile-readonly-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+/* =========================================================
+   🌟 DANGER ZONE & ADMINISTRATIVE PASSWORD OVERRIDE
+   ========================================================= */
 
-.form-group-readonly label {
-  font-size: 12px;
-  color: #718096;
-  display: block;
-}
-
-.form-group-readonly input {
-  background-color: #edf2f7;
-  border: 1px solid #cbd5e0;
-  cursor: not-allowed;
-  width: 100%;
-  padding: 6px;
-  border-radius: 4px;
-}
-
-/* ==========================================
-   SECURITY BOX 
-   ========================================== */
-
-.password-cautionary-box {
-  margin-top: 20px;
+.danger-zone-password-reset {
+  margin-top: 15px;
   padding: 15px;
   background-color: #fff3cd;
   border: 1px solid #ffeeba;
-  border-radius: 8px;
+  border-radius: 12px;
+  flex-shrink: 0;
 }
 
-.password-cautionary-box h4 {
-  margin: 0 0 5px 0;
+.danger-zone-password-reset h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
   color: #856404;
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
-.password-cautionary-box p {
-  margin: 0 0 12px 0;
+.trigger-reset-btn {
+  padding: 8px 14px;
+  background-color: #e0a800;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
   font-size: 13px;
-  color: #664d03;
-  line-height: 1.4;
+  transition: background-color 0.2s;
 }
 
-.password-cautionary-form {
+.trigger-reset-btn:hover {
+  background-color: #d39e00;
+}
+
+.inline-password-form {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.password-cautionary-form input {
-  flex: 1;
-  padding: 8px;
+.inline-password-form input {
+  padding: 8px 12px;
   border: 1px solid #f5c6cb;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
 }
 
-.password-cautionary-form button {
-  padding: 8px 15px;
+.inline-action-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.confirm-reset-btn {
+  padding: 8px 14px;
   background-color: #bd2130;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 13px;
+}
+
+.confirm-reset-btn:hover {
+  background-color: #b21f2d;
+}
+
+.cancel-reset-btn {
+  padding: 8px 14px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 @keyframes modalSlideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;

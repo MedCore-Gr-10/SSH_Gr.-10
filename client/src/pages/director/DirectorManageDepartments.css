@@ -8,13 +8,34 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
-.director-departments-grid {
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 24px;
-  margin-top: 24px;
+.director-departments-header h2 {
+  margin: 0;
+}
+
+.director-departments-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+}
+
+.departments-count {
+  background: #e0f2fe;
+  color: #075985;
+  border-radius: 999px;
+  font-weight: 700;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.departments-error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-top: 18px;
+  padding: 12px 14px;
 }
 
 .departments-table {
@@ -29,24 +50,65 @@
   text-align: left;
 }
 
-.departments-form {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+.departments-table th {
+  color: #475569;
+  font-size: 0.85rem;
+  text-transform: uppercase;
 }
 
-.departments-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
+.status-active,
+.status-inactive {
+  border-radius: 999px;
+  display: inline-flex;
+  font-weight: 700;
+  padding: 6px 10px;
 }
 
-.btn-primary { background: #2563eb; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; }
-.btn-secondary { background: #6b7280; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; }
+.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
 
-.content-scroll { overflow-y: auto; max-height: calc(100vh - 240px); }
+.status-inactive {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.btn-primary,
+.btn-secondary {
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  min-width: 108px;
+  padding: 10px 14px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: #fff;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.content-scroll {
+  margin-top: 24px;
+  overflow-y: auto;
+  max-height: calc(100vh - 220px);
+}
 
 @media (max-width: 900px) {
-  .director-departments-grid { grid-template-columns: 1fr; }
+  .director-departments-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

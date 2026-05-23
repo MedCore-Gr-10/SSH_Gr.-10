@@ -8,17 +8,48 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%; /* Siguron që kontaineri kryesor shtrihet plotësisht */
+  box-sizing: border-box;
 }
 
 .page-header {
+  width: 100%;
+  box-sizing: border-box;
   border-bottom: 1px solid #eef2f5;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
+  display: flex;
+  flex-direction: row; 
+  justify-content: space-between;
+  align-items: center; 
+  gap: 15px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
 }
 
 .page-title {
-  margin: 0 0 2px 0;
+  margin: 0;
   color: #1a202c;
   font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.header-right {
+  display: flex;
+  align-items: column;
+  margin-left: auto; /* Sigurim ekstra: Nëse diçka prish flex-in, kjo e shtyn automatikisht djathtas */
+}
+
+.page-title {
+  margin: 0;
+  color: #1a202c;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .page-subtitle {

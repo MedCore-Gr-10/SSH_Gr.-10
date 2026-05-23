@@ -23,7 +23,8 @@ CREATE TABLE profiles(
     birth DATE,
     gender TEXT ,
     personal_no TEXT UNIQUE ,
-    phone_number TEXT 
+    phone_number TEXT,
+    current_emergency_contact_id UUID
 );
 
 CREATE TABLE users_profiles(
@@ -35,12 +36,21 @@ CREATE TABLE users_profiles(
 
 CREATE TABLE emergency_contacts(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    patient_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    contact_name VARCHAR(100) NOT NULL,
+    profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL DEFAULT '',
     relationship VARCHAR(50),
-    phone_number TEXT,
-    UNIQUE (patient_id, phone_number)
+    phone_number TEXT NOT NULL,
+    email TEXT,
+    id_number VARCHAR(50),
+    UNIQUE (profile_id, phone_number)
 );
+
+ALTER TABLE profiles
+ADD CONSTRAINT profiles_current_emergency_contact_id_fkey
+FOREIGN KEY (current_emergency_contact_id)
+REFERENCES emergency_contacts(id)
+ON DELETE SET NULL;
 
 CREATE TABLE hospitals(
     id SERIAL PRIMARY KEY,
@@ -95,15 +105,20 @@ CREATE TABLE staff_specializations(
 
 CREATE TABLE allergies(
     id SERIAL PRIMARY KEY,
-    patient_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    allergy_name VARCHAR(50),
-    UNIQUE (patient_id, allergy_name)
+    profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    allergy_name VARCHAR(50) NOT NULL,
+    allergy_type VARCHAR(50) NOT NULL DEFAULT 'Other',
+    reaction_symptoms TEXT NOT NULL DEFAULT '',
+    severity VARCHAR(50) NOT NULL DEFAULT 'Mild',
+    UNIQUE (profile_id, allergy_name)
 );
 
 CREATE TABLE insurance(
     id SERIAL PRIMARY KEY,
-    patient_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     provider TEXT,
+    insurance_company_email TEXT,
+    customer_support_number TEXT,
     policy_number TEXT,
     coverage_percent INTEGER,
     start_date DATE,

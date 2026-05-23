@@ -19,13 +19,160 @@ const authService = new AuthService(
 );
 const authController = new AuthController(authService);
 
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Creates a new user account in the system
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: johndoe
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 example: Password123!
+ *               role:
+ *                 type: string
+ *                 example: PATIENT
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid input data
+ */
 router.post("/register", authController.register);
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     description: Authenticates user and returns JWT token
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 example: Password123!
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ */
 router.post("/login", authController.login);
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Request password reset
+ *     description: Sends password reset instructions to the user's email
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *     responses:
+ *       200:
+ *         description: Password reset request processed
+ *       404:
+ *         description: User not found
+ */
 router.post("/forgot-password", authController.forgotPassword);
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Reset password
+ *     description: Resets the user password using reset token
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: reset_token_example
+ *               newPassword:
+ *                 type: string
+ *                 example: NewPassword123!
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *       400:
+ *         description: Invalid or expired token
+ */
 router.post("/reset-password", authController.resetPassword);
 
 // Dev-only: create a mock JWT for frontend testing when backend runs in non-production
 if (process.env.NODE_ENV !== "production") {
+  /**
+ * @swagger
+ * /api/auth/dev/mock-login:
+ *   post:
+ *     summary: Development mock login
+ *     description: Generates a mock JWT token for frontend testing in development mode
+ *     tags:
+ *       - Development
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *                 example: 1
+ *               role:
+ *                 type: string
+ *                 example: director
+ *               hospital_id:
+ *                 type: integer
+ *                 example: 1
+ *               username:
+ *                 type: string
+ *                 example: devuser
+ *               email:
+ *                 type: string
+ *                 example: dev@local
+ *     responses:
+ *       200:
+ *         description: Mock token generated successfully
+ *       500:
+ *         description: Unable to generate mock token
+ */
   router.post("/dev/mock-login", (req, res) => {
     const {
       id = 1,
