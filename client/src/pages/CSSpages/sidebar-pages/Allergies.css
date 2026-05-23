@@ -39,6 +39,7 @@
 
 .allergy-entry-row {
   display: flex;
+  justify-content: center;
   gap: 0.75rem;
   flex-wrap: wrap;
   align-items: center;
@@ -86,6 +87,30 @@
   box-shadow: 0 14px 30px rgba(92, 92, 214, 0.18);
 }
 
+.remove-allergy-button {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.remove-allergy-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(217, 70, 72, 0.12);
+}
+
+.remove-allergy-button:disabled,
+.modal-secondary:disabled,
+.modal-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
 .allergies-table-wrapper {
   overflow-x: auto;
   margin-top: 1.5rem;
@@ -94,7 +119,7 @@
 .allergies-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  min-width: 780px;
 }
 
 .allergies-table th,
@@ -114,6 +139,12 @@
 
 .allergies-table tbody tr:hover {
   background-color: #f8fafc;
+}
+
+.no-results {
+  color: #718096;
+  font-weight: 600;
+  text-align: center;
 }
 
 .error-message,
@@ -136,6 +167,137 @@
   color: #2f855a;
 }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  z-index: 2000;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 680px;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #1a202c;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: #4a5568;
+  font-size: 1.75rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  color: #5c5cd6;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.form-input,
+.form-textarea {
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  padding: 1rem 1rem;
+  background-color: #ffffff;
+  color: #2d3748;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-input:hover,
+.form-textarea:hover {
+  border-color: #c3d4fd;
+  box-shadow: 0 10px 25px rgba(92, 92, 214, 0.08);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #5c5cd6;
+  box-shadow: 0 0 20px rgba(92, 92, 214, 0.15);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.modal-secondary,
+.modal-primary {
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  padding: 0.95rem 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-secondary {
+  background: #f7fafc;
+  color: #4a5568;
+}
+
+.modal-primary {
+  background: #5c5cd6;
+  color: white;
+}
+
+.modal-secondary:hover,
+.modal-primary:hover {
+  transform: translateY(-1px);
+}
+
 @media (max-width: 768px) {
   .allergies-card {
     padding: 2rem;
@@ -143,6 +305,10 @@
 
   .allergies-title {
     font-size: 30px;
+  }
+
+  .modal-row {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -154,6 +320,14 @@
 
   .add-allergy-button {
     width: 100%;
+  }
+
+  .modal-card {
+    padding: 1.5rem;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
   }
 
   .allergies-table {

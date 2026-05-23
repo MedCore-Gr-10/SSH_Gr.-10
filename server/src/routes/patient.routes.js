@@ -4,6 +4,7 @@ import { AuthMiddleware } from "../middlewares/authMiddleware.js";
 import { RoleMiddleware } from "../middlewares/roleMiddleware.js";
 import PatientReviewsController from "../controllers/patient-controllers/reviews.controller.js";
 import PatientEmergencyContactsController from "../controllers/patient-controllers/emergencyContacts.controller.js";
+import PatientAllergiesController from "../controllers/patient-controllers/allergies.controller.js";
 
 const router = express.Router();
 const jwtService = new JwtService();
@@ -11,6 +12,7 @@ const authMiddleware = new AuthMiddleware(jwtService);
 const roleMiddleware = new RoleMiddleware("patient", "PATIENT");
 const reviewsController = new PatientReviewsController();
 const emergencyContactsController = new PatientEmergencyContactsController();
+const allergiesController = new PatientAllergiesController();
 
 router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
@@ -31,5 +33,9 @@ router.delete(
   "/emergency-contacts/:contactId",
   (req, res, next) => emergencyContactsController.deleteContact(req, res, next)
 );
+
+router.get("/allergies", (req, res, next) => allergiesController.listAllergies(req, res, next));
+router.post("/allergies", (req, res, next) => allergiesController.createAllergy(req, res, next));
+router.delete("/allergies/:allergyId", (req, res, next) => allergiesController.deleteAllergy(req, res, next));
 
 export default router;
