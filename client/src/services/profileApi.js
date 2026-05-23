@@ -25,18 +25,19 @@ const handleResponse = async (response) => {
   return payload.data ?? payload;
 };
 
-export const getStaffSchedules = async () => {
-  const response = await fetch(`${API}/staff/schedules`, {
+export const getMyProfile = async () => {
+  const response = await fetch(`${API}/profiles/me`, {
     method: "GET",
     headers: getHeaders(),
   });
   return handleResponse(response);
 };
 
-export const getDoctorHospitalStaffSchedules = async () => {
-  const response = await fetch(`${API}/staff/schedules?scope=hospital`, {
-    method: "GET",
+export const updateMyProfile = async (data) => {
+  const response = await fetch(`${API}/profiles/me`, {
+    method: "PUT",
     headers: getHeaders(),
+    body: JSON.stringify(data),
   });
   return handleResponse(response);
 };

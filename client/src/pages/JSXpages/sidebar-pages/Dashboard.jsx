@@ -4,6 +4,7 @@ import { useAuth } from "../../../context/authContext.jsx";
 import DirectorDashboard from "../../director/DirectorDashboard.jsx";
 import DoctorDashboard from "../../doctor/DoctorDashboard.jsx";
 import PatientDashboard from "../../patient/PatientDashboard.jsx";
+import NurseDashboard from "../../nurse/NurseDashboard.jsx";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -20,6 +21,9 @@ export default function Dashboard() {
   }
   if (role === "patient") {
     return <PatientDashboard />;
+  }
+  if (role === "nurse") {
+    return <NurseDashboard />;
   }
 
   return (

@@ -1,4 +1,5 @@
 import profileRepository from "../../repositories/profile.repository.js";
+import prisma from "../../prisma.js";
 
 class ProfileService {
   async getAllProfiles() {
@@ -149,6 +150,164 @@ class ProfileService {
       throw new Error("Profile not found.");
     }
     return await profileRepository.delete(id);
+  }
+
+  async getCurrentUserProfile(userId, role, hospitalId) {
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      include: {
+        roles: true,
+        users_profiles: {
+          include: { profiles: true },
+          take: 1,
+        },
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                hospitals: true,
+                departments: true,
+              },
+            },
+            staff_specializations: {
+              include: { specializations: true },
+            },
+          },
+          take: 1,
+        },
+        patients_hospitals: {
+          include: { hospitals: true },
+          take: 1,
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    const profileLink = user.users_profiles?.[0];
+    const profile = profileLink?.profiles;
+    const staffAssignment = user.staff_hospitals_departments?.[0];
+    const hospital = staffAssignment?.hospitals_departments?.hospitals || user.patients_hospitals?.[0]?.hospitals || null;
+    const department = staffAssignment?.hospitals_departments?.departments || null;
+    const specialization = staffAssignment?.staff_specializations?.[0]?.specializations || null;
+
+    const [staffCount, patientCount] = hospitalId
+      ? await Promise.all([
+          prisma.staff_hospitals_departments.groupBy({
+            by: ["staff_id"],
+            where: { hospital_id: Number(hospitalId) },
+          }),
+          prisma.patients_hospitals.count({
+            where: { hospital_id: Number(hospitalId) },
+          }),
+        ])
+      : [[], 0];
+
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        role: role || user.roles?.role_name?.toLowerCase() || "",
+        is_active: user.is_active,
+      },
+      profile: {
+        id: profile?.id || null,
+        first_name: profile?.first_name || "",
+        last_name: profile?.last_name || "",
+        birth: profile?.birth || null,
+        gender: profile?.gender || "",
+        personal_no: profile?.personal_no || "",
+        phone_number: profile?.phone_number || "",
+        email: profileLink?.email || "",
+      },
+      assignment: {
+        hospital_id: hospital?.id || hospitalId || null,
+        hospital_name: hospital?.hospital_name || "",
+        department_name: department?.department_name || "",
+        specialization_name: specialization?.specialization_name || "",
+      },
+      summary: {
+        staff_count: staffCount.length,
+        patient_count: patientCount,
+      },
+    };
+  }
+
+  async updateCurrentUserProfile(userId, data, role = null, hospitalId = null) {
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      include: {
+        users_profiles: {
+          include: { profiles: true },
+          take: 1,
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    const profileLink = user.users_profiles?.[0];
+    if (!profileLink) {
+      throw new Error("Profile not found.");
+    }
+
+    const username = data.username?.trim();
+    const email = data.email?.trim();
+    const firstName = data.first_name?.trim();
+    const lastName = data.last_name?.trim();
+
+    if (!username) throw new Error("Username is required.");
+    if (!email) throw new Error("Email is required.");
+    if (!firstName) throw new Error("First name is required.");
+    if (!lastName) throw new Error("Last name is required.");
+
+    const usernameInUse = await prisma.users.findUnique({ where: { username } });
+    if (usernameInUse && usernameInUse.id !== userId) {
+      throw new Error("Username already exists.");
+    }
+
+    const emailInUse = await prisma.users_profiles.findFirst({
+      where: {
+        email,
+        user_id: { not: userId },
+      },
+    });
+    if (emailInUse) {
+      throw new Error("Email already exists.");
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.users.update({
+        where: { id: userId },
+        data: { username },
+      });
+
+      await tx.profiles.update({
+        where: { id: profileLink.profile_id },
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          phone_number: data.phone_number?.trim() || null,
+          gender: data.gender || null,
+        },
+      });
+
+      await tx.users_profiles.update({
+        where: {
+          user_id_profile_id: {
+            user_id: userId,
+            profile_id: profileLink.profile_id,
+          },
+        },
+        data: { email },
+      });
+    });
+
+    return this.getCurrentUserProfile(userId, role || user.roles?.role_name?.toLowerCase(), hospitalId);
   }
 }
 

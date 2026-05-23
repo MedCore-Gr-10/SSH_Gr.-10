@@ -17,29 +17,24 @@ class DirectorStaffService {
     }
   }
 
-  normalizeDepartmentIds(data) {
-    const rawIds = Array.isArray(data.department_ids)
-      ? data.department_ids
-      : data.department_id
-        ? [data.department_id]
-        : [];
+  async ensureHospitalDepartment(hospitalId, departmentId) {
+    const departments = await hospitalsDepartmentsRepository.findByHospital(hospitalId);
+    const belongsToHospital = departments.some(
+      (entry) => entry.department_id === Number(departmentId)
+    );
 
-    return [...new Set(rawIds.map((id) => Number(id)).filter(Boolean))];
+    if (!belongsToHospital) {
+      throw new Error("Department does not belong to this hospital");
+    }
   }
 
-  async ensureHospitalDepartments(hospitalId, departmentIds) {
-    if (!departmentIds.length) {
-      throw new Error("Select at least one department");
-    }
+  async ensureSpecialization(specializationId) {
+    const specialization = await prisma.specializations.findUnique({
+      where: { id: Number(specializationId) },
+    });
 
-    const departments = await hospitalsDepartmentsRepository.findByHospital(hospitalId);
-    const activeDepartmentIds = new Set(
-      departments.map((entry) => Number(entry.department_id))
-    );
-    const invalidDepartment = departmentIds.find((id) => !activeDepartmentIds.has(Number(id)));
-
-    if (invalidDepartment) {
-      throw new Error("One or more departments do not belong to this hospital");
+    if (!specialization) {
+      throw new Error("Specialization not found");
     }
   }
 
@@ -65,6 +60,8 @@ class DirectorStaffService {
       email,
       password,
       role,
+      department_id,
+      specialization_id,
       first_name,
       last_name,
       birth,
@@ -72,7 +69,6 @@ class DirectorStaffService {
       personal_no,
       phone_number,
     } = data;
-    const departmentIds = this.normalizeDepartmentIds(data);
     const normalizedPersonalNo = this.normalizePersonalNo(personal_no);
     const birthDate = new Date(birth);
 
@@ -81,7 +77,8 @@ class DirectorStaffService {
       !email ||
       !password ||
       !role ||
-      departmentIds.length === 0 ||
+      !department_id ||
+      !specialization_id ||
       !first_name ||
       !last_name ||
       !birth ||
@@ -117,7 +114,8 @@ class DirectorStaffService {
       throw new Error("Staff role not found");
     }
 
-    await this.ensureHospitalDepartments(hospitalId, departmentIds);
+    await this.ensureHospitalDepartment(hospitalId, department_id);
+    await this.ensureSpecialization(specialization_id);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -229,12 +227,21 @@ class DirectorStaffService {
         },
       });
 
-      await tx.staff_hospitals_departments.createMany({
-        data: departmentIds.map((departmentId) => ({
+      await tx.staff_hospitals_departments.create({
+        data: {
           staff_id: user.id,
           hospital_id: hospitalId,
-          department_id: Number(departmentId),
-        })),
+          department_id: Number(department_id),
+        },
+      });
+
+      await tx.staff_specializations.create({
+        data: {
+          staff_id: user.id,
+          hospital_id: hospitalId,
+          department_id: Number(department_id),
+          specialization_id: Number(specialization_id),
+        },
       });
 
       return user;
@@ -281,10 +288,11 @@ class DirectorStaffService {
       this.validatePassword(data.password);
     }
 
-    const hasDepartmentUpdate = Array.isArray(data.department_ids) || Boolean(data.department_id);
-    const departmentIds = this.normalizeDepartmentIds(data);
-    if (hasDepartmentUpdate) {
-      await this.ensureHospitalDepartments(hospitalId, departmentIds);
+    if (data.department_id) {
+      await this.ensureHospitalDepartment(hospitalId, data.department_id);
+    }
+    if (data.specialization_id) {
+      await this.ensureSpecialization(data.specialization_id);
     }
 
     const normalizedPersonalNo = this.normalizePersonalNo(data.personal_no);
@@ -348,7 +356,7 @@ class DirectorStaffService {
         },
       });
 
-      if (hasDepartmentUpdate) {
+      if (data.department_id) {
         await tx.staff_hospitals_departments.deleteMany({
           where: {
             staff_id: id,
@@ -356,12 +364,31 @@ class DirectorStaffService {
           },
         });
 
-        await tx.staff_hospitals_departments.createMany({
-          data: departmentIds.map((departmentId) => ({
+        await tx.staff_hospitals_departments.create({
+          data: {
             staff_id: id,
             hospital_id: hospitalId,
-            department_id: Number(departmentId),
-          })),
+            department_id: Number(data.department_id),
+          },
+        });
+      }
+
+      if (data.specialization_id) {
+        const departmentId = Number(data.department_id || staff.staff_hospitals_departments?.[0]?.department_id);
+        await tx.staff_specializations.deleteMany({
+          where: {
+            staff_id: id,
+            hospital_id: hospitalId,
+          },
+        });
+
+        await tx.staff_specializations.create({
+          data: {
+            staff_id: id,
+            hospital_id: hospitalId,
+            department_id: departmentId,
+            specialization_id: Number(data.specialization_id),
+          },
         });
       }
     });

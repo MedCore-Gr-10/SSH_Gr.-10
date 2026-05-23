@@ -46,6 +46,8 @@ router.route("/")
   .get((req, res, next) => manageDepartmentsController.getAll(req, res, next))
   .post((req, res, next) => manageDepartmentsController.create(req, res, next));
 
+router.get("/:id/hospitals", (req, res, next) => manageDepartmentsController.getHospitals(req, res, next));
+  
 // /api/departments/:id
 /**
  * @swagger

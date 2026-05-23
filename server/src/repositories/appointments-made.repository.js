@@ -32,6 +32,122 @@ class AppointmentsMadeRepository {
     });
   }
 
+  async findPatientHistoryAtHospital(patientId, hospitalId, filters = {}) {
+    const templateWhere = { hospital_id: hospitalId };
+    if (filters.departmentId) {
+      templateWhere.department_id = Number(filters.departmentId);
+    }
+
+    const slotWhere = {
+      appointments_templates: templateWhere,
+    };
+
+    if (filters.dateFrom || filters.dateTo) {
+      slotWhere.appointment_date = {};
+      if (filters.dateFrom) {
+        slotWhere.appointment_date.gte = new Date(filters.dateFrom);
+      }
+      if (filters.dateTo) {
+        slotWhere.appointment_date.lte = new Date(filters.dateTo);
+      }
+    }
+
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        appointments_booking_slots: slotWhere,
+      },
+      include: {
+        diagnoses: {
+          orderBy: { created_at: "desc" },
+        },
+        prescriptions: {
+          orderBy: { created_at: "desc" },
+        },
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true,
+                        hospitals: true,
+                      },
+                    },
+                    users: {
+                      include: {
+                        users_profiles: {
+                          include: {
+                            profiles: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async findPatientAppointmentsAtHospital(patientId, hospitalId) {
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        appointments_booking_slots: {
+          appointments_templates: {
+            hospital_id: hospitalId,
+          },
+        },
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true,
+                      },
+                    },
+                    users: {
+                      include: {
+                        users_profiles: {
+                          include: {
+                            profiles: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
+  }
+
   async findHospitalAppointments(hospitalId) {
     return prisma.appointments_made.findMany({
       where: {

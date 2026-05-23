@@ -29,6 +29,40 @@ class ProfileController {
     }
   }
 
+  async getMe(req, res, next) {
+    try {
+      const profile = await this.profileService.getCurrentUserProfile(
+        req.user.user_id,
+        req.user.role,
+        req.user.hospital_id
+      );
+      res.status(200).json({
+        success: true,
+        data: profile,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateMe(req, res, next) {
+    try {
+      const profile = await this.profileService.updateCurrentUserProfile(
+        req.user.user_id,
+        req.body,
+        req.user.role,
+        req.user.hospital_id
+      );
+      res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        data: profile,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async createProfile(req, res, next) {
     try {
       const newProfile = await this.profileService.createProfile(req.body);

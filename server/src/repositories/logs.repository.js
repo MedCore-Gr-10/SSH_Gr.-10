@@ -8,14 +8,84 @@ class LogsRepository {
     });
   }
 
-  async findUserLogs(userId) {
+  async findUserLogs(userId, limit = 100) {
     return prisma.logs.findMany({
       where: {
         user_id: userId
       },
       orderBy: {
         timestamp: "desc"
-      }
+      },
+      take: limit,
+    });
+  }
+
+  async countUserLogsSince(userId, since) {
+    return prisma.logs.count({
+      where: {
+        user_id: userId,
+        timestamp: {
+          gte: since,
+        },
+      },
+    });
+  }
+
+  /** My Patients page actions only (prefix match). */
+  static MY_PATIENTS_ACTION_PREFIXES = [
+    "Search patients",
+    "View allergies",
+    "View insurance",
+    "View emergency contacts",
+    "View appointments",
+    "View patient history",
+  ];
+
+  myPatientsActionFilter() {
+    return {
+      OR: LogsRepository.MY_PATIENTS_ACTION_PREFIXES.map((prefix) => ({
+        action: { startsWith: prefix },
+      })),
+    };
+  }
+
+  async findMyPatientsLogs(userId, limit = 200) {
+    return prisma.logs.findMany({
+      where: {
+        user_id: userId,
+        ...this.myPatientsActionFilter(),
+      },
+      orderBy: { timestamp: "desc" },
+      take: limit,
+    });
+  }
+
+  async countMyPatientsAccessSince(userId, since) {
+    return prisma.logs.count({
+      where: {
+        user_id: userId,
+        timestamp: { gte: since },
+        ...this.myPatientsActionFilter(),
+      },
+    });
+  }
+
+  async findAll() {
+    return prisma.logs.findMany({
+      include: {
+        user: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
     });
   }
 

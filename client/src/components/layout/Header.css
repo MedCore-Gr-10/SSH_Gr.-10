@@ -96,3 +96,80 @@
   box-shadow: none !important;
   filter: none !important;
 }
+
+.nav-links-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.logout-modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+  padding: 28px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.logout-modal h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.35rem;
+  color: #111827;
+}
+
+.logout-modal p {
+  margin: 0 0 22px 0;
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.logout-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.logout-modal-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.logout-modal-btn--primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.logout-modal-btn--primary:hover {
+  background: #1d4ed8;
+}
+
+.logout-modal-btn--secondary {
+  background: #6b7280;
+  color: #fff;
+}
+
+.logout-modal-btn--secondary:hover {
+  background: #4b5563;
+}
