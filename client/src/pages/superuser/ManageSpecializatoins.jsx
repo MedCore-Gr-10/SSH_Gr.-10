@@ -173,7 +173,7 @@ export default function ManageSpecialization() {
 
           <div className="button-group">
             <button type="submit" className={`btn ${isEditing ? "btn-primary" : "btn-success"}`}>
-              {isEditing ? "Update Name" : "Create Specialization"}
+              {isEditing ? "Update Name" : "+  Create Specialization"}
             </button>
             
             {isEditing && (

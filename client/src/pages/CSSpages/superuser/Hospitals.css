@@ -13,6 +13,9 @@
 .page-header {
   border-bottom: 1px solid #eef2f5;
   padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
 }
 
 .page-title {

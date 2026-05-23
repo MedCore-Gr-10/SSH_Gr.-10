@@ -162,7 +162,7 @@ export default function ManageDepartments() {
 
           <div className="button-group">
             <button type="submit" className={`btn ${isEditing ? "btn-primary" : "btn-success"}`}>
-              {isEditing ? "Update Name" : "Create Department"}
+              {isEditing ? "Update Name" : "+  Create Department"}
             </button>
             
             {isEditing && (
