@@ -1,13 +1,11 @@
 import prisma from "../prisma.js";
 
 class ProfilesRepository {
-
   /*
   |--------------------------------------------------------------------------
   | CREATE
   |--------------------------------------------------------------------------
   */
-
   async create(data) {
     return prisma.profiles.create({
       data
@@ -19,7 +17,6 @@ class ProfilesRepository {
   | FIND UNIQUE
   |--------------------------------------------------------------------------
   */
-
   async findById(id) {
     return prisma.profiles.findUnique({
       where: { id },
@@ -58,7 +55,6 @@ class ProfilesRepository {
   | FIND MANY
   |--------------------------------------------------------------------------
   */
-
   async findAll() {
     return prisma.profiles.findMany({
       include: {
@@ -101,7 +97,6 @@ class ProfilesRepository {
   | UPDATE
   |--------------------------------------------------------------------------
   */
-
   async update(id, data) {
     return prisma.profiles.update({
       where: { id },
@@ -123,13 +118,17 @@ class ProfilesRepository {
   | DELETE
   |--------------------------------------------------------------------------
   */
+  async delete(id) {
+    return prisma.profiles.delete({
+      where: { id }
+    });
+  }
 
   /*
   |--------------------------------------------------------------------------
   | USER RELATIONS
   |--------------------------------------------------------------------------
   */
-
   async attachUser(profileId, userId, email) {
     return prisma.users_profiles.create({
       data: {
@@ -197,34 +196,26 @@ class ProfilesRepository {
   | PATIENT DETAILS
   |--------------------------------------------------------------------------
   */
-
   async getPatientFullProfile(userId) {
     return prisma.users.findUnique({
       where: {
         id: userId
       },
       include: {
-
         roles: true,
-
         users_profiles: {
           include: {
             profiles: true
           }
         },
-
         allergies: true,
-
         insurance: true,
-
         emergency_contacts: true,
-
         patients_hospitals: {
           include: {
             hospitals: true
           }
         },
-
         appointments_made: {
           include: {
             appointments_booking_slots: true,
@@ -241,56 +232,75 @@ class ProfilesRepository {
   | DOCTOR DETAILS
   |--------------------------------------------------------------------------
   */
-
   async getDoctorFullProfile(userId) {
     return prisma.users.findUnique({
       where: {
         id: userId
       },
       include: {
-
         roles: true,
-
         users_profiles: {
           include: {
             profiles: true
           }
         },
-
         staff_hospitals_departments: {
           include: {
-
             hospitals_departments: {
               include: {
                 hospitals: true,
                 departments: true
               }
             },
-
             staff_specializations: {
               include: {
                 specializations: true
               }
             },
-
             staff_working_schedules: true,
-
             appointments_templates: true
           }
         },
-
         reviews_reviews_doctor_idTousers: true
       }
     });
   }
-async delete(id) {
-  return await prisma.profile.delete({
-    where: { 
-      id: parseInt(id, 10) 
-    }
-  });
-}
-}
 
+  /*
+  |--------------------------------------------------------------------------
+  | DIRECTOR DETAILS
+  |--------------------------------------------------------------------------
+  */
+  async findDirectorByPersonalNo(personalNo) {
+    return prisma.profiles.findFirst({
+      where: {
+        personal_no: String(personalNo),
+        users_profiles: {
+          some: {
+            users: {
+              roles: {
+                role_name: "director"
+              }
+            }
+          }
+        }
+      },
+      include: {
+        users_profiles: {
+          include: {
+            users: {
+              select: {
+                id: true,
+                username: true,
+                is_active: true,
+                role_id: true
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
 
 export default new ProfilesRepository();

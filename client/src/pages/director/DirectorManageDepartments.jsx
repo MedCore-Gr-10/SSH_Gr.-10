@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from "react";
 import {
-  getDirectorDepartments,
-  createDirectorDepartment,
-  updateDirectorDepartment,
+  activateDirectorDepartment,
   deleteDirectorDepartment,
+  getDirectorDepartmentCatalog,
 } from "../../services/directorDepartmentsApi";
 import "./DirectorManageDepartments.css";
 
 export default function DirectorManageDepartments() {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ department_name: "" });
-  const [editingId, setEditingId] = useState(null);
+  const [savingId, setSavingId] = useState(null);
+  const [error, setError] = useState("");
 
   const load = async () => {
     setLoading(true);
+    setError("");
     try {
-      const data = await getDirectorDepartments();
+      const data = await getDirectorDepartmentCatalog();
       setDepartments(data || []);
     } catch (err) {
       console.error(err);
+      setError(err.message || "Failed to load departments.");
       setDepartments([]);
     } finally {
       setLoading(false);
@@ -28,89 +29,99 @@ export default function DirectorManageDepartments() {
 
   useEffect(() => { load(); }, []);
 
-  const submit = async (e) => {
-    e.preventDefault();
+  const activate = async (id) => {
+    setSavingId(id);
+    setError("");
     try {
-      if (editingId) {
-        await updateDirectorDepartment(editingId, form);
-      } else {
-        await createDirectorDepartment(form);
-      }
-      setForm({ department_name: "" });
-      setEditingId(null);
+      await activateDirectorDepartment(id);
       await load();
     } catch (err) {
       console.error(err);
+      setError(err.message || "Failed to activate department.");
+    } finally {
+      setSavingId(null);
     }
   };
 
-  const startEdit = (dept) => {
-    setEditingId(dept.id);
-    setForm({ department_name: dept.department_name });
-  };
-
   const remove = async (id) => {
-    if (!window.confirm("Remove department from hospital?")) return;
+    if (!window.confirm("Deactivate this department for your hospital?")) return;
+    setSavingId(id);
+    setError("");
     try {
       await deleteDirectorDepartment(id);
       await load();
     } catch (err) {
       console.error(err);
+      setError(err.message || "Failed to deactivate department.");
+    } finally {
+      setSavingId(null);
     }
   };
+
+  const activeCount = departments.filter((department) => department.is_active).length;
 
   return (
     <div className="director-departments-page">
       <div className="director-departments-header">
-        <h2>Manage Departments</h2>
+        <div>
+          <h2>Manage Departments</h2>
+          <p>Select which superuser-created departments are active in your hospital.</p>
+        </div>
+        <span className="departments-count">{activeCount} active</span>
       </div>
 
-      <div className="director-departments-grid">
-        <div className="content-scroll">
-          <table className="departments-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan={2}>Loading...</td></tr>
-              ) : departments.length ? (
-                departments.map((d) => (
-                  <tr key={d.id}>
-                    <td>{d.department_name}</td>
-                    <td>
-                      <button className="btn-secondary" onClick={() => startEdit(d)}>Edit</button>
-                      <button className="btn-primary" onClick={() => remove(d.id)}>Remove</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr><td colSpan={2}>No departments found.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      {error && <div className="departments-error">{error}</div>}
 
-        <div className="departments-form">
-          <form onSubmit={submit}>
-            <div>
-              <label>Department name</label>
-              <input
-                value={form.department_name}
-                onChange={(e) => setForm({ department_name: e.target.value })}
-                placeholder="e.g. Cardiology"
-                required
-              />
-            </div>
-            <div className="departments-actions">
-              <button className="btn-primary" type="submit">{editingId ? 'Save' : 'Create'}</button>
-              <button type="button" className="btn-secondary" onClick={() => { setForm({ department_name: '' }); setEditingId(null); }}>Cancel</button>
-            </div>
-          </form>
-        </div>
+      <div className="content-scroll">
+        <table className="departments-table">
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Staff</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={4}>Loading...</td></tr>
+            ) : departments.length ? (
+              departments.map((department) => (
+                <tr key={department.id}>
+                  <td>{department.department_name}</td>
+                  <td>
+                    <span className={department.is_active ? "status-active" : "status-inactive"}>
+                      {department.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td>{department.staff_count}</td>
+                  <td>
+                    {department.is_active ? (
+                      <button
+                        className="btn-secondary"
+                        disabled={savingId === department.id || department.staff_count > 0}
+                        title={department.staff_count > 0 ? "Remove staff assignments before deactivating" : "Deactivate department"}
+                        onClick={() => remove(department.id)}
+                      >
+                        Deactivate
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-primary"
+                        disabled={savingId === department.id}
+                        onClick={() => activate(department.id)}
+                      >
+                        Activate
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan={4}>No departments have been created by the superuser yet.</td></tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

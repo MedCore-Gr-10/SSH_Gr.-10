@@ -37,6 +37,11 @@ npm run create-director
 Username: dev_director
 Password: devdirector123
 
+9. Per te pasur casje ne dokumentimin Swagger, ne terminal:
+  - cd server
+  - npm install swagger-ui-express swagger-jsdoc
+Ne browser, mundesh m'i hap permes linkut: 
+  - http://localhost:3000/api-docs
 
 ---
 # 🏥 MedCore
