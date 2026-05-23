@@ -33,11 +33,19 @@ export const getDirectorDepartments = async () => {
   return handleResponse(response);
 };
 
-export const createDirectorDepartment = async (data) => {
+export const getDirectorDepartmentCatalog = async () => {
+  const response = await fetch(`${API}/director/departments/catalog`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};
+
+export const activateDirectorDepartment = async (departmentId) => {
   const response = await fetch(`${API}/director/departments`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify(data),
+    body: JSON.stringify({ department_id: departmentId }),
   });
   return handleResponse(response);
 };

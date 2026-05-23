@@ -12,6 +12,47 @@ class ReviewsRepository {
     return prisma.reviews.findMany({
       where: {
         doctor_id: doctorId
+      },
+      include: {
+        users_reviews_patient_idTousers: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  async findPatientReviews(patientId) {
+    return prisma.reviews.findMany({
+      where: {
+        patient_id: patientId
+      },
+      include: {
+        users_reviews_doctor_idTousers: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  async findPatientDoctorReview(patientId, doctorId) {
+    return prisma.reviews.findUnique({
+      where: {
+        patient_id_doctor_id: {
+          patient_id: patientId,
+          doctor_id: doctorId
+        }
       }
     });
   }

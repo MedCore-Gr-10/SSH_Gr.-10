@@ -3,10 +3,12 @@ import React from "react";
 import "./Sidebar.css";
 import SidebarButton from "../JSXcomponents/SidebarButton.jsx";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/authContext.jsx";
+import MedCoreLogo2 from "../../assets/MedCoreLogo-2.png";
 
 const Sidebar = () => {
-
-  const role = "doctor"; // change for testing
+  const { user } = useAuth();
+  const role = user?.role || "patient";
 
   const sidebarConfig = {
     superuser: [
@@ -31,7 +33,7 @@ const Sidebar = () => {
     ],
     patient: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Staff Schedule", path: "/main/staff-schedule" },
+      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
       { label: "My Records", path: "/main/records" },
       { label: "Appointments", path: "/main/appointments" },
       { label: "My Insurance", path: "/main/insurance" },
@@ -59,11 +61,11 @@ const Sidebar = () => {
 
   return (
     <div className="fixed-sidebar">
-      <img src="/LOGO_final.png" alt="Logo" className="sidebar-logo" />
+      <img src={MedCoreLogo2} alt="Logo" className="sidebar-logo" />
 
       <div className="sidebar-userrole-username-bubble">
         <h3 className="sidebar-user-role">{role}</h3>
-        <h3 className="sidebar-username">Username here</h3>
+        <h3 className="sidebar-username">{user?.username}</h3>
       </div>
 
       <nav className="buttons-list">

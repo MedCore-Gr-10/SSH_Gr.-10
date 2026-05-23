@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/api";
 import { useAuth } from "../../context/authContext";
 import MedCoreLogo from "./MedCoreLogo.jsx";
@@ -13,14 +13,29 @@ import {
 import "./auth.css";
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [form, setForm] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  console.log("Login form state:", form);
+  const [success, setSuccess] = useState(() => {
+    if (location.state?.passwordReset) {
+      return "Password updated. You can sign in with your new password.";
+    }
+    if (location.state?.registered) {
+      return "Account created. You can sign in now.";
+    }
+    return "";
+  });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/main/home", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +49,7 @@ export default function Login() {
       }
       const ok = login(res);
       if (ok) {
-        navigate("/dashboard");
+        navigate("/main/home", { replace: true });
       } else {
         setError("Could not sign you in. Please try again.");
       }
@@ -58,6 +73,7 @@ export default function Login() {
           Sign in to access your MedCore profile.
         </p>
 
+        {success ? <div className="mc-info-banner">{success}</div> : null}
         {error ? <div className="mc-error-banner">{error}</div> : null}
 
         <form onSubmit={handleSubmit}>
@@ -121,18 +137,9 @@ export default function Login() {
         </form>
 
         <div className="mc-link-row">
-          <a
-            href="#"
-            className="mc-link-muted"
-            onClick={(e) => {
-              e.preventDefault();
-              window.alert(
-                "Password recovery is not set up yet. Contact support if you need help.",
-              );
-            }}
-          >
+          <Link to="/forgot-password" className="mc-link-muted">
             Forgot password?
-          </a>
+          </Link>
         </div>
         <p className="mc-footer-link">
           Don&apos;t have an account? <Link to="/register">Sign Up</Link>

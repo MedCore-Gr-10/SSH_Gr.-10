@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authContext.jsx";
 import DirectorManageDepartments from "../../director/DirectorManageDepartments.jsx";
+import SuperuserManageDepartments from "../../superuser/ManageDepartments.jsx";
 
 export default function ManageDepartments() {
   const location = useLocation();
@@ -10,6 +11,9 @@ export default function ManageDepartments() {
 
   if (role === "director") {
     return <DirectorManageDepartments />;
+  }
+  if (role === "superuser") {
+    return <SuperuserManageDepartments />;
   }
 
   return (

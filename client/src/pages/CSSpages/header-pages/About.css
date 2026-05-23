@@ -1,53 +1,228 @@
-.about-container {
- width: 95%;
- height: 95%;
-  padding: 20px 20px 20px 20px;
+.hms-about-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #2d3748;
   background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 0px 20px 10px rgba(0, 0, 0, 0.05);
+  height: 100vh;
   overflow-y: auto;
-}
-
-.about-container h1 {
-  color: #FFFFFF; /* Navy */
-  background-color: #4B70F5;
-  font-size: 2.5rem;
-  border: 3px solid #FFFFFF; /* Teal Accent */
-  display: inline-block;
-  margin-top: 0px;
-  border-radius: 30px;
-  padding: 1% ;
-  box-shadow: 0px 10px 15px #4B70F5;
-
-}
-
-.about-container h2, .about-container h3 , .about-container h4 {
-  color: #2b6cb0; /* Medical Blue */
-  margin-top: 20px;
-}
-
-.about-container p {
-  line-height: 1.8;
-  font-size: 1.0rem;
-  color: #4a5568;
-}
-
-.about-container ul {
-  list-style: none;
+  scroll-behavior: smooth;
+  margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-.about-container li {
-  background: #f7fafc;
-  margin: 10px 0;
-  padding: 15px;
-  border-left: 5px solid #2b6cb0;
-  border-radius: 4px;
+.hms-about-divider {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(226, 232, 240, 1), rgba(0, 0, 0, 0));
+  margin: 20px 10%;
+}
+
+.hms-about-hero {
+  background: transparent;
+  color: #2d3748;
+  padding: 60px 10% 40px 10%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.hms-about-hero-text {
+  flex: 1;
+  max-width: 850px;
+}
+
+.hms-about-badge {
+  background-color: #5c5cd6;
+  color: white;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.hms-about-title {
+  font-size: 40px;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0 0 15px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.hms-about-subtitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: #4a5568;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+}
+
+.hms-about-description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #718096;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.hms-about-stats {
+  background-color: #ffffff;
+  padding: 30px 10%;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.hms-about-stat-card {
+  text-align: center;
+  flex: 1;
+  min-width: 160px;
+}
+
+.hms-about-stat-number {
+  font-size: 32px;
+  color: #5c5cd6;
+  margin: 0;
+  font-weight: 700;
+}
+
+.hms-about-stat-label {
+  font-size: 13px;
+  color: #718096;
+  margin: 5px 0 0 0;
+  font-weight: 500;
+}
+
+.hms-about-features {
+  padding: 40px 10% 40px 10%;
+  background-color: #ffffff;
+}
+
+.hms-about-features-header {
+  text-align: center;
+  margin-bottom: 45px;
+}
+
+.hms-about-section-tag {
+  color: #5c5cd6;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.hms-about-section-title {
+  font-size: 24px;
+  color: #1a202c;
+  font-weight: 700;
+  margin: 0;
+}
+
+.hms-about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.hms-about-card {
+  background-color: #ffffff;
+  padding: 35px 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  border: 1px solid #edf2f7;
   transition: transform 0.2s;
 }
 
-.about-container li:hover {
-  transform: translateX(10px);
-  background: #edf2f7;
+.hms-about-card:hover {
+  transform: translateY(-2px);
 }
 
+.hms-about-card-icon {
+  font-size: 26px;
+  margin-bottom: 15px;
+}
+
+.hms-about-card-title {
+  font-size: 16px;
+  color: #2d3748;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.hms-about-card-text {
+  font-size: 13px;
+  color: #718096;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 400;
+}
+
+.hms-about-team {
+  padding: 40px 10% 80px 10%;
+  background-color: #ffffff;
+}
+
+.hms-about-team-grid {
+  display: flex;
+  justify-content: center; 
+  flex-wrap: wrap;         
+  gap: 30px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.hms-about-team-card {
+  background-color: #ffffff;
+  padding: 25px 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(92, 92, 214, 0.04);
+  border: 1px solid #edf2f7;
+  text-align: center;
+  flex: 1;
+  min-width: 240px; 
+  max-width: 280px; 
+  transition: transform 0.2s;
+}
+
+.hms-about-team-card:hover {
+  transform: translateY(-2px);
+}
+
+.hms-about-avatar {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.hms-about-member-name {
+  font-size: 18px;
+  color: #1a202c;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.hms-about-member-role {
+  font-size: 13px;
+  color: #5c5cd6; 
+  font-weight: 600;
+  margin: 0;
+}
+
+.hms-about-card-icon {
+  font-size: 32px;      
+  color: #5c5cd6;       
+  margin-bottom: 15px;
+  display: flex;        
+}
+
+.hms-about-avatar {
+  font-size: 36px;
+  color: #a0aec0;       
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+}

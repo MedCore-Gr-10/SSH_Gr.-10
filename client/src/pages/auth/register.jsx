@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../../services/api";
+import { useAuth } from "../../context/authContext";
 import MedCoreLogo from "./MedCoreLogo.jsx";
 import {
   IconStethoscope,
@@ -10,8 +12,6 @@ import {
   IconArrowRight,
 } from "./AuthIcons.jsx";
 import "./auth.css";
-
-const API = "http://localhost:3000/api";
 
 function passwordRulesMet(password) {
   return {
@@ -27,6 +27,13 @@ function allRulesMet(rules) {
 
 export default function Register() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/main/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const [form, setForm] = useState({
     username: "",
@@ -34,7 +41,7 @@ export default function Register() {
     confirmPassword: "",
     email: "",
     first_name: "",
-    last_surname: "",
+    last_name: "",
     birth: "",
     gender: "",
     personal_no: "",
@@ -68,17 +75,12 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Registration failed.");
+      const data = await registerUser(payload);
+      if (data.error) {
+        setError(data.error);
         return;
       }
-      navigate("/login");
+      navigate("/", { replace: true, state: { registered: true } });
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -90,7 +92,7 @@ export default function Register() {
     form.username &&
     form.email &&
     form.first_name &&
-    form.last_surname &&
+    form.last_name &&
     form.birth &&
     form.gender &&
     form.personal_no &&
@@ -278,12 +280,12 @@ export default function Register() {
                   <div className="mc-input-wrap">
                     <input
                       id="reg-last"
-                      name="last_surname"
+                      name="last_name"
                       autoComplete="family-name"
                       placeholder="Last name"
-                      value={form.last_surname}
+                      value={form.last_name}
                       onChange={(e) =>
-                        setForm({ ...form, last_surname: e.target.value })
+                        setForm({ ...form, last_name: e.target.value })
                       }
                     />
                   </div>

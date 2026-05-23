@@ -37,7 +37,6 @@ export default function DirectorAppointments() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const loadData = async () => {
     try {
       const [appointmentData, slotData] = await Promise.all([
@@ -98,8 +97,6 @@ export default function DirectorAppointments() {
     }
   };
 
-  const canSave = !!selectedAppointment && !!selectedSlotId && selectedSlotId !== String(selectedAppointment.appointment_booking_slot_id);
-
   const handleCancel = async () => {
     if (!selectedAppointment) {
       setError("Select an appointment to cancel.");
@@ -126,6 +123,7 @@ export default function DirectorAppointments() {
       setIsSubmitting(false);
     }
   };
+
 
   const renderSlotLabel = (slot) => {
     const doctor = getName(slot.users);
@@ -204,6 +202,14 @@ export default function DirectorAppointments() {
                 }))}
             </tbody>
           </table>
+        </section>
+
+        <section className="director-appointments-section content-scroll">
+          <h2>Appointment templates</h2>
+          <p>
+            Creation and management of working schedules has moved to the Staff Schedule page.
+            Use the staff schedule page to create, update, and remove doctor/nurse availability.
+          </p>
         </section>
 
         <section className="director-appointments-section content-scroll">

@@ -6,6 +6,7 @@ import {
   updateDirectorStaffSchedule,
   deleteDirectorStaffSchedule,
 } from "../../services/directorStaffScheduleApi";
+import { getDirectorDepartments } from "../../services/directorDepartmentsApi";
 import "./DirectorStaffSchedule.css";
 
 const initialFormState = {
@@ -30,6 +31,7 @@ const weekDays = [
 export default function DirectorStaffSchedule() {
   const [scheduleList, setScheduleList] = useState([]);
   const [staffList, setStaffList] = useState([]);
+  const [departmentList, setDepartmentList] = useState([]);
   const [formValues, setFormValues] = useState(initialFormState);
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
   const [message, setMessage] = useState(null);
@@ -38,12 +40,14 @@ export default function DirectorStaffSchedule() {
 
   const loadData = async () => {
     try {
-      const [staff, schedules] = await Promise.all([
+      const [staff, schedules, departments] = await Promise.all([
         getDirectorStaff(),
         getDirectorStaffSchedules(),
+        getDirectorDepartments(),
       ]);
-      setStaffList(staff);
-      setScheduleList(schedules);
+      setStaffList(staff || []);
+      setScheduleList(schedules || []);
+      setDepartmentList(departments || []);
     } catch (err) {
       setError(err.message);
     }
@@ -65,14 +69,16 @@ export default function DirectorStaffSchedule() {
   const formatTime = (value) => {
     if (!value) return "";
     if (typeof value !== "string") {
-      return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return new Date(value).toISOString().slice(11, 16);
     }
+    const isoTimeMatch = value.match(/T(\d{2}:\d{2})/);
+    if (isoTimeMatch) return isoTimeMatch[1];
     return value.length >= 5 ? value.slice(0, 5) : value;
   };
 
   const getStaffFullName = (schedule) => {
     const user = schedule.staff_hospitals_departments?.users;
-    const profile = user?.users_profiles?.[0] || {};
+    const profile = user?.users_profiles?.[0]?.profiles || {};
     const fullName = `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
     return fullName || user?.username || "Unknown";
   };
@@ -82,14 +88,27 @@ export default function DirectorStaffSchedule() {
   };
 
   const getDepartmentLabel = (schedule) => {
-    return schedule.staff_hospitals_departments?.hospitals_departments?.department_name || schedule.department_id || "—";
+    return (
+      schedule.staff_hospitals_departments?.hospitals_departments?.departments?.department_name ||
+      departmentList.find((department) => department.id === schedule.department_id)?.department_name ||
+      schedule.department_id ||
+      "—"
+    );
   };
+
+  const selectedStaff = staffList.find((staff) => staff.id === formValues.staff_id);
+  const availableDepartments =
+    selectedStaff?.staff_hospitals_departments?.map((assignment) => {
+      const department = assignment.hospitals_departments?.departments;
+      return department || departmentList.find((item) => item.id === assignment.department_id);
+    }).filter(Boolean) || departmentList;
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
     setFormValues((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+      ...(name === "staff_id" ? { department_id: "" } : {}),
     }));
   };
 
@@ -138,7 +157,7 @@ export default function DirectorStaffSchedule() {
         setMessage("Schedule updated successfully.");
       } else {
         await createDirectorStaffSchedule(payload);
-        setMessage("Schedule slot created successfully.");
+        setMessage("Schedule shift created successfully.");
       }
 
       handleReset();
@@ -151,13 +170,13 @@ export default function DirectorStaffSchedule() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Remove this schedule slot?")) {
+    if (!window.confirm("Remove this schedule shift?")) {
       return;
     }
 
     try {
       await deleteDirectorStaffSchedule(id);
-      setMessage("Schedule slot removed.");
+      setMessage("Schedule shift removed.");
       setError(null);
       await loadData();
     } catch (err) {
@@ -180,7 +199,7 @@ export default function DirectorStaffSchedule() {
           {daySummary.map((item) => (
             <div key={item.day} className="overview-card">
               <span>{item.day}</span>
-              <strong>{item.count} slot{item.count === 1 ? "" : "s"}</strong>
+              <strong>{item.count} shift{item.count === 1 ? "" : "s"}</strong>
             </div>
           ))}
         </div>
@@ -188,7 +207,7 @@ export default function DirectorStaffSchedule() {
 
       <div className="director-staff-schedule-grid">
         <section className="director-staff-schedule-table-section content-scroll">
-          <h2>Schedule slots</h2>
+          <h2>Schedule shifts</h2>
           <table className="director-staff-schedule-table">
             <thead>
               <tr>
@@ -205,7 +224,7 @@ export default function DirectorStaffSchedule() {
             <tbody>
               {scheduleList.length === 0 ? (
                 <tr>
-                  <td colSpan="8">No schedule slots found.</td>
+                  <td colSpan="8">No schedule shifts found.</td>
                 </tr>
               ) : (
                 scheduleList.map((schedule) => (
@@ -240,7 +259,7 @@ export default function DirectorStaffSchedule() {
               <select name="staff_id" value={formValues.staff_id} onChange={handleChange}>
                 <option value="">Select staff</option>
                 {staffList.map((staff) => {
-                  const profile = staff.users_profiles?.[0] || {};
+                  const profile = staff.users_profiles?.[0]?.profiles || {};
                   const fullName = `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
                   return (
                     <option key={staff.id} value={staff.id}>
@@ -252,15 +271,19 @@ export default function DirectorStaffSchedule() {
             </label>
 
             <label>
-              Department ID
-              <input
+              Department
+              <select
                 name="department_id"
-                type="number"
-                min="1"
                 value={formValues.department_id}
                 onChange={handleChange}
-                placeholder="Department ID"
-              />
+              >
+                <option value="">Select department</option>
+                {availableDepartments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.department_name}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label>
@@ -301,7 +324,7 @@ export default function DirectorStaffSchedule() {
                 checked={formValues.active_schedule}
                 onChange={handleChange}
               />
-              Active slot
+              Active shift
             </label>
 
             <div className="director-staff-schedule-actions">
