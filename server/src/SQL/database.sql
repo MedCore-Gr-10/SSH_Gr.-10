@@ -115,8 +115,10 @@ CREATE TABLE allergies(
 
 CREATE TABLE insurance(
     id SERIAL PRIMARY KEY,
-    patient_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     provider TEXT,
+    insurance_company_email TEXT,
+    customer_support_number TEXT,
     policy_number TEXT,
     coverage_percent INTEGER,
     start_date DATE,

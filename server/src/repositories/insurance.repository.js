@@ -8,10 +8,33 @@ class InsuranceRepository {
     });
   }
 
-  async findPatientInsurance(patientId) {
+  async findProfileInsurance(profileId) {
     return prisma.insurance.findMany({
       where: {
-        patient_id: patientId
+        profile_id: profileId
+      },
+      orderBy: {
+        id: "desc"
+      }
+    });
+  }
+
+  async findCurrentProfileInsurance(profileId) {
+    return prisma.insurance.findFirst({
+      where: {
+        profile_id: profileId
+      },
+      orderBy: {
+        id: "desc"
+      }
+    });
+  }
+
+  async findProfileInsuranceById(profileId, insuranceId) {
+    return prisma.insurance.findFirst({
+      where: {
+        id: Number(insuranceId),
+        profile_id: profileId
       }
     });
   }
