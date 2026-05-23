@@ -19,7 +19,7 @@ function Header() {
         <NavLink to="/main/settings" className="header-button">
           <IoSettingsOutline className="nav-icon" /> Settings
         </NavLink>
-        <NavLink to="/main/Profile" className="header-button">
+        <NavLink to="/main/profile" className="header-button">
           <IoPersonOutline className="nav-icon" /> Profile
         </NavLink>
         <NavLink to="/main/logout" className="header-button">
