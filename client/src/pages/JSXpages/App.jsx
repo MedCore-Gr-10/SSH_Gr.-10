@@ -38,6 +38,9 @@ import EmergencyContacts from "./sidebar-pages/EmergencyContacts";
 
 import AppointmentsSchedule from "./sidebar-pages/AppointmentsSchedule";
 
+import NurseMySchedule from "../nurse/NurseMySchedule.jsx";
+import NurseStaffSchedules from "../nurse/NurseStaffSchedules.jsx";
+import NursePatients from "../nurse/NursePatients.jsx";
 function MainLayout() {
   return (
     <div className="App">
@@ -75,8 +78,6 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
           <Route path="logout" element={<LogOut />} />
-          // SIDE
-          BAR-------------------------------------------------------------------
           {/* ===================== SUPERUSER ===================== */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="hospitals" element={<Hospitals />} />
@@ -120,9 +121,9 @@ export default function App() {
           <Route path="booked-appointments" element={<BookedAppointments />} />
           <Route path="make-request" element={<MakeRequest />} />
           {/* ===================== NURSE ===================== */}
-          {/* <Route path="dashboard" element={<Dashboard />} /> */}
-          {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
-          {/* <Route path="patients" element={<Patients />} /> */}
+          <Route path="nurse/schedule" element={<NurseMySchedule />} />
+          <Route path="nurse/staff-schedules" element={<NurseStaffSchedules />} />
+          <Route path="nurse/patients" element={<NursePatients />} />
           <Route path="make-request" element={<MakeRequest />} />
         </Route>
       </Route>

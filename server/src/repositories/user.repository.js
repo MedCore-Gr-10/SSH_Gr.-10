@@ -250,6 +250,110 @@ class UsersRepository {
     });
   }
 
+  async findHospitalTenantPatients(hospitalId) {
+    return prisma.users.findMany({
+      where: {
+        patients_hospitals: {
+          some: {
+            hospital_id: hospitalId,
+          },
+        },
+      },
+      include: {
+        roles: true,
+        users_profiles: {
+          include: {
+            profiles: true,
+          },
+        },
+        patients_hospitals: {
+          include: {
+            hospitals: true,
+          },
+        },
+      },
+      orderBy: {
+        username: "asc",
+      },
+    });
+  }
+
+  async searchHospitalTenantPatients(hospitalId, query) {
+    const trimmed = (query || "").trim();
+    if (!trimmed) {
+      return [];
+    }
+
+    const uuidPattern =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const isUuid = uuidPattern.test(trimmed);
+
+    return prisma.users.findMany({
+      where: {
+        patients_hospitals: {
+          some: {
+            hospital_id: hospitalId,
+          },
+        },
+        OR: [
+          ...(isUuid ? [{ id: trimmed }] : []),
+          {
+            username: {
+              contains: trimmed,
+              mode: "insensitive",
+            },
+          },
+          {
+            users_profiles: {
+              some: {
+                OR: [
+                  {
+                    profiles: {
+                      first_name: {
+                        contains: trimmed,
+                        mode: "insensitive",
+                      },
+                    },
+                  },
+                  {
+                    profiles: {
+                      last_name: {
+                        contains: trimmed,
+                        mode: "insensitive",
+                      },
+                    },
+                  },
+                  {
+                    profiles: {
+                      personal_no: {
+                        contains: trimmed,
+                        mode: "insensitive",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        roles: true,
+        users_profiles: {
+          include: {
+            profiles: true,
+          },
+        },
+        patients_hospitals: {
+          include: {
+            hospitals: true,
+          },
+        },
+      },
+      take: 50,
+    });
+  }
+
   /*
   |--------------------------------------------------------------------------
   | UPDATE (Zgjidhja e saktë transaksionale)
