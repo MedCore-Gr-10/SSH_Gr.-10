@@ -11,6 +11,7 @@ import {
   generateDoctorSlotsRange,
   generateDoctorTemplateSlots,
 } from "../../services/doctorAppointmentsApi";
+import "./DoctorAppointmentSlots.css";
 
 const todayDate = () => new Date().toISOString().slice(0, 10);
 
@@ -60,8 +61,13 @@ const getTemplateSummary = (template) => {
 };
 
 const getDepartmentLabel = (template) => {
+  const departmentName =
+    template.staff_hospitals_departments?.hospitals_departments?.departments?.department_name ||
+    template.department?.department_name ||
+    template.department_name;
   const departmentId = template.department_id || template.department?.id;
-  return departmentId ? `Department #${departmentId}` : "No department listed";
+
+  return departmentName || (departmentId ? `Department #${departmentId}` : "No department listed");
 };
 
 export default function DoctorAppointmentSlots() {
@@ -71,6 +77,8 @@ export default function DoctorAppointmentSlots() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [generationStatus, setGenerationStatus] = useState(null);
   const [selectedDate, setSelectedDate] = useState(todayDate());
+  const [checkedAvailableDate, setCheckedAvailableDate] = useState(todayDate());
+  const [showAvailableOnly, setShowAvailableOnly] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -101,6 +109,7 @@ export default function DoctorAppointmentSlots() {
       setSlots(slotData || []);
       setGenerationStatus(statusData || null);
       setAvailableSlots(availableData || []);
+      setCheckedAvailableDate(selectedDate);
       if (nextAssignments.length === 1) {
         setTemplateForm((prev) => ({
           ...prev,
@@ -119,18 +128,32 @@ export default function DoctorAppointmentSlots() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!selectedDate) return;
-    const refreshAvailable = async () => {
-      try {
-        const availableData = await getDoctorAvailableSlots(selectedDate);
-        setAvailableSlots(availableData || []);
-      } catch (err) {
-        setError(err.message || "Unable to refresh available slots.");
-      }
-    };
-    refreshAvailable();
-  }, [selectedDate]);
+  const handleCheckAvailableSlots = async () => {
+    if (!selectedDate) {
+      setError("Choose a date to check available slots.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      const availableData = await getDoctorAvailableSlots(selectedDate);
+      setAvailableSlots(availableData || []);
+      setCheckedAvailableDate(selectedDate);
+      setShowAvailableOnly(true);
+      setMessage(`Available slots refreshed for ${formatDate(selectedDate)}.`);
+    } catch (err) {
+      setError(err.message || "Unable to refresh available slots.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShowAllSlots = () => {
+    setShowAvailableOnly(false);
+    setMessage("");
+    setError("");
+  };
 
   const handleInputChange = (field, value) => {
     setTemplateForm((prev) => ({ ...prev, [field]: value }));
@@ -252,14 +275,14 @@ export default function DoctorAppointmentSlots() {
     <tr key={template.id}>
       <td>
         <strong>{getTemplateSummary(template)}</strong>
-        <span style={styles.rowHint}>Repeats every {template.day_of_week || "selected day"}</span>
+        <span className="doctor-slots-row-hint">Repeats every {template.day_of_week || "selected day"}</span>
       </td>
       <td>{getDepartmentLabel(template)}</td>
       <td>
-        <span style={styles.badgeSuccess}>Active template</span>
+        <span className="doctor-slots-badge doctor-slots-badge--success">Active template</span>
       </td>
       <td>
-        <button style={styles.dangerButton} onClick={() => handleDeleteTemplate(template.id)}>
+        <button className="doctor-slots-btn doctor-slots-btn--danger" onClick={() => handleDeleteTemplate(template.id)}>
           Delete
         </button>
       </td>
@@ -275,17 +298,17 @@ export default function DoctorAppointmentSlots() {
       <tr key={slot.id}>
         <td>
           <strong>{formatDate(date)}</strong>
-          <span style={styles.rowHint}>
+          <span className="doctor-slots-row-hint">
             {formatTime(slot.slot_start_time || slot.start_time)} - {formatTime(slot.slot_end_time || slot.end_time)}
           </span>
         </td>
         <td>
-          <span style={isActive ? styles.badgeSuccess : styles.badgeMuted}>
+          <span className={`doctor-slots-badge ${isActive ? "doctor-slots-badge--success" : "doctor-slots-badge--muted"}`}>
             {isActive ? "Ready to book" : "Inactive"}
           </span>
         </td>
         <td>
-          <span style={isBooked ? styles.badgeWarning : styles.badgeOpen}>
+          <span className={`doctor-slots-badge ${isBooked ? "doctor-slots-badge--warning" : "doctor-slots-badge--open"}`}>
             {isBooked ? "Booked by patient" : "Open for patients"}
           </span>
         </td>
@@ -294,54 +317,62 @@ export default function DoctorAppointmentSlots() {
     );
   };
 
+  const displayedSlots = showAvailableOnly ? availableSlots : slots;
+  const slotsTitle = showAvailableOnly
+    ? `Available Slots for ${formatDate(checkedAvailableDate)}`
+    : "Upcoming Slots";
+  const emptySlotsMessage = showAvailableOnly
+    ? `No available slots found for ${formatDate(checkedAvailableDate)}.`
+    : "No upcoming slots yet. Generate slots from your templates when you are ready for patients to book.";
+
   return (
-    <div style={styles.container}>
-      <div style={styles.headerRow}>
+    <div className="doctor-slots-page">
+      <div className="doctor-slots-header-row">
         <div>
-          <h1 style={styles.title}>Doctor Appointments</h1>
-          <p style={styles.subtitle}>
+          <h1 className="doctor-slots-title">Doctor Appointments</h1>
+          <p className="doctor-slots-subtitle">
             Manage recurring templates, generate booking slots, and review your doctor schedule from one UI.
           </p>
         </div>
-        <div style={styles.actionRow}>
-          <button style={styles.primaryButton} onClick={handleGenerateWeekly} disabled={loading}>
+        <div className="doctor-slots-action-row">
+          <button className="doctor-slots-btn doctor-slots-btn--primary" onClick={handleGenerateWeekly} disabled={loading}>
             Generate Weekly Slots
           </button>
         </div>
       </div>
 
-      {error && <div style={styles.errorBox}>{error}</div>}
-      {message && <div style={styles.successBox}>{message}</div>}
-      {loading && <div style={styles.infoBox}>Working… please wait.</div>}
+      {error && <div className="doctor-slots-alert doctor-slots-alert--error">{error}</div>}
+      {message && <div className="doctor-slots-alert doctor-slots-alert--success">{message}</div>}
+      {loading && <div className="doctor-slots-alert doctor-slots-alert--info">Working… please wait.</div>}
 
-      <div style={styles.statsGrid}>
-        <div style={styles.statCard}>
+      <div className="doctor-slots-stats-grid">
+        <div className="doctor-slots-stat-card">
           <strong>{templates.length}</strong>
           <p>Active templates</p>
         </div>
-        <div style={styles.statCard}>
+        <div className="doctor-slots-stat-card">
           <strong>{slots.length}</strong>
           <p>Total slots loaded</p>
         </div>
-        <div style={styles.statCard}>
+        <div className="doctor-slots-stat-card">
           <strong>{availableSlots.length}</strong>
-          <p>Available on {selectedDate}</p>
+          <p>Available on {checkedAvailableDate}</p>
         </div>
-        <div style={styles.statCard}>
+        <div className="doctor-slots-stat-card">
           <strong>{generationStatus?.latest_slot_date || "-"}</strong>
           <p>Latest generated slot</p>
         </div>
       </div>
 
-      <div style={styles.gridLayout}>
-        <section style={styles.card}>
-          <h2 style={styles.sectionTitle}>Create Appointment Template</h2>
-          <form style={styles.form} onSubmit={handleCreateTemplate}>
-            <label style={styles.label}>
+      <div className="doctor-slots-grid-layout">
+        <section className="doctor-slots-card">
+          <h2 className="doctor-slots-section-title">Create Appointment Template</h2>
+          <form className="doctor-slots-form" onSubmit={handleCreateTemplate}>
+            <label className="doctor-slots-label">
               Department
               {assignments.length > 1 ? (
                 <select
-                  style={styles.input}
+                  className="doctor-slots-input"
                   value={templateForm.department_id}
                   onChange={(e) => handleInputChange("department_id", e.target.value)}
                 >
@@ -353,15 +384,15 @@ export default function DoctorAppointmentSlots() {
                   ))}
                 </select>
               ) : (
-                <div style={styles.readOnlyField}>
+                <div className="doctor-slots-readonly-field">
                   {assignments[0]?.department_name || "Department will be selected from your doctor profile"}
                 </div>
               )}
             </label>
-            <label style={styles.label}>
+            <label className="doctor-slots-label">
               Day of Week
               <select
-                style={styles.input}
+                className="doctor-slots-input"
                 value={templateForm.day_of_week}
                 onChange={(e) => handleInputChange("day_of_week", e.target.value)}
               >
@@ -370,64 +401,64 @@ export default function DoctorAppointmentSlots() {
                 ))}
               </select>
             </label>
-            <div style={styles.inlineFields}>
-              <label style={styles.labelHalf}>
+            <div className="doctor-slots-inline-fields">
+              <label className="doctor-slots-label doctor-slots-label--half">
                 Start Time
                 <input
-                  style={styles.input}
+                  className="doctor-slots-input"
                   type="time"
                   value={templateForm.start_time}
                   onChange={(e) => handleInputChange("start_time", e.target.value)}
                 />
               </label>
-              <label style={styles.labelHalf}>
+              <label className="doctor-slots-label doctor-slots-label--half">
                 End Time
                 <input
-                  style={styles.input}
+                  className="doctor-slots-input"
                   type="time"
                   value={templateForm.end_time}
                   onChange={(e) => handleInputChange("end_time", e.target.value)}
                 />
               </label>
             </div>
-            <button style={styles.secondaryButton} type="submit" disabled={loading}>
+            <button className="doctor-slots-btn doctor-slots-btn--secondary" type="submit" disabled={loading}>
               Save Template
             </button>
           </form>
         </section>
 
-        <section style={styles.card}>
-          <h2 style={styles.sectionTitle}>Slot Generation</h2>
-          <form style={styles.form} onSubmit={handleGenerateRange}>
-            <label style={styles.label}>
+        <section className="doctor-slots-card">
+          <h2 className="doctor-slots-section-title">Slot Generation</h2>
+          <form className="doctor-slots-form" onSubmit={handleGenerateRange}>
+            <label className="doctor-slots-label">
               From Date
               <input
-                style={styles.input}
+                className="doctor-slots-input"
                 type="date"
                 value={slotRangeForm.from_date}
                 onChange={(e) => setSlotRangeForm((prev) => ({ ...prev, from_date: e.target.value }))}
               />
             </label>
-            <label style={styles.label}>
+            <label className="doctor-slots-label">
               To Date
               <input
-                style={styles.input}
+                className="doctor-slots-input"
                 type="date"
                 value={slotRangeForm.to_date}
                 onChange={(e) => setSlotRangeForm((prev) => ({ ...prev, to_date: e.target.value }))}
               />
             </label>
-            <button style={styles.secondaryButton} type="submit" disabled={loading}>
+            <button className="doctor-slots-btn doctor-slots-btn--secondary" type="submit" disabled={loading}>
               Generate Range Slots
             </button>
           </form>
 
-          <div style={styles.divider} />
+          <div className="doctor-slots-divider" />
 
-          <label style={styles.label}>
+          <label className="doctor-slots-label">
             Choose template
             <select
-              style={styles.input}
+              className="doctor-slots-input"
               value={selectedTemplateId}
               onChange={(e) => setSelectedTemplateId(e.target.value)}
             >
@@ -439,38 +470,38 @@ export default function DoctorAppointmentSlots() {
               ))}
             </select>
           </label>
-          <form style={styles.form} onSubmit={handleGenerateForTemplate}>
-            <div style={styles.inlineFields}>
-              <label style={styles.labelHalf}>
+          <form className="doctor-slots-form" onSubmit={handleGenerateForTemplate}>
+            <div className="doctor-slots-inline-fields">
+              <label className="doctor-slots-label doctor-slots-label--half">
                 Start date
                 <input
-                  style={styles.input}
+                  className="doctor-slots-input"
                   type="date"
                   value={templateRange.from_date}
                   onChange={(e) => setTemplateRange((prev) => ({ ...prev, from_date: e.target.value }))}
                 />
               </label>
-              <label style={styles.labelHalf}>
+              <label className="doctor-slots-label doctor-slots-label--half">
                 End date
                 <input
-                  style={styles.input}
+                  className="doctor-slots-input"
                   type="date"
                   value={templateRange.to_date}
                   onChange={(e) => setTemplateRange((prev) => ({ ...prev, to_date: e.target.value }))}
                 />
               </label>
             </div>
-            <button style={styles.secondaryButton} type="submit" disabled={loading || !selectedTemplateId}>
+            <button className="doctor-slots-btn doctor-slots-btn--secondary" type="submit" disabled={loading || !selectedTemplateId}>
               Generate For Template
             </button>
           </form>
         </section>
       </div>
 
-      <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>My Templates</h2>
-        <div style={styles.tableWrapper}>
-          <table style={styles.table}>
+      <section className="doctor-slots-card">
+        <h2 className="doctor-slots-section-title">My Templates</h2>
+        <div className="doctor-slots-table-wrapper">
+          <table className="doctor-slots-table">
             <thead>
               <tr>
                 <th>When it repeats</th>
@@ -482,7 +513,7 @@ export default function DoctorAppointmentSlots() {
             <tbody>
               {templates.length === 0 ? (
                 <tr>
-                  <td colSpan="4" style={styles.emptyRow}>
+                  <td colSpan="4" className="doctor-slots-empty-row">
                     No recurring appointment times yet. Create one above to start building bookable slots.
                   </td>
                 </tr>
@@ -494,23 +525,41 @@ export default function DoctorAppointmentSlots() {
         </div>
       </section>
 
-      <section style={styles.card}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>Upcoming Slots</h2>
-          <div style={styles.dateFilter}>
-            <label style={styles.labelSmall}>
+      <section className="doctor-slots-card">
+        <div className="doctor-slots-section-header">
+          <h2 className="doctor-slots-section-title">{slotsTitle}</h2>
+          <div className="doctor-slots-date-filter">
+            <label className="doctor-slots-label-small">
               Check available slots for
               <input
-                style={styles.inputSmall}
+                className="doctor-slots-input-small"
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
             </label>
+            <button
+              className="doctor-slots-btn doctor-slots-btn--secondary"
+              type="button"
+              onClick={handleCheckAvailableSlots}
+              disabled={loading}
+            >
+              Check
+            </button>
+            {showAvailableOnly && (
+              <button
+                className="doctor-slots-btn doctor-slots-btn--secondary"
+                type="button"
+                onClick={handleShowAllSlots}
+                disabled={loading}
+              >
+                Show All
+              </button>
+            )}
           </div>
         </div>
-        <div style={styles.tableWrapper}>
-          <table style={styles.table}>
+        <div className="doctor-slots-table-wrapper">
+          <table className="doctor-slots-table">
             <thead>
               <tr>
                 <th>Appointment time</th>
@@ -520,14 +569,14 @@ export default function DoctorAppointmentSlots() {
               </tr>
             </thead>
             <tbody>
-              {slots.length === 0 ? (
+              {displayedSlots.length === 0 ? (
                 <tr>
-                  <td colSpan="4" style={styles.emptyRow}>
-                    No upcoming slots yet. Generate slots from your templates when you are ready for patients to book.
+                  <td colSpan="4" className="doctor-slots-empty-row">
+                    {emptySlotsMessage}
                   </td>
                 </tr>
               ) : (
-                slots.map(renderSlotRow)
+                displayedSlots.map(renderSlotRow)
               )}
             </tbody>
           </table>
@@ -536,248 +585,3 @@ export default function DoctorAppointmentSlots() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: "32px",
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
-    color: "#1f2937",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: "16px",
-    flexWrap: "wrap",
-    alignItems: "flex-start",
-    marginBottom: "24px",
-  },
-  title: {
-    fontSize: "28px",
-    margin: 0,
-  },
-  subtitle: {
-    margin: "8px 0 0 0",
-    color: "#4b5563",
-    maxWidth: "720px",
-  },
-  actionRow: {
-    display: "flex",
-    alignItems: "center",
-  },
-  primaryButton: {
-    background: "#2563eb",
-    border: "none",
-    color: "white",
-    padding: "12px 18px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "600",
-    minWidth: "180px",
-  },
-  secondaryButton: {
-    background: "#111827",
-    border: "none",
-    color: "white",
-    padding: "12px 18px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "600",
-    marginTop: "12px",
-  },
-  dangerButton: {
-    background: "#dc2626",
-    border: "none",
-    color: "white",
-    padding: "8px 12px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontWeight: "600",
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "16px",
-    marginBottom: "24px",
-  },
-  statCard: {
-    border: "1px solid #e5e7eb",
-    borderRadius: "18px",
-    padding: "18px",
-    background: "#ffffff",
-    minHeight: "100px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-  },
-  gridLayout: {
-    display: "grid",
-    gridTemplateColumns: "1.2fr 0.8fr",
-    gap: "20px",
-    marginBottom: "24px",
-  },
-  card: {
-    border: "1px solid #e5e7eb",
-    borderRadius: "20px",
-    padding: "24px",
-    background: "#ffffff",
-    boxShadow: "0 12px 30px rgba(15, 23, 42, 0.05)",
-  },
-  sectionTitle: {
-    fontSize: "20px",
-    marginBottom: "16px",
-  },
-  form: {
-    display: "grid",
-    gap: "14px",
-  },
-  label: {
-    display: "grid",
-    gap: "8px",
-    fontSize: "14px",
-    color: "#374151",
-  },
-  input: {
-    width: "100%",
-    padding: "12px 14px",
-    borderRadius: "14px",
-    border: "1px solid #d1d5db",
-    outline: "none",
-    fontSize: "14px",
-  },
-  readOnlyField: {
-    width: "100%",
-    padding: "12px 14px",
-    borderRadius: "14px",
-    border: "1px solid #d1d5db",
-    background: "#f9fafb",
-    color: "#374151",
-    fontSize: "14px",
-    fontWeight: "600",
-  },
-  inlineFields: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "14px",
-  },
-  labelHalf: {
-    display: "grid",
-    gap: "8px",
-  },
-  divider: {
-    height: "1px",
-    background: "#e5e7eb",
-    margin: "18px 0",
-  },
-  tableWrapper: {
-    overflowX: "auto",
-    marginTop: "12px",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    minWidth: "640px",
-  },
-  sectionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: "12px",
-    flexWrap: "wrap",
-    marginBottom: "10px",
-  },
-  dateFilter: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  labelSmall: {
-    display: "flex",
-    flexDirection: "column",
-    fontSize: "14px",
-    color: "#374151",
-  },
-  inputSmall: {
-    width: "180px",
-    padding: "10px 12px",
-    borderRadius: "12px",
-    border: "1px solid #d1d5db",
-    outline: "none",
-    fontSize: "14px",
-    marginTop: "8px",
-  },
-  emptyRow: {
-    textAlign: "center",
-    padding: "18px 0",
-    color: "#6b7280",
-  },
-  rowHint: {
-    display: "block",
-    marginTop: "4px",
-    color: "#6b7280",
-    fontSize: "13px",
-  },
-  badgeSuccess: {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: "999px",
-    background: "#dcfce7",
-    color: "#166534",
-    padding: "6px 10px",
-    fontSize: "13px",
-    fontWeight: "700",
-  },
-  badgeOpen: {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: "999px",
-    background: "#dbeafe",
-    color: "#1d4ed8",
-    padding: "6px 10px",
-    fontSize: "13px",
-    fontWeight: "700",
-  },
-  badgeWarning: {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: "999px",
-    background: "#fef3c7",
-    color: "#92400e",
-    padding: "6px 10px",
-    fontSize: "13px",
-    fontWeight: "700",
-  },
-  badgeMuted: {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: "999px",
-    background: "#f3f4f6",
-    color: "#4b5563",
-    padding: "6px 10px",
-    fontSize: "13px",
-    fontWeight: "700",
-  },
-  errorBox: {
-    background: "#fee2e2",
-    color: "#991b1b",
-    borderRadius: "16px",
-    padding: "16px 18px",
-    marginBottom: "18px",
-    border: "1px solid #fca5a5",
-  },
-  successBox: {
-    background: "#dcfce7",
-    color: "#166534",
-    borderRadius: "16px",
-    padding: "16px 18px",
-    marginBottom: "18px",
-    border: "1px solid #86efac",
-  },
-  infoBox: {
-    background: "#e0f2fe",
-    color: "#075985",
-    borderRadius: "16px",
-    padding: "16px 18px",
-    marginBottom: "18px",
-    border: "1px solid #7dd3fc",
-  },
-};

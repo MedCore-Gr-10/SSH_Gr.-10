@@ -66,6 +66,17 @@ class AppointmentsTemplatesRepository {
         staff_id: staffId,
         active_appointment_template: true 
       },
+      include: {
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
+          }
+        }
+      },
       orderBy: [{ day_of_week: 'asc' }, { start_time: 'asc' }]
     });
   }
@@ -82,6 +93,17 @@ class AppointmentsTemplatesRepository {
         staff_id: staffId,
         day_of_week: dayOfWeek,
         active_appointment_template: true
+      },
+      include: {
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
+          }
+        }
       },
       orderBy: { start_time: 'asc' }
     });
@@ -101,6 +123,17 @@ class AppointmentsTemplatesRepository {
         hospital_id: hospitalId,
         department_id: departmentId,
         active_appointment_template: true
+      },
+      include: {
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
+          }
+        }
       },
       orderBy: [{ day_of_week: 'asc' }, { start_time: 'asc' }]
     });

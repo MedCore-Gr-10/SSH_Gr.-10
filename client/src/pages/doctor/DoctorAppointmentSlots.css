@@ -1,0 +1,345 @@
+.doctor-slots-page {
+  padding: 40px 4% 60px 4%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #2d3748;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.doctor-slots-header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.doctor-slots-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.doctor-slots-subtitle {
+  margin: 8px 0 0;
+  color: #4a5568;
+  max-width: 720px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.doctor-slots-action-row {
+  display: flex;
+  align-items: center;
+}
+
+.doctor-slots-btn {
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.doctor-slots-btn:hover {
+  transform: translateY(-1px);
+}
+
+.doctor-slots-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.doctor-slots-btn--primary {
+  background: #5c5cd6;
+  padding: 12px 18px;
+  border-radius: 10px;
+  min-width: 180px;
+}
+
+.doctor-slots-btn--primary:hover {
+  background: #4b4bca;
+}
+
+.doctor-slots-btn--secondary {
+  background: #1a202c;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+
+.doctor-slots-btn--secondary:hover {
+  background: #2d3748;
+}
+
+.doctor-slots-btn--danger {
+  background: #ef4444;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.doctor-slots-btn--danger:hover {
+  background: #dc2626;
+}
+
+.doctor-slots-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.doctor-slots-stat-card {
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  padding: 20px;
+  background: #ffffff;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+}
+
+.doctor-slots-grid-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 30px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.doctor-slots-card {
+  border: 1px solid #edf2f7;
+  border-radius: 16px;
+  padding: 30px;
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+
+.doctor-slots-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 20px 0;
+}
+
+.doctor-slots-form {
+  display: grid;
+  gap: 16px;
+}
+
+.doctor-slots-label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.doctor-slots-label--half {
+  display: grid;
+  gap: 8px;
+}
+
+.doctor-slots-input,
+.doctor-slots-readonly-field {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #edf2f7;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.doctor-slots-input:focus {
+  border-color: #5c5cd6;
+}
+
+.doctor-slots-readonly-field {
+  background: #fafafa;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.doctor-slots-inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.doctor-slots-divider {
+  height: 1px;
+  background: #edf2f7;
+  margin: 20px 0;
+}
+
+.doctor-slots-table-wrapper {
+  overflow-x: auto;
+  margin-top: 12px;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+}
+
+.doctor-slots-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+  background: #ffffff;
+}
+
+.doctor-slots-table th,
+.doctor-slots-table td {
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf2f7;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.doctor-slots-table th {
+  background: #fafafa;
+  color: #1a202c;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.doctor-slots-table tr:last-child td {
+  border-bottom: none;
+}
+
+.doctor-slots-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.doctor-slots-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.doctor-slots-label-small {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.doctor-slots-input-small {
+  width: 180px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #edf2f7;
+  outline: none;
+  font-size: 14px;
+  margin-top: 6px;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.doctor-slots-input-small:focus {
+  border-color: #5c5cd6;
+}
+
+.doctor-slots-empty-row {
+  text-align: center;
+  padding: 30px 0;
+  color: #718096;
+  font-size: 14px;
+}
+
+.doctor-slots-row-hint {
+  display: block;
+  margin-top: 4px;
+  color: #718096;
+  font-size: 12px;
+}
+
+.doctor-slots-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.doctor-slots-badge--success {
+  background: rgba(16, 185, 129, 0.08);
+  color: #10b981;
+}
+
+.doctor-slots-badge--open {
+  background: rgba(92, 92, 214, 0.08);
+  color: #5c5cd6;
+}
+
+.doctor-slots-badge--warning {
+  background: rgba(245, 158, 11, 0.08);
+  color: #f59e0b;
+}
+
+.doctor-slots-badge--muted {
+  background: #fafafa;
+  color: #718096;
+  border: 1px solid #edf2f7;
+}
+
+.doctor-slots-alert {
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.doctor-slots-alert--error {
+  background: rgba(239, 68, 68, 0.06);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.doctor-slots-alert--success {
+  background: rgba(16, 185, 129, 0.06);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.doctor-slots-alert--info {
+  background: rgba(92, 92, 214, 0.06);
+  color: #5c5cd6;
+  border: 1px solid rgba(92, 92, 214, 0.15);
+}
+
+@media (max-width: 840px) {
+  .doctor-slots-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .doctor-slots-page {
+    padding: 20px;
+  }
+
+  .doctor-slots-inline-fields {
+    grid-template-columns: 1fr;
+  }
+}
