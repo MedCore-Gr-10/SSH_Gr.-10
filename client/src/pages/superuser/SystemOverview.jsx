@@ -3,29 +3,78 @@ import "./../CSSpages/superuser/SystemOverview.css";
 
 export default function SystemOverview() {
   const [stats, setStats] = useState({
-    // Widgeti i madh (Llogaritë dhe Rolet)
-    totalUsers: 1240,
-    activeUsers: 1020,
-    inactiveUsers: 220,
-    superusers: 5,
-    directors: 12,
-    doctors: 145,
-    nurses: 280,
-    patients: 408,
-    insuredPatients: 315,
-    uninsuredPatients: 93,
+    // Widgeti i parë i madh (Llogaritë dhe Rolet - Dinamike)
+    totalUsers: 0,
+    activeUsers: 0,
+    inactiveUsers: 0,
+    superusers: 0,
+    directors: 0,
+    doctors: 0,
+    nurses: 0,
+    patients: 0,
 
-    // Widgetet poshtë (Infrastruktura, Angazhimi & Performanca)
-    hospitals: 12,
-    departments: 48,
-    specialties: 32,
-    appointments: 5420,
-    hospitalRating: 4.7,
-    totalRequests: 340, // SHTUAR: Numri total i kërkesave (p.sh. llogari të reja, transferte, etj.)
-    totalRatings: 850   // SHTUAR: Sa vlerësime janë bërë në total nga pacientët
+    hospitals: 0, 
+    departments: 0,     
+    specializations: 0,
+    hospitalRating: 'Err',
+    totalRatings: 'Err',
+    appointments: 'Err',
+
+    totalRequests: 'Err'
   });
   
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Hook-u për të tërhequr të dhënat live nga kontrolluesi i ri i System Overview
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Thirrja e rrugës së re të dedikuar në backend
+        const response = await fetch('/api/system-overview'); 
+        const result = await response.json();
+
+        if (result.success) {
+          setStats(prevStats => ({
+            ...prevStats,
+            totalUsers: result.data.totalUsers,
+            activeUsers: result.data.activeUsers,
+            inactiveUsers: result.data.inactiveUsers,
+            superusers: result.data.superusers,
+            directors: result.data.directors,
+            doctors: result.data.doctors,
+            nurses: result.data.nurses,
+            patients: result.data.patients,
+            hospitals: result.data.hospitals,
+            departments: result.data.departments,          // 🌟 Ngarkimi dinamik i departamenteve
+            specializations: result.data.specializations   // 🌟 Ngarkimi dinamik i specializimeve
+          }));
+        } else {
+          setError(result.error || "Nuk u mundësua ngarkimi i të dhënave.");
+        }
+      } catch (err) {
+        console.error("Gabim gjatë fetch:", err);
+        setError("Gabim në lidhje! Sigurohuni që backend-i është i ndezur.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardStats();
+  }, []);
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div style={{ color: '#e53e3e', backgroundColor: '#fff5f5', padding: '16px', borderRadius: '8px', border: '1px solid #fed7d7' }}>
+          ⚠️ {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
@@ -39,14 +88,14 @@ export default function SystemOverview() {
       {loading ? (
         <div className="page-loading">Loading system metrics...</div>
       ) : (
-        <div className="dashboard-content">
+        <div className="system-overview-content">
           
           {/* =========================================================
-              WIDGETI I MADH (CEPI NË CEP): USER & ROLE MANAGEMENT
+              WIDGETI I MADH 1: USER & ROLE MANAGEMENT (Dinamik)
              ========================================================= */}
           <div className="main-dashboard-widget">
             
-            {/* RRESHTI I PARË: Totali dhe Statuset */}
+            {/* Rreshti 1: Totali dhe Statuset */}
             <div className="widget-row row-overview">
               <div className="main-user-count">
                 <div className="big-icon">👥</div>
@@ -68,7 +117,7 @@ export default function SystemOverview() {
               </div>
             </div>
 
-            {/* RRESHTI I DYTË: Shpërndarja sipas roleve specifike */}
+            {/* Rreshti 2: Shpërndarja sipas roleve (5 Kartela të Pastra) */}
             <div className="widget-row row-roles">
               <h4 className="roles-section-title">User Roles Distribution</h4>
               <div className="roles-inner-grid">
@@ -97,86 +146,81 @@ export default function SystemOverview() {
                   <h3 className="role-value">{stats.nurses}</h3>
                 </div>
 
-                <div className="role-subcard role-patient patient-extended-card">
-                  <div className="patient-main-info">
-                    <span className="role-icon">🤕</span>
-                    <span className="role-label">Patients</span>
-                    <h3 className="role-value">{stats.patients.toLocaleString()}</h3>
-                  </div>
-                  
-                  <div className="patient-insurance-split">
-                    <div className="insurance-badge insured">
-                      Insured: <strong>{stats.insuredPatients}</strong>
-                    </div>
-                    <div className="insurance-badge uninsured">
-                      Uninsured: <strong>{stats.uninsuredPatients}</strong>
-                    </div>
-                  </div>
+                <div className="role-subcard role-patient">
+                  <span className="role-icon">🤕</span>
+                  <span className="role-label">Patients</span>
+                  <h3 className="role-value">{stats.patients.toLocaleString()}</h3>
                 </div>
 
               </div>
             </div>
-
           </div>
 
           {/* =========================================================
-              WIDGETET POSHTË: METRIKAT E TJERA TË SISTEMIT
+              WIDGETI I MADH 2: HOSPITAL & INFRASTRUCTURE MANAGEMENT
+             ========================================================= */}
+          <div className="main-dashboard-widget">
+            
+            {/* Rreshti 1: Hospitals kryesore */}
+            <div className="widget-row row-overview">
+              <div className="main-user-count">
+                <div className="big-icon hospital-main-icon">🏥</div>
+                <div className="count-details">
+                  <span className="widget-label">Registered Hospitals</span>
+                  <h1 className="widget-big-value">{stats.hospitals}</h1>
+                </div>
+              </div>
+            </div>
+
+            {/* Rreshti 2: Detajet e infrastrukturës (5 Kartela) */}
+            <div className="widget-row row-roles">
+              <h4 className="roles-section-title">Hospital Analytics & Core Structure</h4>
+              <div className="roles-inner-grid">
+                
+                <div className="role-subcard infra-card-dept">
+                  <span className="role-icon">🗂️</span>
+                  <span className="role-label">Departments</span>
+                  <h3 className="role-value">{stats.departments}</h3>
+                </div>
+
+                <div className="role-subcard infra-card-spec">
+                  <span className="role-icon">📚</span>
+                  <span className="role-label">Specialties</span>
+                  <h3 className="role-value">{stats.specializations}</h3> {/* 🌟 Ndryshuar këtu në stats.specializations */}
+                </div>
+
+                <div className="role-subcard infra-card-rating">
+                  <span className="role-icon">⭐</span>
+                  <span className="role-label">Avg Rating</span>
+                  <h3 className="role-value">{stats.hospitalRating} <span className="rating-max-small">/ 5.0</span></h3>
+                </div>
+
+                <div className="role-subcard infra-card-total-ratings">
+                  <span className="role-icon">💬</span>
+                  <span className="role-label">Total Ratings</span>
+                  <h3 className="role-value">{stats.totalRatings.toLocaleString()}</h3>
+                </div>
+
+                <div className="role-subcard infra-card-appointments">
+                  <span className="role-icon">📅</span>
+                  <span className="role-label">Appointments</span>
+                  <h3 className="role-value">{stats.appointments.toLocaleString()}</h3>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {/* =========================================================
+              WIDGETET POSHTË: OPERACIONET KRYESORE ADMINISTRATIVE
              ========================================================= */}
           <div className="infrastructure-grid">
             
-            {/* Kartela: Appointments */}
-            <div className="infra-card border-appointments">
-              <div className="infra-icon icon-bg-appointments">📅</div>
-              <div className="infra-info">
-                <span className="infra-label">Total Appointments</span>
-                <h3 className="infra-value">{stats.appointments.toLocaleString()}</h3>
-              </div>
-            </div>
-
-            {/* Kartela e re: System Requests */}
             <div className="infra-card border-requests">
               <div className="infra-icon icon-bg-requests">📩</div>
               <div className="infra-info">
-                <span className="infra-label">System Requests</span>
+                <span className="infra-label">Pending System Requests</span>
                 <h3 className="infra-value">{stats.totalRequests.toLocaleString()}</h3>
-              </div>
-            </div>
-
-            {/* Kartela: Avg Hospital Rating */}
-            <div className="infra-card border-rating">
-              <div className="infra-icon icon-bg-rating">⭐</div>
-              <div className="infra-info">
-                <span className="infra-label">Avg Hospital Rating</span>
-                <h3 className="infra-value">
-                  {stats.hospitalRating} <span className="rating-max">/ 5.0 ({stats.totalRatings})</span>
-                </h3>
-              </div>
-            </div>
-
-            {/* Kartela: Hospitals */}
-            <div className="infra-card border-hospitals">
-              <div className="infra-icon">🏥</div>
-              <div className="infra-info">
-                <span className="infra-label">Registered Hospitals</span>
-                <h3 className="infra-value">{stats.hospitals}</h3>
-              </div>
-            </div>
-
-            {/* Kartela: Departments */}
-            <div className="infra-card border-departments">
-              <div className="infra-icon">🗂️</div>
-              <div className="infra-info">
-                <span className="infra-label">Total Departments</span>
-                <h3 className="infra-value">{stats.departments}</h3>
-              </div>
-            </div>
-
-            {/* Kartela: Specialties */}
-            <div className="infra-card border-specialties">
-              <div className="infra-icon">📚</div>
-              <div className="infra-info">
-                <span className="infra-label">Medical Specialties</span>
-                <h3 className="infra-value">{stats.specialties}</h3>
               </div>
             </div>
 

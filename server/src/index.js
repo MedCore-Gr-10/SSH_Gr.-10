@@ -13,7 +13,7 @@ import patientRoutes from "./routes/patient.routes.js";
 import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js";
 import manageDepartmentsRouter from "./routes/manageDepartments.routes.js"; 
 import hospitalsRoutes from "./routes/hospital.routes.js";
-
+import systemOverviewRoutes from "./routes/systemOverview.routes.js";
 const app = express();
 
 app.use(
@@ -33,6 +33,7 @@ app.use("/api/staff", staffRoutes);
 app.use("/api/patient", patientRoutes);
 app.use("/api/departments", manageDepartmentsRouter); 
 app.use("/api/hospitals", hospitalsRoutes);
+app.use("/api/system-overview", systemOverviewRoutes);
 
 app.use("/api", (req, res) => {
   res

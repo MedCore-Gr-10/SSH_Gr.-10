@@ -1,123 +1,66 @@
-/* ==========================================
-   PAGE LAYOUT & CONTAINER RULES
-   ========================================== */
-
-.page-container {
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  padding: 15px;
+.system-overview-content{
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  box-sizing: border-box;
+  gap: 36px; /* ⬅️ Change this from 24px to 36px or 40px to increase the space */
 }
 
-.page-header {
-  width: 100%;
-  box-sizing: border-box;
-  border-bottom: 1px solid #eef2f5;
-  padding-bottom: 12px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center; 
-  gap: 15px;
-}
-
-.header-left {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-}
-
-.page-title {
-  margin: 0;
-  color: #1a202c;
-  font-size: 20px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.page-subtitle {
-  color: #718096;
-  margin: 0;
-  font-size: 13px;
-  position: relative;
-  padding-left: 12px;
-}
-
-.page-subtitle::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #cbd5e0;
-  font-weight: bold;
-}
-
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-}
-
-/* ==========================================
-   WIDGETI I MADH (CORNER TO CORNER)
-   ========================================== */
-
+/* ==========================================================================
+   MAIN DASHBOARD WIDGETS (CORNER TO CORNER) - FIXED HEIGHTS FOR COMPACT VIEW
+   ========================================================================== */
 .main-dashboard-widget {
   width: 100%;
+  height: auto; /* Ndryshuar nga 300px në auto që të mos ketë overflow të kartelave */
   background-color: #ffffff;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
-.widget-row {
-  padding: 24px;
-}
-
-.row-overview {
+/* Row 1: Overview Panel */
+.widget-row.row-overview {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #f0f4f8;
-  background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
-  flex-wrap: wrap;
-  gap: 20px;
+  height: auto; /* Ndryshuar nga 100px në auto për t'u bërë më i hollë */
+  padding: 12px 20px; /* Reduktuar padding-u për kompaktësi */
+  border-bottom: 1px solid #edf2f7;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
 }
 
 .main-user-count {
   display: flex;
   align-items: center;
-  gap: 20px;
-}
-
-.border-appointments {
-  border-left: 4px solid #3182ce; 
-}
-
-.icon-bg-appointments {
-  background-color: #ebf8ff; 
+  gap: 12px;
 }
 
 .big-icon {
-  font-size: 40px;
+  font-size: 22px; /* Zvogëluar pak madhësia e ikonës */
+  width: 44px;    /* Bërë më e vogël */
+  height: 44px;   /* Bërë më e vogël */
   background-color: #ebf8ff;
-  width: 70px;
-  height: 70px;
-  border-radius: 14px;
+  color: #2b6cb0;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.hospital-main-icon {
+  background-color: #fff5f5 !important;
+  color: #e53e3e !important;
+}
+
+.count-details {
+  display: flex;
+  flex-direction: column;
 }
 
 .widget-label {
-  font-size: 13px;
+  font-size: 11px; /* Zvogëluar tekstet */
   font-weight: 600;
   color: #718096;
   text-transform: uppercase;
@@ -125,181 +68,279 @@
 }
 
 .widget-big-value {
-  margin: 4px 0 0 0;
-  font-size: 38px;
+  font-size: 26px; /* Zvogëluar numri i madh kryesor */
   font-weight: 800;
   color: #1a202c;
-  line-height: 1;
+  margin: 2px 0 0 0;
 }
 
+/* Top Right Subcount Badges */
 .status-subcounts {
   display: flex;
-  gap: 16px;
+  gap: 10px;
 }
 
 .subcount-box {
+  padding: 6px 12px; /* Më pak hapësirë e brendshme */
+  border-radius: 8px;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
-  padding: 12px 20px;
-  border-radius: 10px;
-  min-width: 130px;
+  display: flex;
+  flex-direction: column;
+  min-width: 110px;
+}
+
+.status-active {
+  border-top: 3px solid #48bb78;
+}
+
+.status-inactive {
+  border-top: 3px solid #f56565;
+}
+
+.infrastructure-badge-status {
+  border-top: 3px solid #319795 !important;
 }
 
 .subcount-label {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  color: #4a5568;
+  color: #718096;
 }
 
 .subcount-value {
-  margin: 6px 0 0 0;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: #2d3748;
+  margin: 2px 0 0 0;
 }
 
-.status-active { border-top: 3px solid #38a169; }
-.status-inactive { border-top: 3px solid #e53e3e; }
-
-.row-roles {
-  background-color: #ffffff;
+/* Row 2: Roles & Inner Grid Distribution */
+.widget-row.row-roles {
+  padding: 14px 20px 18px 20px; /* Reduktuar padding i jashtëm i zonës së kartelave */
 }
 
 .roles-section-title {
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: #4a5568;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  margin: 0 0 10px 0;
 }
 
 .roles-inner-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); 
-  gap: 12px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px; /* Reduktuar hapësira mes kartelave */
 }
 
+/* ==========================================================================
+   ROLE SUBCARDS & INNER SPECIFIC BORDERS (COMPACT VERSION)
+   ========================================================================== */
 .role-subcard {
   background-color: #f8fafc;
-  border: 1px solid #edf2f7;
-  border-radius: 10px;
-  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  height: 95px; /* NDRYSHUAR: Nga 150px në 95px për t'i bërë dukshëm më të shkurtra */
+  padding: 10px 12px; /* Përshtatur padding për lartësinë e re */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 4px;
+  justify-content: space-between; /* Shpërndan ikonën sipër dhe vlerën poshtë */
+  box-sizing: border-box;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.role-subcard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .role-icon {
-  font-size: 20px;
+  font-size: 16px; /* Zvogëluar ikona brenda kartelës */
   margin-bottom: 2px;
+  line-height: 1;
 }
 
 .role-label {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Nëse teksti është i gjatë nuk e thyen rreshtin keq */
 }
 
 .role-value {
-  margin: 0;
-  font-size: 18px;
+  font-size: 18px; /* Zvogëluar font-size i vlerave (p.sh. 145 Doctors) */
   font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Specific left borders for User Roles */
+.role-superuser { border-left: 3px solid #ecc94b; }
+.role-director { border-left: 3px solid #4299e1; }
+.role-doctor { border-left: 3px solid #319795; }
+.role-nurse { border-left: 3px solid #ed64a6; }
+.role-patient { border-left: 3px solid #ed8936; }
+
+/* Specific left borders for Infrastructure */
+.infra-card-dept { border-left: 3px solid #4a5568 !important; }
+.infra-card-spec { border-left: 3px solid #00b5d8 !important; }
+.infra-card-rating { border-left: 3px solid #dd6b20 !important; }
+.infra-card-total-ratings { border-left: 3px solid #805ad5 !important; }
+.infra-card-appointments { border-left: 3px solid #3182ce !important; }
+
+.rating-max-small {
+  font-size: 11px;
+  color: #a0aec0;
+  font-weight: normal;
+}
+
+/* ==========================================================================
+   EXTENDED PATIENT CARD WITH DETAILS (COMPACT ADAPTATION)
+   ========================================================================== */
+.patient-extended-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Ndryshuar për kompaktësi */
+  gap: 4px !important;
+  padding: 8px 10px !important;
+}
+
+.patient-main-info {
+  display: flex;
+  flex-direction: row; /* Kthyer në rresht që të zërë më pak lartësi */
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.patient-main-info .role-value {
+  font-size: 16px; /* Pak më i vogël që të përshtatet në rresht horizontal */
+}
+
+.patient-insurance-split {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 4px;
+  margin-top: auto;
+}
+
+.insurance-badge {
+  font-size: 10px; /* Zvogëluar font-i i sigurimeve */
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  line-height: 1.2;
+}
+
+.insurance-badge strong {
   color: #1a202c;
 }
 
-.role-superuser { border-left: 3px solid #805ad5; }
-.role-director { border-left: 3px solid #dd6b20; }
-.role-doctor { border-left: 3px solid #319795; }
-.role-nurse { border-left: 3px solid #3182ce; }
-.role-patient { border-left: 3px solid #d69e2e; }
-
-@media (max-width: 900px) {
-  .roles-inner-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  }
+.insurance-badge::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-right: 4px;
 }
 
-/* ==========================================
-   WIDGETET POSHTË (INFRASTRUKTURA)
-   ========================================== */
+.insured::before { background-color: #3182ce; }
+.uninsured::before { background-color: #a0aec0; }
+
+/* ==========================================================================
+   BOTTOM OPERATIONAL CARDS GRID
+   ========================================================================== */
+.infrastructure-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 100%;
+}
 
 .infra-card {
   background-color: #ffffff;
-  padding: 18px;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
+  padding: 16px; /* Zvogëluar pak padding */
   display: flex;
   align-items: center;
-  gap: 15px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .infra-icon {
-  font-size: 24px;
-  width: 48px;
-  height: 48px;
-  background-color: #f7fafc;
-  border-radius: 10px;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex-shrink: 0;
+  justify-content: center;
+  border-radius: 8px;
 }
 
 .infra-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .infra-label {
   font-size: 12px;
   font-weight: 600;
   color: #718096;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .infra-value {
-  margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #1a202c;
+  margin: 2px 0 0 0;
 }
 
-.border-requests {
-  border-left: 4px solid #805ad5; 
+.border-requests { border-left: 4px solid #805ad5; }
+.icon-bg-requests { background-color: #faf5ff; color: #805ad5; }
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .roles-inner-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .role-subcard {
+    height: auto; /* Lejon zgjatjen nëse thyhet teksti në ekrane më të vogla */
+  }
 }
 
-.icon-bg-requests {
-  background-color: #faf5ff;
+@media (max-width: 768px) {
+  .widget-row.row-overview {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .status-subcounts {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .roles-inner-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }
 
-.rating-max {
-  font-size: 11px;
-  color: #718096;
-  font-weight: 500;
-  margin-left: 2px;
-}
-
-.infrastructure-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  width: 100%;
-}
-
-.border-hospitals { border-left: 4px solid #e53e3e; }
-.border-departments { border-left: 4px solid #4a5568; }
-.border-specialties { border-left: 4px solid #00b5d8; }
-
-.page-loading {
-  font-size: 15px;
-  color: #4a5568;
-  font-weight: 500;
-  text-align: center;
-  padding: 40px;
+@media (max-width: 480px) {
+  .roles-inner-grid {
+    grid-template-columns: 1fr;
+  }
 }
