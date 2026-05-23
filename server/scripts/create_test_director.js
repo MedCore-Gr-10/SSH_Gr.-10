@@ -40,9 +40,13 @@ async function main() {
   } else {
     user = await prisma.users.update({
       where: { id: user.id },
-      data: { hash_password },
+      data: {
+        hash_password,
+        role_id: role.id,
+        is_active: true,
+      },
     });
-    console.log("User exists, password reset for:", username);
+    console.log("User exists, password, role, and active status reset for:", username);
   }
 
   // attach a profile and email if missing
