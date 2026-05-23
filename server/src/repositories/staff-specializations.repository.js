@@ -1,7 +1,8 @@
-// staff-specializations.repository.js
-import { prisma } from './prisma.js'; // Përshtat rrugën ku keni iniciuar PrismaClient
+import prisma from "../prisma.js";
 
-export const StaffSpecializationsRepository = {
+// 1. Ndryshohet nga objekt në klasë të vërtetë
+export class StaffSpecializationsRepository {
+  
   // I cakton një specializim një mjeku në një spital dhe departament specifik
   async addSpecializationToStaff(data) {
     return await prisma.staff_specializations.create({
@@ -15,9 +16,38 @@ export const StaffSpecializationsRepository = {
         specializations: true,
       },
     });
-  },
+  }
 
   // Gjen të gjitha specializimet e një mjeku për një vend të caktuar pune
+  async replaceStaffSpecialization(data) {
+    const staffId = data.staff_id;
+    const hospitalId = Number(data.hospital_id);
+    const departmentId = Number(data.department_id);
+    const specializationId = data.specialization_id ? Number(data.specialization_id) : null;
+
+    return prisma.$transaction(async (tx) => {
+      await tx.staff_specializations.deleteMany({
+        where: { staff_id: staffId },
+      });
+
+      if (!specializationId) {
+        return null;
+      }
+
+      return tx.staff_specializations.create({
+        data: {
+          staff_id: staffId,
+          hospital_id: hospitalId,
+          department_id: departmentId,
+          specialization_id: specializationId,
+        },
+        include: {
+          specializations: true,
+        },
+      });
+    });
+  }
+
   async findSpecializationsByStaffLocation(staffId, hospitalId, departmentId) {
     return await prisma.staff_specializations.findMany({
       where: {
@@ -29,7 +59,7 @@ export const StaffSpecializationsRepository = {
         specializations: true,
       },
     });
-  },
+  }
 
   // Heq një specializim specifik nga mjeku (përdor çelësin e përbërë me 4 fusha)
   async removeSpecializationFromStaff(staffId, hospitalId, departmentId, specializationId) {
@@ -44,4 +74,6 @@ export const StaffSpecializationsRepository = {
       },
     });
   }
-};
+} // Mbyllja e klasës
+
+export default new StaffSpecializationsRepository();

@@ -1,13 +1,10 @@
-import UserService from "../../services/superuser-services/user.service.js";
+import userService from "../../services/superuser-services/user.service.js";
 
 class UserController {
-  constructor() {
-    this.userService = new UserService();
-  }
 
   async getAllUsers(req, res, next) {
     try {
-      const users = await this.userService.getAllUsers();
+      const users = await userService.getAllUsers();
 
       res.status(200).json({
         success: true,
@@ -20,7 +17,7 @@ class UserController {
 
   async getUserById(req, res, next) {
     try {
-      const user = await this.userService.getUserById(req.params.id);
+      const user = await userService.getUserById(req.params.id);
 
       res.status(200).json({
         success: true,
@@ -35,14 +32,15 @@ class UserController {
     try {
       const { id } = req.params;
       // 🌟 SHTUAR: department_id dhe specialization_id merren nga req.body
-      const { username, role_id, is_active, email, department_id, specialization_id } = req.body;
+      const { username, role_id, is_active, email, hospital_id, department_id, specialization_id } = req.body;
 
       // Kalojmë fushat e reja te shërbimi (UserService)
-      const updatedUser = await this.userService.updateUser(id, {
+      const updatedUser = await userService.updateUser(id, {
         username,
         role_id,
         is_active,
         email,
+        hospital_id,
         department_id,     
         specialization_id,
       });
@@ -60,14 +58,15 @@ class UserController {
   async createUser(req, res, next) {
     try {
       // 🌟 SHTUAR: department_id dhe specialization_id merren nga req.body
-      const { username, role_id, is_active, email, password, profile_id, department_id, specialization_id } = req.body; 
+      const { username, role_id, is_active, email, password, profile_id, hospital_id, department_id, specialization_id } = req.body;
 
       // Kalojmë fushat e reja te shërbimi (UserService)
-      const newUser = await this.userService.createUser({
+      const newUser = await userService.createUser({
         username,
         role_id: parseInt(role_id, 10),
         is_active,
         email,
+        hospital_id,
         password,
         profile_id,
         department_id,      // 🌟 SHTUAR
@@ -100,7 +99,7 @@ class UserController {
         });
       }
 
-      const result = await this.userService.updateUserPassword(id, password);
+      const result = await userService.updateUserPassword(id, password);
 
       res.status(200).json({
         success: true,
@@ -111,6 +110,8 @@ class UserController {
       next(err);
     }
   }
+
+
 }
 
 export default UserController;

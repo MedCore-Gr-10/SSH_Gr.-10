@@ -27,8 +27,22 @@ router.use((req, res, next) => roleMiddleware.handle(req, res, next));
  */
 
 /**
- * GET /api/doctor/appointments/assignments
- * Fetch hospital/department assignments for the logged-in doctor
+ * @swagger
+ * /api/doctor/appointments/assignments:
+ *   get:
+ *     summary: Get doctor assignments
+ *     description: Returns hospital and department assignments for the logged-in doctor
+ *     tags:
+ *       - Doctor Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Assignments retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  */
 router.get(
   "/appointments/assignments",
@@ -36,8 +50,20 @@ router.get(
 );
 
 /**
- * GET /api/doctor/appointments/templates
- * Fetch all recurring templates for the doctor
+ * @swagger
+ * /api/doctor/appointments/templates:
+ *   get:
+ *     summary: Get appointment templates
+ *     description: Returns all recurring appointment templates for the doctor
+ *     tags:
+ *       - Doctor Appointment Templates
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Templates retrieved successfully
+ *       401:
+ *         description: Unauthorized
  */
 router.get(
   "/appointments/templates",
@@ -45,8 +71,18 @@ router.get(
 );
 
 /**
- * GET /api/doctor/appointments/templates/summary
- * Get summary of templates with counts by day
+ * @swagger
+ * /api/doctor/appointments/templates/summary:
+ *   get:
+ *     summary: Get appointment templates summary
+ *     description: Returns template counts grouped by day
+ *     tags:
+ *       - Doctor Appointment Templates
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Template summary retrieved successfully
  */
 router.get(
   "/appointments/templates/summary",
@@ -54,8 +90,27 @@ router.get(
 );
 
 /**
- * GET /api/doctor/appointments/templates/by-day/:day
- * Fetch templates for a specific day (Monday, Tuesday, etc)
+ * @swagger
+ * /api/doctor/appointments/templates/by-day/{day}:
+ *   get:
+ *     summary: Get templates by day
+ *     description: Returns appointment templates for a specific weekday
+ *     tags:
+ *       - Doctor Appointment Templates
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: day
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Day of the week
+ *     responses:
+ *       200:
+ *         description: Templates retrieved successfully
+ *       404:
+ *         description: No templates found
  */
 router.get(
   "/appointments/templates/by-day/:day",
@@ -63,14 +118,43 @@ router.get(
 );
 
 /**
- * POST /api/doctor/appointments/templates?department_id=1
- * Create a new recurring template
- * 
- * Body: {
- *   "day_of_week": "Monday",
- *   "start_time": "09:00:00",
- *   "end_time": "09:30:00"
- * }
+ * @swagger
+ * /api/doctor/appointments/templates:
+ *   post:
+ *     summary: Create appointment template
+ *     description: Creates a recurring appointment template
+ *     tags:
+ *       - Doctor Appointment Templates
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: department_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Department ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               day_of_week:
+ *                 type: string
+ *                 example: Monday
+ *               start_time:
+ *                 type: string
+ *                 example: "09:00:00"
+ *               end_time:
+ *                 type: string
+ *                 example: "09:30:00"
+ *     responses:
+ *       201:
+ *         description: Template created successfully
+ *       400:
+ *         description: Bad request
  */
 router.post(
   "/appointments/templates",
@@ -78,13 +162,40 @@ router.post(
 );
 
 /**
- * PUT /api/doctor/appointments/templates/:id
- * Update a template
- * 
- * Body: {
- *   "start_time": "10:00:00",  (optional)
- *   "end_time": "10:30:00"     (optional)
- * }
+ * @swagger
+ * /api/doctor/appointments/templates/{id}:
+ *   put:
+ *     summary: Update appointment template
+ *     description: Updates an existing recurring appointment template
+ *     tags:
+ *       - Doctor Appointment Templates
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Template ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               start_time:
+ *                 type: string
+ *                 example: "10:00:00"
+ *               end_time:
+ *                 type: string
+ *                 example: "10:30:00"
+ *     responses:
+ *       200:
+ *         description: Template updated successfully
+ *       404:
+ *         description: Template not found
  */
 router.put(
   "/appointments/templates/:id",
@@ -92,8 +203,27 @@ router.put(
 );
 
 /**
- * DELETE /api/doctor/appointments/templates/:id
- * Delete a template (deactivates it and its slots)
+ * @swagger
+ * /api/doctor/appointments/templates/{id}:
+ *   delete:
+ *     summary: Delete appointment template
+ *     description: Deactivates an appointment template and its slots
+ *     tags:
+ *       - Doctor Appointment Templates
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Template ID
+ *     responses:
+ *       200:
+ *         description: Template deleted successfully
+ *       404:
+ *         description: Template not found
  */
 router.delete(
   "/appointments/templates/:id",
@@ -101,15 +231,25 @@ router.delete(
 );
 
 /**
- * ===================================
- * APPOINTMENT SLOTS ENDPOINTS
- * ===================================
- */
-
-/**
- * GET /api/doctor/appointments/slots
- * Fetch booking slots (optionally filtered by date)
- * Query params: ?date=2026-06-01
+ * @swagger
+ * /api/doctor/appointments/slots:
+ *   get:
+ *     summary: Get appointment slots
+ *     description: Returns appointment booking slots, optionally filtered by date
+ *     tags:
+ *       - Doctor Appointment Slots
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *         description: Filter slots by date
+ *         example: 2026-06-01
+ *     responses:
+ *       200:
+ *         description: Slots retrieved successfully
  */
 router.get(
   "/appointments/slots",
@@ -117,9 +257,25 @@ router.get(
 );
 
 /**
- * GET /api/doctor/appointments/slots/available?date=2026-06-01
- * Fetch only available (unbooked) slots for a date
- * Note: Date is required for this endpoint
+ * @swagger
+ * /api/doctor/appointments/slots/available:
+ *   get:
+ *     summary: Get available appointment slots
+ *     description: Returns only unbooked appointment slots for a date
+ *     tags:
+ *       - Doctor Appointment Slots
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 2026-06-01
+ *     responses:
+ *       200:
+ *         description: Available slots retrieved successfully
  */
 router.get(
   "/appointments/slots/available",
@@ -127,8 +283,18 @@ router.get(
 );
 
 /**
- * GET /api/doctor/appointments/slots/generation/status
- * Get current slot generation status and health
+ * @swagger
+ * /api/doctor/appointments/slots/generation/status:
+ *   get:
+ *     summary: Get slot generation status
+ *     description: Returns slot generation health and status
+ *     tags:
+ *       - Doctor Appointment Slots
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Generation status retrieved successfully
  */
 router.get(
   "/appointments/slots/generation/status",
@@ -136,8 +302,27 @@ router.get(
 );
 
 /**
- * GET /api/doctor/appointments/slots/:id
- * Fetch a specific slot
+ * @swagger
+ * /api/doctor/appointments/slots/{id}:
+ *   get:
+ *     summary: Get appointment slot by ID
+ *     description: Returns a specific appointment slot
+ *     tags:
+ *       - Doctor Appointment Slots
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Slot ID
+ *     responses:
+ *       200:
+ *         description: Slot retrieved successfully
+ *       404:
+ *         description: Slot not found
  */
 router.get(
   "/appointments/slots/:id",
@@ -145,16 +330,18 @@ router.get(
 );
 
 /**
- * ===================================
- * SLOT GENERATION ENDPOINTS (Testing)
- * ===================================
- * These are primarily for testing and development
- * In production, slots are generated automatically by cron job
- */
-
-/**
- * POST /api/doctor/appointments/slots/generate/week
- * Generate slots for next 7 days (manual trigger for testing)
+ * @swagger
+ * /api/doctor/appointments/slots/generate/week:
+ *   post:
+ *     summary: Generate weekly slots
+ *     description: Manually generates appointment slots for the next 7 days
+ *     tags:
+ *       - Doctor Slot Generation
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Weekly slots generated successfully
  */
 router.post(
   "/appointments/slots/generate/week",
@@ -162,13 +349,31 @@ router.post(
 );
 
 /**
- * POST /api/doctor/appointments/slots/generate/range
- * Generate slots for a date range
- * 
- * Body: {
- *   "from_date": "2026-06-01",
- *   "to_date": "2026-06-30"
- * }
+ * @swagger
+ * /api/doctor/appointments/slots/generate/range:
+ *   post:
+ *     summary: Generate slots for date range
+ *     description: Generates appointment slots for a custom date range
+ *     tags:
+ *       - Doctor Slot Generation
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               from_date:
+ *                 type: string
+ *                 example: 2026-06-01
+ *               to_date:
+ *                 type: string
+ *                 example: 2026-06-30
+ *     responses:
+ *       201:
+ *         description: Slots generated successfully
  */
 router.post(
   "/appointments/slots/generate/range",
@@ -176,13 +381,38 @@ router.post(
 );
 
 /**
- * POST /api/doctor/appointments/slots/generate/template/:id
- * Generate slots for a specific template
- * 
- * Body: {
- *   "start_date": "2026-06-01",
- *   "end_date": "2026-06-30"
- * }
+ * @swagger
+ * /api/doctor/appointments/slots/generate/template/{id}:
+ *   post:
+ *     summary: Generate slots for template
+ *     description: Generates appointment slots for a specific template
+ *     tags:
+ *       - Doctor Slot Generation
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Template ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               start_date:
+ *                 type: string
+ *                 example: 2026-06-01
+ *               end_date:
+ *                 type: string
+ *                 example: 2026-06-30
+ *     responses:
+ *       201:
+ *         description: Slots generated successfully
  */
 router.post(
   "/appointments/slots/generate/template/:id",
@@ -190,9 +420,29 @@ router.post(
 );
 
 /**
- * DELETE /api/doctor/appointments/slots/:id
- * Deactivate a slot (soft delete)
- * Note: Cannot deactivate booked slots
+ * @swagger
+ * /api/doctor/appointments/slots/{id}:
+ *   delete:
+ *     summary: Deactivate appointment slot
+ *     description: Soft deletes an appointment slot if it is not booked
+ *     tags:
+ *       - Doctor Appointment Slots
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Slot ID
+ *     responses:
+ *       200:
+ *         description: Slot deactivated successfully
+ *       400:
+ *         description: Slot cannot be deactivated
+ *       404:
+ *         description: Slot not found
  */
 router.delete(
   "/appointments/slots/:id",

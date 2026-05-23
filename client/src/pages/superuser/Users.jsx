@@ -294,6 +294,12 @@ export default function Users() {
         [name]: type === "checkbox" ? checked : value
       };
 
+      // Reset nested values if hospital changes to prevent stale data
+      if (name === "hospital_id") {
+        updatedFields.department_id = "";
+        updatedFields.specialization_id = "";
+      }
+
       if (name === "role_id") {
         const isDirector = value === "2";
         const isDoc = value === "4";
@@ -446,6 +452,38 @@ export default function Users() {
 
     return matchesSearch && matchesGender;
   });
+
+  const selectedHospitalDepartments = (() => {
+    if (!newUser.hospital_id) return [];
+
+    const selectedHospital = hospitals.find(
+      (hospital) => String(hospital.id) === String(newUser.hospital_id)
+    );
+
+    if (Array.isArray(selectedHospital?.departments) && selectedHospital.departments.length > 0) {
+      return selectedHospital.departments.filter(Boolean);
+    }
+
+    return departments.filter((department) => {
+      const directHospitalId = department.hospital_id ?? department.hospitals?.id;
+      const hospitalLinks = Array.isArray(department.hospitals_departments)
+        ? department.hospitals_departments
+        : [];
+
+      return (
+        (directHospitalId && String(directHospitalId) === String(newUser.hospital_id)) ||
+        hospitalLinks.some(
+          (link) => String(link.hospital_id ?? link.hospitals?.id) === String(newUser.hospital_id)
+        )
+      );
+    });
+  })();
+
+  const getDepartmentOptionId = (department) =>
+    department.id ?? department.department_id ?? department.departments?.id;
+
+  const getDepartmentOptionName = (department) =>
+    department.department_name ?? department.departments?.department_name ?? "Unnamed Department";
 
   return (
     <div className="page-container">
@@ -671,11 +709,18 @@ export default function Users() {
                       value={newUser.department_id} 
                       onChange={handleUserInputChange}
                       required
+                      disabled={!newUser.hospital_id} // Prevents choosing a department before selecting a hospital
                     >
                       <option value="">-- Select Department --</option>
-                      {departments.map((dept) => (
-                        <option key={dept.id} value={dept.id}>{dept.department_name}</option>
-                      ))}
+                      {selectedHospitalDepartments.map((dept) => {
+                        const departmentId = getDepartmentOptionId(dept);
+
+                        return (
+                          <option key={departmentId} value={departmentId}>
+                            {getDepartmentOptionName(dept)}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
                 )}

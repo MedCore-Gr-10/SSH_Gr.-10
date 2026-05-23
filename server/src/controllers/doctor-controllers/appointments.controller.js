@@ -1,6 +1,7 @@
 import appointmentTemplatesService from "../../services/doctor-services/appointmentTemplates.service.js";
 import slotGeneratorService from "../../services/doctor-services/slotGenerator.service.js";
 import appointmentsBookingSlotsRepository from "../../repositories/appointments-booking-slots.repository.js";
+import logsRepository from "../../repositories/logs.repository.js";
 
 /**
  * Doctor Appointment Templates Controller
@@ -25,6 +26,12 @@ class DoctorAppointmentTemplatesController {
         hospitalId
       );
 
+      await logsRepository.create({
+        user_id: doctorId,
+        action: "view doctor assignments",
+        reason: "Doctor viewed hospital and department assignments",
+      });
+
       res.status(200).json({ success: true, data: assignments });
     } catch (err) {
       next(err);
@@ -45,6 +52,11 @@ class DoctorAppointmentTemplatesController {
       }
 
       const templates = await appointmentTemplatesService.getTemplates(doctorId, hospitalId);
+      await logsRepository.create({
+        user_id: doctorId,
+        action: "view doctor appointment templates",
+        reason: "Doctor viewed appointment templates",
+      });
       res.status(200).json({ success: true, data: templates });
     } catch (err) {
       next(err);
@@ -61,6 +73,11 @@ class DoctorAppointmentTemplatesController {
       const doctorId = req.user.user_id;
 
       const templates = await appointmentTemplatesService.getTemplatesByDay(doctorId, day);
+      await logsRepository.create({
+        user_id: doctorId,
+        action: "view doctor appointment templates by day",
+        reason: `Doctor viewed appointment templates for ${day}`,
+      });
       res.status(200).json({ success: true, data: templates });
     } catch (err) {
       next(err);
@@ -76,6 +93,11 @@ class DoctorAppointmentTemplatesController {
       const doctorId = req.user.user_id;
 
       const summary = await appointmentTemplatesService.getTemplateSummary(doctorId);
+      await logsRepository.create({
+        user_id: doctorId,
+        action: "view doctor appointment template summary",
+        reason: "Doctor viewed appointment template summary",
+      });
       res.status(200).json({ success: true, data: summary });
     } catch (err) {
       next(err);
@@ -181,6 +203,14 @@ class DoctorAppointmentSlotsController {
         date ? new Date(date) : null
       );
 
+      await logsRepository.create({
+        user_id: doctorId,
+        action: "view doctor appointment slots",
+        reason: date
+          ? `Doctor viewed appointment slots for ${date}`
+          : "Doctor viewed appointment slots",
+      });
+
       res.status(200).json({ success: true, data: slots });
     } catch (err) {
       next(err);
@@ -206,6 +236,12 @@ class DoctorAppointmentSlotsController {
         new Date(date)
       );
 
+      await logsRepository.create({
+        user_id: doctorId,
+        action: "view available doctor appointment slots",
+        reason: `Doctor viewed available appointment slots for ${date}`,
+      });
+
       res.status(200).json({ success: true, data: slots });
     } catch (err) {
       next(err);
@@ -230,6 +266,12 @@ class DoctorAppointmentSlotsController {
         return res.status(403).json({ error: "Unauthorized" });
       }
 
+      await logsRepository.create({
+        user_id: req.user.user_id,
+        action: "view doctor appointment slot",
+        reason: `Doctor viewed appointment slot ${id}`,
+      });
+
       res.status(200).json({ success: true, data: slot });
     } catch (err) {
       next(err);
@@ -244,6 +286,12 @@ class DoctorAppointmentSlotsController {
     try {
       const doctorId = req.user.user_id;
       const status = await slotGeneratorService.getGenerationStatus(doctorId);
+
+      await logsRepository.create({
+        user_id: doctorId,
+        action: "view doctor slot generation status",
+        reason: "Doctor viewed appointment slot generation status",
+      });
 
       res.status(200).json({ success: true, data: status });
     } catch (err) {

@@ -1,0 +1,432 @@
+.doctor-staff-schedule-page {
+  padding: 40px 4% 60px 4%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #2d3748;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.doctor-staff-schedule-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.doctor-staff-schedule-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a202c;
+  letter-spacing: -0.5px;
+}
+
+.doctor-staff-schedule-header p {
+  margin: 8px 0 0;
+  color: #4a5568;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.doctor-staff-schedule-total {
+  min-width: 140px;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  padding: 14px 18px;
+  text-align: center;
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
+}
+
+.doctor-staff-schedule-total strong {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  color: #5c5cd6;
+}
+
+.doctor-staff-schedule-total span {
+  color: #718096;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.doctor-staff-schedule-alert,
+.doctor-staff-schedule-loading {
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.doctor-staff-schedule-alert {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.doctor-staff-schedule-loading {
+  background: rgba(92, 92, 214, 0.06);
+  border: 1px solid rgba(92, 92, 214, 0.15);
+  color: #5c5cd6;
+}
+
+.doctor-staff-calendar-section,
+.doctor-staff-now-section,
+.doctor-staff-day-section {
+  border: 1px solid #edf2f7;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+
+.doctor-staff-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.doctor-staff-section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.doctor-staff-section-heading span {
+  color: #718096;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.doctor-staff-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(128px, 1fr));
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.doctor-staff-calendar-day {
+  min-height: 156px;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.doctor-staff-calendar-day-name {
+  color: #1a202c;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.doctor-staff-empty-shift {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 92px;
+  border: 1px dashed #edf2f7;
+  border-radius: 8px;
+  color: #a0aec0;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.doctor-staff-shift-block {
+  display: grid;
+  gap: 4px;
+  border-left: 3px solid #5c5cd6;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: rgba(92, 92, 214, 0.06);
+}
+
+.doctor-staff-shift-block strong {
+  color: #5c5cd6;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.doctor-staff-shift-block span {
+  color: #4a5568;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.doctor-staff-now-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.doctor-staff-now-card {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  padding: 14px;
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.doctor-staff-now-card strong {
+  color: #1a202c;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.doctor-staff-now-card span {
+  color: #2d3748;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.doctor-staff-now-card small {
+  color: #047857;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.doctor-staff-now-empty {
+  border: 1px dashed #edf2f7;
+  border-radius: 10px;
+  padding: 18px;
+  color: #718096;
+  background: #fafafa;
+  font-size: 14px;
+}
+
+.doctor-staff-today-button {
+  border: 1px solid #5c5cd6;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: #5c5cd6;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.doctor-staff-today-button:hover {
+  background: #5c5cd6;
+  color: #ffffff;
+}
+
+.doctor-staff-day-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.doctor-staff-day-tabs button {
+  min-width: 48px;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: #4a5568;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.doctor-staff-day-tabs button:hover {
+  background: #fafafa;
+}
+
+.doctor-staff-day-tabs button.active {
+  border-color: #5c5cd6;
+  background: #5c5cd6;
+  color: #ffffff;
+}
+
+.doctor-staff-filter-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(230px, 280px) minmax(190px, 260px);
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.doctor-staff-search,
+.doctor-staff-role-filter,
+.doctor-staff-department-filter {
+  display: grid;
+  gap: 8px;
+  color: #2d3748;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.doctor-staff-role-filter {
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 43px;
+}
+
+.doctor-staff-role-filter legend {
+  padding: 0 4px;
+  color: #2d3748;
+}
+
+.doctor-staff-role-filter label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 12px;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.doctor-staff-role-filter input {
+  accent-color: #5c5cd6;
+}
+
+.doctor-staff-search input,
+.doctor-staff-department-filter select {
+  width: 100%;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 11px 12px;
+  color: #2d3748;
+  background: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.doctor-staff-search input:focus,
+.doctor-staff-department-filter select:focus {
+  border-color: #5c5cd6;
+}
+
+.doctor-staff-role-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.doctor-staff-role-counts span {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: #fafafa;
+  border: 1px solid #edf2f7;
+  color: #4a5568;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.doctor-staff-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+}
+
+.doctor-staff-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.doctor-staff-table th,
+.doctor-staff-table td {
+  padding: 16px;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.doctor-staff-table th {
+  background: #fafafa;
+  color: #1a202c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.doctor-staff-table tr:last-child td {
+  border-bottom: none;
+}
+
+.doctor-staff-table td {
+  color: #2d3748;
+}
+
+.doctor-staff-table td strong {
+  color: #1a202c;
+  font-weight: 600;
+}
+
+.doctor-staff-you {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(92, 92, 214, 0.08);
+  color: #5c5cd6;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.doctor-staff-empty-row {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+  font-size: 14px;
+}
+
+@media (max-width: 860px) {
+  .doctor-staff-schedule-header,
+  .doctor-staff-section-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .doctor-staff-schedule-total {
+    text-align: left;
+  }
+}
+
+@media (max-width: 620px) {
+  .doctor-staff-schedule-page {
+    padding: 24px 4% 40px;
+  }
+
+  .doctor-staff-calendar-section,
+  .doctor-staff-now-section,
+  .doctor-staff-day-section {
+    padding: 16px;
+  }
+
+  .doctor-staff-filter-row {
+    grid-template-columns: 1fr;
+  }
+
+}
