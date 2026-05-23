@@ -19,7 +19,8 @@ const Sidebar = () => {
       { label: "Manage Departments", path: "/main/manage-departments" },
       { label: "Manage Specialization", path: "/main/manage-specializations" },
       { label: "System Overview", path: "/main/system-overview" },
-      { label: "System Logs", path: "/main/system-logs" }
+      { label: "System Logs", path: "/main/system-logs" },
+      { label: "Make a Request", path: "/main/make-request" }
     ],
     director: [
       { label: "Dashboard", path: "/main/dashboard" },
