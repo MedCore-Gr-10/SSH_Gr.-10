@@ -68,6 +68,72 @@
   max-height: calc(100vh - 230px);
 }
 
+.section-heading-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-heading-row h2 {
+  margin: 0;
+}
+
+.section-heading-row span {
+  background: #e0f2fe;
+  border-radius: 999px;
+  color: #075985;
+  font-weight: 700;
+  padding: 6px 10px;
+}
+
+.empty-state {
+  color: #6b7280;
+}
+
+.slots-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.slot-row {
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.slot-row div {
+  display: grid;
+  gap: 4px;
+}
+
+.slot-row div span {
+  color: #4b5563;
+}
+
+.slot-available,
+.slot-booked {
+  border-radius: 999px;
+  flex: 0 0 auto;
+  font-weight: 700;
+  padding: 6px 10px;
+}
+
+.slot-available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.slot-booked {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .director-appointments-table {
   width: 100%;
   border-collapse: collapse;

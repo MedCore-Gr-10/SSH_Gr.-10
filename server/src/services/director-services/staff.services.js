@@ -17,14 +17,29 @@ class DirectorStaffService {
     }
   }
 
-  async ensureHospitalDepartment(hospitalId, departmentId) {
-    const departments = await hospitalsDepartmentsRepository.findByHospital(hospitalId);
-    const belongsToHospital = departments.some(
-      (entry) => entry.department_id === Number(departmentId)
-    );
+  normalizeDepartmentIds(data) {
+    const rawIds = Array.isArray(data.department_ids)
+      ? data.department_ids
+      : data.department_id
+        ? [data.department_id]
+        : [];
 
-    if (!belongsToHospital) {
-      throw new Error("Department does not belong to this hospital");
+    return [...new Set(rawIds.map((id) => Number(id)).filter(Boolean))];
+  }
+
+  async ensureHospitalDepartments(hospitalId, departmentIds) {
+    if (!departmentIds.length) {
+      throw new Error("Select at least one department");
+    }
+
+    const departments = await hospitalsDepartmentsRepository.findByHospital(hospitalId);
+    const activeDepartmentIds = new Set(
+      departments.map((entry) => Number(entry.department_id))
+    );
+    const invalidDepartment = departmentIds.find((id) => !activeDepartmentIds.has(Number(id)));
+
+    if (invalidDepartment) {
+      throw new Error("One or more departments do not belong to this hospital");
     }
   }
 
@@ -50,7 +65,6 @@ class DirectorStaffService {
       email,
       password,
       role,
-      department_id,
       first_name,
       last_name,
       birth,
@@ -58,6 +72,7 @@ class DirectorStaffService {
       personal_no,
       phone_number,
     } = data;
+    const departmentIds = this.normalizeDepartmentIds(data);
     const normalizedPersonalNo = this.normalizePersonalNo(personal_no);
     const birthDate = new Date(birth);
 
@@ -66,7 +81,7 @@ class DirectorStaffService {
       !email ||
       !password ||
       !role ||
-      !department_id ||
+      departmentIds.length === 0 ||
       !first_name ||
       !last_name ||
       !birth ||
@@ -102,7 +117,7 @@ class DirectorStaffService {
       throw new Error("Staff role not found");
     }
 
-    await this.ensureHospitalDepartment(hospitalId, department_id);
+    await this.ensureHospitalDepartments(hospitalId, departmentIds);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -214,12 +229,12 @@ class DirectorStaffService {
         },
       });
 
-      await tx.staff_hospitals_departments.create({
-        data: {
+      await tx.staff_hospitals_departments.createMany({
+        data: departmentIds.map((departmentId) => ({
           staff_id: user.id,
           hospital_id: hospitalId,
-          department_id: Number(department_id),
-        },
+          department_id: Number(departmentId),
+        })),
       });
 
       return user;
@@ -266,8 +281,10 @@ class DirectorStaffService {
       this.validatePassword(data.password);
     }
 
-    if (data.department_id) {
-      await this.ensureHospitalDepartment(hospitalId, data.department_id);
+    const hasDepartmentUpdate = Array.isArray(data.department_ids) || Boolean(data.department_id);
+    const departmentIds = this.normalizeDepartmentIds(data);
+    if (hasDepartmentUpdate) {
+      await this.ensureHospitalDepartments(hospitalId, departmentIds);
     }
 
     const normalizedPersonalNo = this.normalizePersonalNo(data.personal_no);
@@ -331,7 +348,7 @@ class DirectorStaffService {
         },
       });
 
-      if (data.department_id) {
+      if (hasDepartmentUpdate) {
         await tx.staff_hospitals_departments.deleteMany({
           where: {
             staff_id: id,
@@ -339,12 +356,12 @@ class DirectorStaffService {
           },
         });
 
-        await tx.staff_hospitals_departments.create({
-          data: {
+        await tx.staff_hospitals_departments.createMany({
+          data: departmentIds.map((departmentId) => ({
             staff_id: id,
             hospital_id: hospitalId,
-            department_id: Number(data.department_id),
-          },
+            department_id: Number(departmentId),
+          })),
         });
       }
     });
