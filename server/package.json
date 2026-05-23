@@ -26,7 +26,8 @@
     "jsonwebtoken": "^9.0.3",
     "redis": "^5.12.1",
     "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

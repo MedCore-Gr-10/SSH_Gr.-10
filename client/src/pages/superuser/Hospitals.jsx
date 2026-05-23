@@ -4,6 +4,7 @@ import "./../CSSpages/superuser/Hospitals.css";
 
 export default function ManageHospitals() {
   const [hospitals, setHospitals] = useState([]);
+  const [departments, setDepartments] = useState([]); 
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
@@ -14,7 +15,7 @@ export default function ManageHospitals() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
-  // State për verifikimin e profilit të drejtorit (përdoret si te krijimi, ashtu edhe te editimi)
+  // State për verifikimin e profilit të drejtorit
   const [searchPersonalNo, setSearchPersonalNo] = useState('');
   const [linkedProfile, setLinkedProfile] = useState(null);
   const [profileSearchError, setProfileSearchError] = useState('');
@@ -24,7 +25,8 @@ export default function ManageHospitals() {
     hospital_name: '',
     hospital_address: '',
     email: '',
-    director_personal_no: ''
+    director_personal_no: '',
+    departments: [] 
   });
 
   // State për formën e editimit të spitalit ekzistues
@@ -32,10 +34,12 @@ export default function ManageHospitals() {
     hospital_name: '',
     hospital_address: '',
     email: '',
-    director_personal_no: '' 
+    director_personal_no: '',
+    departments: [] 
   });
 
   const API_URL = 'http://localhost:3000/api/hospitals'; 
+  const DEPARTMENTS_API_URL = 'http://localhost:3000/api/departments';
 
   // 1. Merr spitalet nga Backend-i
   const fetchHospitals = async () => {
@@ -55,8 +59,24 @@ export default function ManageHospitals() {
     }
   };
 
+  // Funksioni për të marrë departamentet nga Backend-i
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch(DEPARTMENTS_API_URL);
+      const resData = await response.json();
+      if (resData.success) {
+        setDepartments(resData.data);
+      } else {
+        console.error(resData.message || 'Failed to fetch departments.');
+      }
+    } catch (err) {
+      console.error('Cannot connect to departments backend server.', err);
+    }
+  };
+
   useEffect(() => {
     fetchHospitals();
+    fetchDepartments();
   }, []);
 
   const handleInputChange = (e) => {
@@ -67,6 +87,40 @@ export default function ManageHospitals() {
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditFormData({ ...editFormData, [name]: value });
+  };
+
+  // Logjika e re për ndryshimin e Checkbox-eve (Krijim)
+  const handleCheckboxChange = (deptId) => {
+    const currentDepartments = [...formData.departments];
+    if (currentDepartments.includes(deptId)) {
+      // Nëse është i selektuar, e heqim
+      setFormData({
+        ...formData,
+        departments: currentDepartments.filter(id => id !== deptId)
+      });
+    } else {
+      // Nëse nuk është i selektuar, e shtojmë
+      setFormData({
+        ...formData,
+        departments: [...currentDepartments, deptId]
+      });
+    }
+  };
+
+  // Logjika e re për ndryshimin e Checkbox-eve (Editim)
+  const handleEditCheckboxChange = (deptId) => {
+    const currentDepartments = [...editFormData.departments];
+    if (currentDepartments.includes(deptId)) {
+      setEditFormData({
+        ...editFormData,
+        departments: currentDepartments.filter(id => id !== deptId)
+      });
+    } else {
+      setEditFormData({
+        ...editFormData,
+        departments: [...currentDepartments, deptId]
+      });
+    }
   };
 
   // Verifikimi i Profilit nga API
@@ -135,7 +189,7 @@ export default function ManageHospitals() {
       if (resData.success) {
         fetchHospitals(); 
         setIsModalOpen(false);
-        setFormData({ hospital_name: '', hospital_address: '', email: '', director_personal_no: '' }); 
+        setFormData({ hospital_name: '', hospital_address: '', email: '', director_personal_no: '', departments: [] }); 
         setSearchPersonalNo('');
         setLinkedProfile(null);
       } else {
@@ -181,7 +235,8 @@ export default function ManageHospitals() {
       hospital_name: item.hospital_name || '',
       hospital_address: item.hospital_address || '',
       email: item.email || '',
-      director_personal_no: item.director?.personal_no || '' 
+      director_personal_no: item.director?.personal_no || '',
+      departments: item.departments ? item.departments.map(d => d.id) : []
     });
     setLinkedProfile(null);
     setSearchPersonalNo('');
@@ -278,6 +333,34 @@ export default function ManageHospitals() {
                 <input type="text" name="hospital_address" value={formData.hospital_address} onChange={handleInputChange} placeholder="Street, City, Zip"/>
               </div>
 
+              {/* INTEGRIMI I CHECKBOX-EVE PËR DEPARTAMENTET (KRIJIM) */}
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold', marginBottom: '8px', display: 'block' }}>Link Departments</label>
+                <div style={{ 
+                  maxHeight: '120px', 
+                  overflowY: 'auto', 
+                  border: '1px solid #e2e8f0', 
+                  borderRadius: '6px', 
+                  padding: '10px',
+                  backgroundColor: '#fff' 
+                }}>
+                  {departments.map(dept => (
+                    <div key={dept.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '6px', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        id={`create-dept-${dept.id}`}
+                        checked={formData.departments.includes(dept.id)}
+                        onChange={() => handleCheckboxChange(dept.id)}
+                        style={{ cursor: 'pointer', width: 'auto' }}
+                      />
+                      <label htmlFor={`create-dept-${dept.id}`} style={{ cursor: 'pointer', fontSize: '14px', color: '#2d3748', margin: 0 }}>
+                        {dept.department_name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="form-group profile-verification-box">
                 <label>Link Existing Profile (Unique Personal Number):</label>
                 <div className="profile-verification-input-wrapper">
@@ -341,6 +424,49 @@ export default function ManageHospitals() {
                     <input type="text" name="hospital_address" value={editFormData.hospital_address} onChange={handleEditInputChange} className="search-input" style={{ width: '100%', marginTop: '5px' }} />
                   ) : (
                     <p style={{ margin: '4px 0 0 0', fontSize: '15px', color: '#2d3748' }}>{selectedHospital.hospital_address}</p>
+                  )}
+                </div>
+
+                {/* INTEGRIMI I CHECKBOX-EVE PËR DEPARTAMENTET (EDITIM / SHFAQJE) */}
+                <div className="form-group" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+                  <label style={{ fontWeight: 'bold', color: '#4a5568', fontSize: '12px' }}>Associated Departments</label>
+                  {isEditing ? (
+                    <div style={{ 
+                      maxHeight: '120px', 
+                      overflowY: 'auto', 
+                      border: '1px solid #e2e8f0', 
+                      borderRadius: '6px', 
+                      padding: '10px',
+                      backgroundColor: '#fff',
+                      marginTop: '5px'
+                    }}>
+                      {departments.map(dept => (
+                        <div key={dept.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '6px', gap: '8px' }}>
+                          <input 
+                            type="checkbox" 
+                            id={`edit-dept-${dept.id}`}
+                            checked={editFormData.departments.includes(dept.id)}
+                            onChange={() => handleEditCheckboxChange(dept.id)}
+                            style={{ cursor: 'pointer', width: 'auto' }}
+                          />
+                          <label htmlFor={`edit-dept-${dept.id}`} style={{ cursor: 'pointer', fontSize: '14px', color: '#2d3748', margin: 0 }}>
+                            {dept.department_name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: '5px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                      {selectedHospital.departments && selectedHospital.departments.length > 0 ? (
+                        selectedHospital.departments.map(dept => (
+                          <span key={dept.id} style={{ backgroundColor: '#e2e8f0', color: '#4a5568', padding: '3px 8px', borderRadius: '12px', fontSize: '13px' }}>
+                            {dept.department_name}
+                          </span>
+                        ))
+                      ) : (
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#718096', fontStyle: 'italic' }}>No departments linked.</p>
+                      )}
+                    </div>
                   )}
                 </div>
 
