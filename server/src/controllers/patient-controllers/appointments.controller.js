@@ -21,6 +21,18 @@ class PatientAppointmentsController {
       next(err);
     }
   }
+
+  async bookAppointment(req, res, next) {
+    try {
+      const appointment = await PatientAppointmentsService.bookAppointment(
+        req.user.user_id,
+        req.params.slotId
+      );
+      res.status(201).json({ success: true, data: appointment });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export default PatientAppointmentsController;

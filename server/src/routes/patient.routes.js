@@ -429,4 +429,29 @@ router.get("/appointments/filters", (req, res, next) => appointmentsController.g
  */
 router.get("/appointments/search", (req, res, next) => appointmentsController.searchAppointments(req, res, next));
 
+/**
+ * @swagger
+ * /api/patient/appointments/{slotId}/book:
+ *   post:
+ *     summary: Book an available appointment slot
+ *     description: Creates an appointment_made record for the logged-in patient and selected available booking slot.
+ *     tags:
+ *       - Patient Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: slotId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Appointment booking slot ID.
+ *     responses:
+ *       201:
+ *         description: Appointment booked successfully.
+ *       400:
+ *         description: Slot is invalid, inactive, or already booked.
+ */
+router.post("/appointments/:slotId/book", (req, res, next) => appointmentsController.bookAppointment(req, res, next));
+
 export default router;

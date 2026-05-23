@@ -41,3 +41,12 @@ export const getPatientAppointmentFilters = async () => {
 
   return readResponse(response);
 };
+
+export const bookPatientAppointment = async (slotId) => {
+  const response = await fetch(`/api/patient/appointments/${slotId}/book`, {
+    method: "POST",
+    headers: getHeaders(),
+  });
+
+  return readResponse(response);
+};
