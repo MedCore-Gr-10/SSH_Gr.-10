@@ -205,7 +205,6 @@ export default function ManageHospitals() {
     director_username: hosp.director?.username ? `@${hosp.director.username}` : 'N/A'
   }));
 
-  // SHTUAR: Kushti `String(hosp.id).includes(...)` që të bëhet kërkimi edhe me ID
   const filteredHospitals = preparedHospitals.filter(hosp =>
     String(hosp.id).includes(searchTerm.trim()) ||
     (hosp.hospital_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -216,8 +215,7 @@ export default function ManageHospitals() {
 
   return (
     <div className="page-container">
-      {/* PËRDITËSUAR: Butoni "+ Add New Hospital" u zhvendos këtu lart */}
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'between', alignItems: 'center' }}>
+      <div className="page-header">
         <div className="header-left">
           <h2 className="page-title">Hospital Management</h2>
           <p className="page-subtitle">Create, monitor and filter hospital configurations</p>

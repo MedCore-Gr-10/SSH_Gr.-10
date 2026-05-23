@@ -144,8 +144,10 @@ export default function ManageSpecialization() {
   return (
     <div className="page-container">  
       <div className="page-header">
-        <h2 className="page-title">Manage Specializations</h2>
-        <p className="page-subtitle">View, add, and modify hospital department specializations.</p>
+        <div className="header-left">
+          <h2 className="page-title">Manage Specializations</h2>
+          <p className="page-subtitle">View, add, and modify hospital department specializations.</p>
+        </div>
       </div>
 
       {error && (
