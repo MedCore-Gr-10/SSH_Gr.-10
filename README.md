@@ -36,7 +36,26 @@ npm run create-director
 -->ne browser login me kredencialet:
 Username: dev_director
 Password: devdirector123
+9. Per infermieren (roli nurse):
+cd server
+npm run create-nurse
+-->ne browser login:
+Username: dev_nurse
+Password: devpassword
 
+**Full nurse test data** (patients, allergies, insurance, contacts, visits, schedules):
+```bash
+cd server
+npm run seed:nurse-test
+```
+Login: `dev_nurse` / `devpassword` — search patients: Anna, Ben, Clara (or personal numbers PAT-ANNA-1001, etc.)
+
+### Infermier/e (nurse) — API `/api/nurse`
+- Qasje vetëm në tenancën e spitalit (`staff_hospitals_departments` + `patients_hospitals`)
+- Lexim: alergji, sigurim, kontakte urgjente, termine (me `reason` në query — regjistrohet në `logs`)
+- Orari: `GET /api/nurse/schedules/me` (`active_schedule = true`), stafi: `GET /api/nurse/schedules/staff`
+- Pacientët (përfshirë infermierët që duan llogari pacient) regjistrohen në `/register` me të dhënat e profilit.
+- Historia e pacientit (nurse): `GET /api/nurse/patients/:id/history?reason=&from=&to=` — vizita, diagnoza, receta (read-only, logged).
 
 ---
 # 🏥 MedCore
