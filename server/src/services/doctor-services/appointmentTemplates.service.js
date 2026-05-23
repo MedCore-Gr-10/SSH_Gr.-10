@@ -104,6 +104,48 @@ class DoctorAppointmentTemplatesService {
     }
   }
 
+  async getDoctorAssignments(doctorId, hospitalId) {
+    const assignments = await prisma.staff_hospitals_departments.findMany({
+      where: {
+        staff_id: doctorId,
+        hospital_id: hospitalId,
+      },
+      include: {
+        hospitals_departments: {
+          include: {
+            departments: true,
+          },
+        },
+      },
+      orderBy: {
+        department_id: "asc",
+      },
+    });
+
+    return assignments.map((assignment) => ({
+      hospital_id: assignment.hospital_id,
+      department_id: assignment.department_id,
+      department_name:
+        assignment.hospitals_departments?.departments?.department_name ||
+        `Department #${assignment.department_id}`,
+    }));
+  }
+
+  async #resolveDepartmentId(doctorId, hospitalId, departmentId) {
+    if (departmentId) return departmentId;
+
+    const assignments = await this.getDoctorAssignments(doctorId, hospitalId);
+    if (assignments.length === 0) {
+      throw new Error("Doctor is not assigned to a department in this hospital");
+    }
+
+    if (assignments.length > 1) {
+      throw new Error("Choose a department for this appointment template");
+    }
+
+    return assignments[0].department_id;
+  }
+
   /**
    * Create a new recurring appointment template
    * @param {Object} data - { day_of_week, start_time, end_time }
@@ -127,13 +169,19 @@ class DoctorAppointmentTemplatesService {
       throw new Error(`Invalid day_of_week. Must be one of: ${validDays.join(", ")}`);
     }
 
+    const resolvedDepartmentId = await this.#resolveDepartmentId(
+      doctorId,
+      hospitalId,
+      departmentId
+    );
+
     // Validate doctor is assigned to hospital/department
     const assignment = await prisma.staff_hospitals_departments.findUnique({
       where: {
         staff_id_hospital_id_department_id: {
           staff_id: doctorId,
           hospital_id: hospitalId,
-          department_id: departmentId
+          department_id: resolvedDepartmentId
         }
       }
     });
@@ -177,7 +225,7 @@ class DoctorAppointmentTemplatesService {
     const template = await appointmentsTemplatesRepository.create({
       staff_id: doctorId,
       hospital_id: hospitalId,
-      department_id: departmentId,
+      department_id: resolvedDepartmentId,
       day_of_week,
       start_time: normalizedStart,
       end_time: normalizedEnd,

@@ -30,12 +30,20 @@ export const getDoctorTemplates = async () => {
   return handleResponse(res);
 };
 
+export const getDoctorAssignments = async () => {
+  const res = await fetch(`${API}/doctor/appointments/assignments`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return handleResponse(res);
+};
+
 export const createDoctorTemplate = async (template, departmentId) => {
-  const query = departmentId ? `?department_id=${encodeURIComponent(departmentId)}` : "";
-  const res = await fetch(`${API}/doctor/appointments/templates${query}`, {
+  const body = departmentId ? { ...template, department_id: Number(departmentId) } : template;
+  const res = await fetch(`${API}/doctor/appointments/templates`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify(template),
+    body: JSON.stringify(body),
   });
   return handleResponse(res);
 };

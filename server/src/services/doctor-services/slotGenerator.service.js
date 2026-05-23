@@ -23,6 +23,18 @@ class AppointmentSlotGeneratorService {
     return days[date.getDay()];
   }
 
+  #toDateOnly(date) {
+    return new Date(Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      12,
+      0,
+      0,
+      0
+    ));
+  }
+
   /**
    * Get next 7 days from a start date
    * @param {Date} startDate - Start date
@@ -89,7 +101,7 @@ class AppointmentSlotGeneratorService {
         // Check for duplicate
         const duplicate = await appointmentsBookingSlotsRepository.findDuplicate(
           doctorId,
-          date,
+          this.#toDateOnly(date),
           template.start_time,
           template.end_time
         );
@@ -98,7 +110,7 @@ class AppointmentSlotGeneratorService {
           slotsToCreate.push({
             doctor_id: doctorId,
             appointment_template_id: template.id,
-            appointment_date: date,
+            appointment_date: this.#toDateOnly(date),
             slot_start_time: template.start_time,
             slot_end_time: template.end_time,
             active_appointment_booking_slot: true
@@ -163,7 +175,7 @@ class AppointmentSlotGeneratorService {
         // Check for duplicate
         const duplicate = await appointmentsBookingSlotsRepository.findDuplicate(
           doctorId,
-          currentDate,
+          this.#toDateOnly(currentDate),
           template.start_time,
           template.end_time
         );
@@ -172,7 +184,7 @@ class AppointmentSlotGeneratorService {
           slotsToCreate.push({
             doctor_id: doctorId,
             appointment_template_id: template.id,
-            appointment_date: new Date(currentDate),
+            appointment_date: this.#toDateOnly(currentDate),
             slot_start_time: template.start_time,
             slot_end_time: template.end_time,
             active_appointment_booking_slot: true
@@ -235,7 +247,7 @@ class AppointmentSlotGeneratorService {
         // Check for duplicate
         const duplicate = await appointmentsBookingSlotsRepository.findDuplicate(
           template.staff_id,
-          currentDate,
+          this.#toDateOnly(currentDate),
           template.start_time,
           template.end_time
         );
@@ -244,7 +256,7 @@ class AppointmentSlotGeneratorService {
           slotsToCreate.push({
             doctor_id: template.staff_id,
             appointment_template_id: templateId,
-            appointment_date: new Date(currentDate),
+            appointment_date: this.#toDateOnly(currentDate),
             slot_start_time: template.start_time,
             slot_end_time: template.end_time,
             active_appointment_booking_slot: true

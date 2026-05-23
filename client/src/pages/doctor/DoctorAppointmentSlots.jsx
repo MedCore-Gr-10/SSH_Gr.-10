@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  getDoctorAssignments,
   getDoctorTemplates,
   createDoctorTemplate,
   deleteDoctorTemplate,
@@ -22,7 +23,49 @@ const defaultRange = () => {
   };
 };
 
+const formatDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+};
+
+const formatTime = (value) => {
+  if (!value) return "-";
+
+  let date;
+  if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(value)) {
+    date = new Date(`1970-01-01T${value}`);
+  } else {
+    date = new Date(value);
+  }
+
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+};
+
+const getTemplateSummary = (template) => {
+  const day = template.day_of_week || "Scheduled day";
+  return `${day}, ${formatTime(template.start_time)} - ${formatTime(template.end_time)}`;
+};
+
+const getDepartmentLabel = (template) => {
+  const departmentId = template.department_id || template.department?.id;
+  return departmentId ? `Department #${departmentId}` : "No department listed";
+};
+
 export default function DoctorAppointmentSlots() {
+  const [assignments, setAssignments] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [slots, setSlots] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -45,16 +88,25 @@ export default function DoctorAppointmentSlots() {
     try {
       setLoading(true);
       setError("");
-      const [templateData, slotData, statusData, availableData] = await Promise.all([
+      const [assignmentData, templateData, slotData, statusData, availableData] = await Promise.all([
+        getDoctorAssignments(),
         getDoctorTemplates(),
         getDoctorSlots(),
         getDoctorSlotGenerationStatus(),
         getDoctorAvailableSlots(selectedDate),
       ]);
+      const nextAssignments = assignmentData || [];
+      setAssignments(nextAssignments);
       setTemplates(templateData || []);
       setSlots(slotData || []);
       setGenerationStatus(statusData || null);
       setAvailableSlots(availableData || []);
+      if (nextAssignments.length === 1) {
+        setTemplateForm((prev) => ({
+          ...prev,
+          department_id: String(nextAssignments[0].department_id),
+        }));
+      }
     } catch (err) {
       setError(err.message || "Unable to load doctor appointment data.");
     } finally {
@@ -89,8 +141,8 @@ export default function DoctorAppointmentSlots() {
     setMessage("");
     setError("");
 
-    if (!templateForm.department_id) {
-      setError("Department ID is required to create a template.");
+    if (assignments.length > 1 && !templateForm.department_id) {
+      setError("Choose which department this template belongs to.");
       return;
     }
 
@@ -198,10 +250,14 @@ export default function DoctorAppointmentSlots() {
 
   const renderTemplateRow = (template) => (
     <tr key={template.id}>
-      <td>{template.day_of_week || "-"}</td>
-      <td>{template.start_time || "-"}</td>
-      <td>{template.end_time || "-"}</td>
-      <td>{template.department_id || template.department?.id || "Unknown"}</td>
+      <td>
+        <strong>{getTemplateSummary(template)}</strong>
+        <span style={styles.rowHint}>Repeats every {template.day_of_week || "selected day"}</span>
+      </td>
+      <td>{getDepartmentLabel(template)}</td>
+      <td>
+        <span style={styles.badgeSuccess}>Active template</span>
+      </td>
       <td>
         <button style={styles.dangerButton} onClick={() => handleDeleteTemplate(template.id)}>
           Delete
@@ -212,13 +268,28 @@ export default function DoctorAppointmentSlots() {
 
   const renderSlotRow = (slot) => {
     const date = slot.appointment_date || slot.appointmentDate || "-";
+    const isActive = slot.active_appointment_booking_slot !== false;
+    const isBooked = Boolean(slot.appointments_made?.length);
+
     return (
       <tr key={slot.id}>
-        <td>{date}</td>
-        <td>{slot.slot_start_time || slot.start_time || "-"}</td>
-        <td>{slot.slot_end_time || slot.end_time || "-"}</td>
-        <td>{slot.active_slot === false ? "Inactive" : "Active"}</td>
-        <td>{slot.appointments_made ? (slot.appointments_made.length ? "Booked" : "Open") : "Open"}</td>
+        <td>
+          <strong>{formatDate(date)}</strong>
+          <span style={styles.rowHint}>
+            {formatTime(slot.slot_start_time || slot.start_time)} - {formatTime(slot.slot_end_time || slot.end_time)}
+          </span>
+        </td>
+        <td>
+          <span style={isActive ? styles.badgeSuccess : styles.badgeMuted}>
+            {isActive ? "Ready to book" : "Inactive"}
+          </span>
+        </td>
+        <td>
+          <span style={isBooked ? styles.badgeWarning : styles.badgeOpen}>
+            {isBooked ? "Booked by patient" : "Open for patients"}
+          </span>
+        </td>
+        <td>{slot.appointments_templates?.day_of_week || "From template"}</td>
       </tr>
     );
   };
@@ -267,14 +338,25 @@ export default function DoctorAppointmentSlots() {
           <h2 style={styles.sectionTitle}>Create Appointment Template</h2>
           <form style={styles.form} onSubmit={handleCreateTemplate}>
             <label style={styles.label}>
-              Department ID
-              <input
-                style={styles.input}
-                type="text"
-                value={templateForm.department_id}
-                onChange={(e) => handleInputChange("department_id", e.target.value)}
-                placeholder="Enter department ID"
-              />
+              Department
+              {assignments.length > 1 ? (
+                <select
+                  style={styles.input}
+                  value={templateForm.department_id}
+                  onChange={(e) => handleInputChange("department_id", e.target.value)}
+                >
+                  <option value="">Choose a department</option>
+                  {assignments.map((assignment) => (
+                    <option key={assignment.department_id} value={assignment.department_id}>
+                      {assignment.department_name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div style={styles.readOnlyField}>
+                  {assignments[0]?.department_name || "Department will be selected from your doctor profile"}
+                </div>
+              )}
             </label>
             <label style={styles.label}>
               Day of Week
@@ -391,18 +473,17 @@ export default function DoctorAppointmentSlots() {
           <table style={styles.table}>
             <thead>
               <tr>
-                <th>Day</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Department</th>
+                <th>When it repeats</th>
+                <th>Where</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {templates.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={styles.emptyRow}>
-                    No appointment templates found.
+                  <td colSpan="4" style={styles.emptyRow}>
+                    No recurring appointment times yet. Create one above to start building bookable slots.
                   </td>
                 </tr>
               ) : (
@@ -432,18 +513,17 @@ export default function DoctorAppointmentSlots() {
           <table style={styles.table}>
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Start</th>
-                <th>End</th>
+                <th>Appointment time</th>
                 <th>Status</th>
-                <th>Booked</th>
+                <th>Patient booking</th>
+                <th>Source</th>
               </tr>
             </thead>
             <tbody>
               {slots.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={styles.emptyRow}>
-                    No slots found. Generate slots to begin.
+                  <td colSpan="4" style={styles.emptyRow}>
+                    No upcoming slots yet. Generate slots from your templates when you are ready for patients to book.
                   </td>
                 </tr>
               ) : (
@@ -564,6 +644,16 @@ const styles = {
     outline: "none",
     fontSize: "14px",
   },
+  readOnlyField: {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: "14px",
+    border: "1px solid #d1d5db",
+    background: "#f9fafb",
+    color: "#374151",
+    fontSize: "14px",
+    fontWeight: "600",
+  },
   inlineFields: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
@@ -619,6 +709,52 @@ const styles = {
     textAlign: "center",
     padding: "18px 0",
     color: "#6b7280",
+  },
+  rowHint: {
+    display: "block",
+    marginTop: "4px",
+    color: "#6b7280",
+    fontSize: "13px",
+  },
+  badgeSuccess: {
+    display: "inline-flex",
+    alignItems: "center",
+    borderRadius: "999px",
+    background: "#dcfce7",
+    color: "#166534",
+    padding: "6px 10px",
+    fontSize: "13px",
+    fontWeight: "700",
+  },
+  badgeOpen: {
+    display: "inline-flex",
+    alignItems: "center",
+    borderRadius: "999px",
+    background: "#dbeafe",
+    color: "#1d4ed8",
+    padding: "6px 10px",
+    fontSize: "13px",
+    fontWeight: "700",
+  },
+  badgeWarning: {
+    display: "inline-flex",
+    alignItems: "center",
+    borderRadius: "999px",
+    background: "#fef3c7",
+    color: "#92400e",
+    padding: "6px 10px",
+    fontSize: "13px",
+    fontWeight: "700",
+  },
+  badgeMuted: {
+    display: "inline-flex",
+    alignItems: "center",
+    borderRadius: "999px",
+    background: "#f3f4f6",
+    color: "#4b5563",
+    padding: "6px 10px",
+    fontSize: "13px",
+    fontWeight: "700",
   },
   errorBox: {
     background: "#fee2e2",

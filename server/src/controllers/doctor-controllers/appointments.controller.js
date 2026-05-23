@@ -7,6 +7,29 @@ import appointmentsBookingSlotsRepository from "../../repositories/appointments-
  * Handles REST API endpoints for template and slot management
  */
 class DoctorAppointmentTemplatesController {
+  /**
+   * GET /api/doctor/appointments/assignments
+   * Fetch hospital/department assignments for the logged-in doctor
+   */
+  async getAssignments(req, res, next) {
+    try {
+      const doctorId = req.user.user_id;
+      const hospitalId = req.user.hospital_id;
+
+      if (!hospitalId) {
+        return res.status(400).json({ error: "Hospital ID is required" });
+      }
+
+      const assignments = await appointmentTemplatesService.getDoctorAssignments(
+        doctorId,
+        hospitalId
+      );
+
+      res.status(200).json({ success: true, data: assignments });
+    } catch (err) {
+      next(err);
+    }
+  }
 
   /**
    * GET /api/doctor/appointments/templates
@@ -69,17 +92,17 @@ class DoctorAppointmentTemplatesController {
     try {
       const doctorId = req.user.user_id;
       const hospitalId = req.user.hospital_id;
-      const { department_id } = req.query; // Department ID should be in query or body
+      const departmentId = req.query.department_id ?? req.body.department_id;
 
-      if (!hospitalId || !department_id) {
-        return res.status(400).json({ error: "Hospital ID and department ID are required" });
+      if (!hospitalId) {
+        return res.status(400).json({ error: "Hospital ID is required" });
       }
 
       const template = await appointmentTemplatesService.createTemplate(
         req.body,
         doctorId,
         hospitalId,
-        Number(department_id),
+        departmentId ? Number(departmentId) : null,
         doctorId
       );
 

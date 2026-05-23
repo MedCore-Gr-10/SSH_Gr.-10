@@ -196,7 +196,8 @@ class AppointmentsBookingSlotsRepository {
         doctor_id: doctorId,
         appointment_date: appointmentDate,
         slot_start_time: startTime,
-        slot_end_time: endTime
+        slot_end_time: endTime,
+        active_appointment_booking_slot: true
       }
     });
   }

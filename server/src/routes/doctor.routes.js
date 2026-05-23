@@ -27,6 +27,15 @@ router.use((req, res, next) => roleMiddleware.handle(req, res, next));
  */
 
 /**
+ * GET /api/doctor/appointments/assignments
+ * Fetch hospital/department assignments for the logged-in doctor
+ */
+router.get(
+  "/appointments/assignments",
+  (req, res, next) => templatesController.getAssignments(req, res, next)
+);
+
+/**
  * GET /api/doctor/appointments/templates
  * Fetch all recurring templates for the doctor
  */
