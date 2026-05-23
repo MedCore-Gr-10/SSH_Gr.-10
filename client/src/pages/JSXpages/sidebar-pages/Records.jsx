@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Records.css";
+import "../../CSSpages/sidebar-pages/Records.css";
 
 const placeholderRecords = [
   {

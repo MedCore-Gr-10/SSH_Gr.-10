@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authContext.jsx";
 import DirectorMakeRequest from "../../director/DirectorMakeRequest.jsx";
-import "./MakeRequest.css";
+import "../../CSSpages/sidebar-pages/MakeRequest.css";
 
 export default function MakeRequest() {
   const location = useLocation();

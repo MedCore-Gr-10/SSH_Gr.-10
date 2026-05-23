@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./EmergencyContacts.css";
+import "../../CSSpages/sidebar-pages/EmergencyContacts.css";
 
 export default function EmergencyContacts() {
   const [contacts, setContacts] = useState([
@@ -24,6 +24,7 @@ export default function EmergencyContacts() {
   ]);
   const [showModal, setShowModal] = useState(false);
   const [pendingRemoval, setPendingRemoval] = useState(null);
+  const [currentContactId, setCurrentContactId] = useState("contact-1");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -68,6 +69,9 @@ export default function EmergencyContacts() {
     };
 
     setContacts([newContact, ...contacts]);
+    if (!currentContactId) {
+      setCurrentContactId(newContact.id);
+    }
     setSuccess("Emergency contact added successfully!");
     closeModal();
   };
@@ -84,9 +88,20 @@ export default function EmergencyContacts() {
 
   const confirmRemoval = () => {
     if (!pendingRemoval) return;
-    setContacts((current) => current.filter((contact) => contact.id !== pendingRemoval.id));
+    setContacts((current) => {
+      const remainingContacts = current.filter((contact) => contact.id !== pendingRemoval.id);
+      if (currentContactId === pendingRemoval.id) {
+        setCurrentContactId(remainingContacts[0]?.id || "");
+      }
+      return remainingContacts;
+    });
     setSuccess("Emergency contact removed successfully.");
     setPendingRemoval(null);
+  };
+
+  const selectCurrentContact = (contact) => {
+    setCurrentContactId(contact.id);
+    setSuccess(`${contact.firstName} ${contact.lastName} is now your current emergency contact.`);
   };
 
   return (
@@ -114,23 +129,41 @@ export default function EmergencyContacts() {
                 <th>Last name</th>
                 <th>Email</th>
                 <th>Phone number</th>
+                <th>Current contact</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {contacts.map((contact) => (
-                <tr key={contact.id}>
-                  <td>{contact.firstName}</td>
-                  <td>{contact.lastName}</td>
-                  <td>{contact.email}</td>
-                  <td>{contact.phoneNumber}</td>
-                  <td>
-                    <button type="button" className="remove-button" onClick={() => openRemoveConfirm(contact)}>
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {contacts.map((contact) => {
+                const isCurrentContact = contact.id === currentContactId;
+
+                return (
+                  <tr key={contact.id} className={isCurrentContact ? "current-contact-row" : ""}>
+                    <td>{contact.firstName}</td>
+                    <td>{contact.lastName}</td>
+                    <td>{contact.email}</td>
+                    <td>{contact.phoneNumber}</td>
+                    <td>
+                      {isCurrentContact ? (
+                        <span className="current-contact-badge">Current</span>
+                      ) : (
+                        <button
+                          type="button"
+                          className="select-current-button"
+                          onClick={() => selectCurrentContact(contact)}
+                        >
+                          Select
+                        </button>
+                      )}
+                    </td>
+                    <td>
+                      <button type="button" className="remove-button" onClick={() => openRemoveConfirm(contact)}>
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

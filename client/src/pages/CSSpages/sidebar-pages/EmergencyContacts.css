@@ -72,9 +72,39 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.select-current-button {
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
 .remove-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 20px rgba(217, 70, 72, 0.12);
+}
+
+.select-current-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(67, 56, 202, 0.12);
+}
+
+.current-contact-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 800;
 }
 
 .success-message,
@@ -105,7 +135,7 @@
 .contacts-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  min-width: 850px;
 }
 
 .contacts-table th,
@@ -124,6 +154,10 @@
 }
 
 .contacts-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.contacts-table tbody .current-contact-row {
   background-color: #f8fafc;
 }
 
