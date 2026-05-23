@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/user.routes.js";
@@ -9,6 +11,7 @@ import directorRoutes from "./routes/director.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
 import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js";
 import manageDepartmentsRouter from "./routes/manageDepartments.routes.js"; 
+import hospitalsRoutes from "./routes/hospital.routes.js";
 
 const app = express();
 
@@ -18,6 +21,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -26,6 +30,7 @@ app.use("/api/specializations", manageSpecializationRoutes);
 app.use("/api/director", directorRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/departments", manageDepartmentsRouter); 
+app.use("/api/hospitals", hospitalsRoutes);
 
 app.use("/api", (req, res) => {
   res
