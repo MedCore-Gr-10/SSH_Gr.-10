@@ -87,6 +87,13 @@
   line-height: 1.1;
 }
 
+.widget-subheading {
+  margin: 0;
+  font-size: 20px;
+  color: #1a202c;
+  line-height: 1.25;
+}
+
 .widget-copy {
   margin: 0.75rem 0 0 0;
   color: #4a5568;
@@ -100,24 +107,89 @@
 }
 
 .hospitals-widget,
-.doctor-widget,
-.contact-widget,
-.upcoming-widget {
+.contact-widget {
   grid-column: span 4;
+}
+
+.hospitals-widget {
+  grid-column: span 12;
+}
+
+.hospital-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hospital-carousel-controls {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.hospital-carousel-button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #edf2f7;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #5c5cd6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.hospital-carousel-button:hover:not(:disabled) {
+  border-color: #c3d4fd;
+  box-shadow: 0 10px 25px rgba(92, 92, 214, 0.12);
+  transform: translateY(-1px);
+}
+
+.hospital-carousel-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .hospital-list {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.85rem;
 }
 
 .hospital-pill {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.9rem;
   padding: 0.9rem 1rem;
   border-radius: 18px;
   background: #f8fafc;
+  border: 1px solid #edf2f7;
+  color: #2d3748;
+  text-align: left;
+  cursor: pointer;
+  min-height: 118px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.hospital-pill:hover {
+  border-color: #c3d4fd;
+  box-shadow: 0 12px 26px rgba(92, 92, 214, 0.1);
+  transform: translateY(-1px);
+}
+
+.hospital-pill:disabled {
+  cursor: wait;
+  opacity: 0.75;
+  transform: none;
+}
+
+.hospital-pill.selected {
+  border-color: #5c5cd6;
+  background: #f7f7ff;
 }
 
 .hospital-icon,
@@ -133,28 +205,56 @@
 }
 
 .hospital-name,
-.doctor-meta,
 .contact-meta {
   margin: 0;
   color: #1a202c;
   font-size: 0.95rem;
 }
 
-.hospital-meta,
-.doctor-rating {
+.hospital-meta {
   margin: 0.25rem 0 0 0;
   color: #4a5568;
   font-size: 0.9rem;
 }
 
-.doctor-summary,
+.hospital-select-state {
+  margin-left: auto;
+  color: #5c5cd6;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.selected-hospitals-summary {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #edf2f7;
+}
+
+.selected-hospitals-summary p {
+  margin: 0;
+  color: #4a5568;
+  font-weight: 700;
+}
+
+.hospital-empty-state {
+  grid-column: 1 / -1;
+  color: #4a5568;
+  padding: 1rem;
+  border: 1px dashed #c3d4fd;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
 .contact-details {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.doctor-summary h3,
+.contact-widget {
+  min-height: 180px;
+}
+
 .contact-details h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -166,22 +266,34 @@
   color: #4a5568;
 }
 
-.upcoming-summary h3 {
+.contact-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.contact-fallback-copy {
   margin: 0;
-  font-size: 1.2rem;
-  color: #1a202c;
-}
-
-.upcoming-summary p {
-  margin: 0.75rem 0 0 0;
   color: #4a5568;
-  line-height: 1.75;
+  line-height: 1.6;
 }
 
-.upcoming-status {
-  margin: 1rem 0 0 0;
+.contact-action-button {
+  border: none;
+  border-radius: 14px;
+  background: #5c5cd6;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #2d3748;
+  padding: 0.85rem 1rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.contact-action-button:hover {
+  box-shadow: 0 12px 26px rgba(92, 92, 214, 0.16);
+  transform: translateY(-1px);
 }
 
 .circle-icon.small {
@@ -193,9 +305,12 @@
 @media (max-width: 1024px) {
   .latest-record-card,
   .hospitals-widget,
-  .doctor-widget,
   .contact-widget {
     grid-column: span 12;
+  }
+
+  .hospital-list {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -210,5 +325,18 @@
 
   .widget-heading {
     font-size: 24px;
+  }
+
+  .hospital-widget-header {
+    flex-direction: column;
+  }
+
+  .hospital-carousel-controls {
+    width: 100%;
+  }
+
+  .hospital-carousel-button {
+    flex: 1;
+    border-radius: 12px;
   }
 }
