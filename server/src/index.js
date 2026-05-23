@@ -17,6 +17,7 @@ import doctorRoutes from "./routes/doctor.routes.js";
 import { initializeCronJobs, stopCronJobs } from "./services/cronJobs.service.js";
 
 import systemOverviewRoutes from "./routes/systemOverview.routes.js";
+import systemLogsRoutes from "./routes/systemLogs.routes.js";
 const app = express();
 
 app.use(
@@ -39,6 +40,7 @@ app.use("/api/departments", manageDepartmentsRouter);
 app.use("/api/hospitals", hospitalsRoutes);
 app.use("/api/doctor", doctorRoutes);
 app.use("/api/system-overview", systemOverviewRoutes);
+app.use("/api/system-logs", systemLogsRoutes);
 
 // 404 handler MUST be last
 app.use("/api", (req, res) => {
@@ -51,7 +53,7 @@ app.use("/api", (req, res) => {
 app.use((err, req, res, next) => {
   console.error(err);
   res
-    .status(err.status || 500)
+    .status(err.status || err.statusCode || 500)
     .json({ error: err.message || "Internal server error" });
 });
 

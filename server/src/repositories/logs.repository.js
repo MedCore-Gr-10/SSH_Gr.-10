@@ -19,6 +19,25 @@ class LogsRepository {
     });
   }
 
+  async findAll() {
+    return prisma.logs.findMany({
+      include: {
+        user: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+    });
+  }
+
 }
 
 export default new LogsRepository();

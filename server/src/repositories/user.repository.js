@@ -111,6 +111,21 @@ class UsersRepository {
       include: {
         roles: true,           // Merr të dhënat e rolit (përfshirë role_name)
         users_profiles: true,  // Merr tabelën ndërmjetëse ku ndodhet emaili
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                hospitals: true,
+                departments: true,
+              },
+            },
+            staff_specializations: {
+              include: {
+                specializations: true,
+              },
+            },
+          },
+        },
       },
     });
   }
