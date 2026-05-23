@@ -6,6 +6,7 @@ import {
   DoctorAppointmentTemplatesController,
   DoctorAppointmentSlotsController
 } from "../controllers/doctor-controllers/appointments.controller.js";
+import DoctorPatientsController from "../controllers/doctor-controllers/patients.controller.js";
 
 const router = express.Router();
 const jwtService = new JwtService();
@@ -13,12 +14,22 @@ const authMiddleware = new AuthMiddleware(jwtService);
 const roleMiddleware = new RoleMiddleware("doctor", "DOCTOR");
 const templatesController = new DoctorAppointmentTemplatesController();
 const slotsController = new DoctorAppointmentSlotsController();
+const patientsController = new DoctorPatientsController();
 
 /**
  * All routes require doctor authentication
  */
 router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
+
+/**
+ * GET /api/doctor/patients
+ * Fetch unique patients previously treated by the logged-in doctor
+ */
+router.get(
+  "/patients",
+  (req, res, next) => patientsController.getPatients(req, res, next)
+);
 
 /**
  * ===================================

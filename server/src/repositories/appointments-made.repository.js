@@ -86,38 +86,95 @@ class AppointmentsMadeRepository {
     });
   }
 
-  async findDoctorPatientProfiles(doctorId) {
-  const appointments = await prisma.appointments_made.findMany({
-    where: {
-      appointments_booking_slots: {
-        doctor_id: doctorId
-      }
-    },
-    include: {
-      users: {
-        include: {
-          users_profiles: {
-            include: {
-              profiles: true
+  async findDoctorPatients(doctorId) {
+    const appointments = await prisma.appointments_made.findMany({
+      where: {
+        active_appointment_made: {
+          not: false
+        },
+        appointments_booking_slots: {
+          doctor_id: doctorId,
+          appointment_date: {
+            lte: new Date()
+          }
+        }
+      },
+      include: {
+        users: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true
+              }
+            }
+          }
+        },
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
       }
+    });
+
+    appointments.sort((first, second) => {
+      const firstDate = first.appointments_booking_slots?.appointment_date?.getTime?.() || 0;
+      const secondDate = second.appointments_booking_slots?.appointment_date?.getTime?.() || 0;
+      return secondDate - firstDate;
+    });
+
+    const patientMap = new Map();
+
+    for (const appointment of appointments) {
+      const patient = appointment.users;
+      if (!patient?.id) continue;
+
+      const slot = appointment.appointments_booking_slots;
+      const profileLink = patient.users_profiles?.[0];
+      const current = patientMap.get(patient.id);
+      const appointmentDate = slot?.appointment_date || null;
+      const department =
+        slot?.appointments_templates?.staff_hospitals_departments?.hospitals_departments?.departments
+          ?.department_name || null;
+
+      if (current) {
+        current.appointment_count += 1;
+        if (appointmentDate && (!current.last_appointment_date || appointmentDate > current.last_appointment_date)) {
+          current.last_appointment_date = appointmentDate;
+          current.last_appointment = appointment;
+        }
+        if (department && !current.departments.includes(department)) {
+          current.departments.push(department);
+        }
+        continue;
+      }
+
+      patientMap.set(patient.id, {
+        id: patient.id,
+        username: patient.username,
+        email: profileLink?.email || null,
+        profile: profileLink?.profiles || null,
+        appointment_count: 1,
+        last_appointment_date: appointmentDate,
+        last_appointment: appointment,
+        departments: department ? [department] : []
+      });
     }
-  });
 
-  const map = new Map();
-
-  for (const appointment of appointments) {
-    const profile = appointment.users?.users_profiles?.[0]?.profiles;
-
-    if (profile) {
-      map.set(profile.id, profile);
-    }
+    return Array.from(patientMap.values());
   }
-
-  return Array.from(map.values());
-}
 
 }
 
