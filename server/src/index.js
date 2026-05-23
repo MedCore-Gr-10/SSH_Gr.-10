@@ -16,6 +16,7 @@ import hospitalsRoutes from "./routes/hospital.routes.js";
 import doctorRoutes from "./routes/doctor.routes.js";
 import { initializeCronJobs, stopCronJobs } from "./services/cronJobs.service.js";
 
+import systemOverviewRoutes from "./routes/systemOverview.routes.js";
 const app = express();
 
 app.use(
@@ -37,6 +38,7 @@ app.use("/api/patient", patientRoutes);
 app.use("/api/departments", manageDepartmentsRouter);
 app.use("/api/hospitals", hospitalsRoutes);
 app.use("/api/doctor", doctorRoutes);
+app.use("/api/system-overview", systemOverviewRoutes);
 
 // 404 handler MUST be last
 app.use("/api", (req, res) => {

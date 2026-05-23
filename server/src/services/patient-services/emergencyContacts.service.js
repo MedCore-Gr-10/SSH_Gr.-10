@@ -33,7 +33,7 @@ class PatientEmergencyContactsService {
 
   async listContacts(patientId) {
     const profile = await this.getPatientProfile(patientId);
-    const contacts = await emergencyContactsRepository.findPatientContacts(patientId);
+    const contacts = await emergencyContactsRepository.findProfileContacts(profile.id);
 
     return {
       contacts: contacts.map((contact) => this.formatContact(contact)),
@@ -46,7 +46,7 @@ class PatientEmergencyContactsService {
     const profile = await this.getPatientProfile(patientId);
 
     const contact = await emergencyContactsRepository.create({
-      patient_id: patientId,
+      profile_id: profile.id,
       first_name: data.firstName.trim(),
       last_name: data.lastName.trim(),
       email: data.email.trim(),
@@ -64,7 +64,7 @@ class PatientEmergencyContactsService {
 
   async setCurrentContact(patientId, contactId) {
     const profile = await this.getPatientProfile(patientId);
-    const contact = await emergencyContactsRepository.findPatientContactById(patientId, contactId);
+    const contact = await emergencyContactsRepository.findProfileContactById(profile.id, contactId);
 
     if (!contact) {
       throw new Error("Emergency contact not found");
@@ -79,7 +79,7 @@ class PatientEmergencyContactsService {
 
   async deleteContact(patientId, contactId) {
     const profile = await this.getPatientProfile(patientId);
-    const contact = await emergencyContactsRepository.findPatientContactById(patientId, contactId);
+    const contact = await emergencyContactsRepository.findProfileContactById(profile.id, contactId);
 
     if (!contact) {
       throw new Error("Emergency contact not found");
@@ -88,7 +88,7 @@ class PatientEmergencyContactsService {
     await emergencyContactsRepository.delete(contact.id);
 
     if (profile.current_emergency_contact_id === contact.id) {
-      const remainingContacts = await emergencyContactsRepository.findPatientContacts(patientId);
+      const remainingContacts = await emergencyContactsRepository.findProfileContacts(profile.id);
       await profileRepository.updateCurrentEmergencyContact(profile.id, remainingContacts[0]?.id || null);
     }
 

@@ -44,10 +44,10 @@ class AllergiesRepository {
     });
   }
 
-  async findPatientAllergy(patientId, allergyName) {
+  async findProfileAllergy(profileId, allergyName) {
     return prisma.allergies.findFirst({
       where: {
-        patient_id: patientId,
+        profile_id: profileId,
         allergy_name: allergyName
       }
     });
@@ -67,13 +67,22 @@ class AllergiesRepository {
     });
   }
 
-  async findByPatientId(patientId) {
+  async findByProfileId(profileId) {
     return prisma.allergies.findMany({
       where: {
-        patient_id: patientId
+        profile_id: profileId
       },
       orderBy: {
         allergy_name: "asc"
+      }
+    });
+  }
+
+  async findProfileAllergyById(profileId, allergyId) {
+    return prisma.allergies.findFirst({
+      where: {
+        id: Number(allergyId),
+        profile_id: profileId
       }
     });
   }
@@ -123,33 +132,16 @@ class AllergiesRepository {
     });
   }
 
-  async deletePatientAllergy(patientId, allergyName) {
-    return prisma.allergies.deleteMany({
-      where: {
-        patient_id: patientId,
-        allergy_name: allergyName
-      }
-    });
-  }
-
-  async deleteAllPatientAllergies(patientId) {
-    return prisma.allergies.deleteMany({
-      where: {
-        patient_id: patientId
-      }
-    });
-  }
-
   /*
   |--------------------------------------------------------------------------
   | EXISTS / COUNT
   |--------------------------------------------------------------------------
   */
 
-  async exists(patientId, allergyName) {
+  async exists(profileId, allergyName) {
     const allergy = await prisma.allergies.findFirst({
       where: {
-        patient_id: patientId,
+        profile_id: profileId,
         allergy_name: allergyName
       }
     });
@@ -157,10 +149,10 @@ class AllergiesRepository {
     return !!allergy;
   }
 
-  async countPatientAllergies(patientId) {
+  async countProfileAllergies(profileId) {
     return prisma.allergies.count({
       where: {
-        patient_id: patientId
+        profile_id: profileId
       }
     });
   }
