@@ -14,6 +14,7 @@ import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js"
 import manageDepartmentsRouter from "./routes/manageDepartments.routes.js";
 import hospitalsRoutes from "./routes/hospital.routes.js";
 import doctorRoutes from "./routes/doctor.routes.js";
+import requestsRoutes from "./routes/requests.routes.js";
 import { initializeCronJobs, stopCronJobs } from "./services/cronJobs.service.js";
 
 import systemOverviewRoutes from "./routes/systemOverview.routes.js";
@@ -38,6 +39,7 @@ app.use("/api/patient", patientRoutes);
 app.use("/api/departments", manageDepartmentsRouter);
 app.use("/api/hospitals", hospitalsRoutes);
 app.use("/api/doctor", doctorRoutes);
+app.use("/api/requests", requestsRoutes);
 app.use("/api/system-overview", systemOverviewRoutes);
 
 // 404 handler MUST be last
