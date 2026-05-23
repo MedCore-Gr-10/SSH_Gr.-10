@@ -8,10 +8,12 @@ class SystemOverviewRepository {
   }
 
   async countStaff(hospitalId) {
-    return prisma.staff_hospitals_departments.count({
+    const staffGroups = await prisma.staff_hospitals_departments.groupBy({
+      by: ["staff_id"],
       where: { hospital_id: hospitalId },
-      distinct: ["staff_id"],
     });
+
+    return staffGroups.length;
   }
 
   async countAppointments(hospitalId) {

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  createDirectorPatient,
   deleteDirectorPatient,
   getDirectorPatients,
   updateDirectorPatient,
@@ -10,7 +9,6 @@ import "./DirectorPatients.css";
 const initialFormState = {
   username: "",
   email: "",
-  password: "",
   first_name: "",
   last_name: "",
   birth: "",
@@ -44,7 +42,7 @@ export default function DirectorPatients() {
     loadPatients();
   }, []);
 
-  const resetForm = () => {
+  const closeEditor = () => {
     setSelectedPatientId(null);
     setForm(initialFormState);
     setMessage("");
@@ -64,20 +62,11 @@ export default function DirectorPatients() {
 
     try {
       const payload = { ...form };
-      if (selectedPatientId && !payload.password) {
-        delete payload.password;
-      }
+      await updateDirectorPatient(selectedPatientId, payload);
 
-      if (selectedPatientId) {
-        await updateDirectorPatient(selectedPatientId, payload);
-        setMessage("Patient updated successfully.");
-      } else {
-        await createDirectorPatient(payload);
-        setMessage("Patient created successfully.");
-      }
-
-      resetForm();
+      closeEditor();
       await loadPatients();
+      setMessage("Patient updated successfully.");
     } catch (err) {
       setError(err.message || "Unable to save patient.");
     } finally {
@@ -91,7 +80,6 @@ export default function DirectorPatients() {
     setForm({
       username: patient.username || "",
       email: profile?.email || "",
-      password: "",
       first_name: profile?.profiles?.first_name || "",
       last_name: profile?.profiles?.last_name || "",
       birth: profile?.profiles?.birth?.split("T")[0] || "",
@@ -128,14 +116,14 @@ export default function DirectorPatients() {
       <div className="director-patients-header">
         <div>
           <h1>Director Patient Management</h1>
-          <p>Manage patients within your hospital and keep records in sync.</p>
+          <p>Review existing patients and keep hospital records in sync.</p>
         </div>
-        <button type="button" onClick={resetForm}>
-          New patient
-        </button>
       </div>
 
-      <div className="director-patients-grid">
+      {message && <div className="director-message success">{message}</div>}
+      {error && <div className="director-message error">{error}</div>}
+
+      <div className={`director-patients-grid${selectedPatientId ? "" : " director-patients-grid--single"}`}>
         <section className="director-section">
           <h2>Patient directory</h2>
           <div className="content-scroll">
@@ -148,6 +136,7 @@ export default function DirectorPatients() {
                     <th>Username</th>
                     <th>Email</th>
                     <th>Full name</th>
+                    <th>Personal No.</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -160,6 +149,7 @@ export default function DirectorPatients() {
                         <td data-label="Username">{patient.username}</td>
                         <td data-label="Email">{profile?.email || "-"}</td>
                         <td data-label="Full name">{fullName || "-"}</td>
+                        <td data-label="Personal No.">{profile?.profiles?.personal_no || "-"}</td>
                         <td data-label="Actions">
                           <button
                             type="button"
@@ -185,75 +175,63 @@ export default function DirectorPatients() {
           </div>
         </section>
 
-        <section className="director-section">
-          <h2>{selectedPatientId ? "Edit patient" : "Create a patient"}</h2>
-          <div className="content-scroll">
-            <form className="director-form" onSubmit={handleSubmit}>
-            <label>
-              Username
-              <input name="username" value={form.username} onChange={handleChange} required />
-            </label>
-            <label>
-              Email
-              <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </label>
-            {!selectedPatientId && (
-              <label>
-                Password
-                <input
-                  name="password"
-                  type="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            )}
-            <label>
-              First name
-              <input name="first_name" value={form.first_name} onChange={handleChange} />
-            </label>
-            <label>
-              Last name
-              <input name="last_name" value={form.last_name} onChange={handleChange} />
-            </label>
-            <label>
-              Birth date
-              <input name="birth" type="date" value={form.birth} onChange={handleChange} />
-            </label>
-            <label>
-              Gender
-              <input name="gender" value={form.gender} onChange={handleChange} />
-            </label>
-            <label>
-              Personal No.
-              <input name="personal_no" value={form.personal_no} onChange={handleChange} />
-            </label>
-            <label>
-              Phone number
-              <input name="phone_number" value={form.phone_number} onChange={handleChange} />
-            </label>
+        {selectedPatientId && (
+          <section className="director-section">
+            <h2>Edit patient</h2>
+            <div className="content-scroll">
+              <form className="director-form" onSubmit={handleSubmit}>
+                <label>
+                  Username
+                  <input name="username" value={form.username} onChange={handleChange} required />
+                </label>
+                <label>
+                  Email
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </label>
+                <label>
+                  First name
+                  <input name="first_name" value={form.first_name} onChange={handleChange} />
+                </label>
+                <label>
+                  Last name
+                  <input name="last_name" value={form.last_name} onChange={handleChange} />
+                </label>
+                <label>
+                  Birth date
+                  <input name="birth" type="date" value={form.birth} onChange={handleChange} />
+                </label>
+                <label>
+                  Gender
+                  <input name="gender" value={form.gender} onChange={handleChange} />
+                </label>
+                <label>
+                  Personal No.
+                  <input name="personal_no" value={form.personal_no} onChange={handleChange} />
+                </label>
+                <label>
+                  Phone number
+                  <input name="phone_number" value={form.phone_number} onChange={handleChange} />
+                </label>
 
-            <div className="director-form-actions">
-              <button className="primary" type="submit" disabled={loading}>
-                {selectedPatientId ? "Save changes" : "Create patient"}
-              </button>
-              <button className="secondary" type="button" onClick={resetForm}>
-                Clear
-              </button>
+                <div className="director-form-actions">
+                  <button className="primary" type="submit" disabled={loading}>
+                    Save changes
+                  </button>
+                  <button className="secondary" type="button" onClick={closeEditor}>
+                    Close
+                  </button>
+                </div>
+              </form>
+
             </div>
-            </form>
-
-            {message && <div className="director-message success">{message}</div>}
-            {error && <div className="director-message error">{error}</div>}
-          </div>
-        </section>
+          </section>
+        )}
       </div>
     </div>
   );

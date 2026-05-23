@@ -21,6 +21,28 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName =  .env
     •	cd client
     •	npm run dev
 
+6. ne .env file (qe gjendet brenda gitignore) --> DATABASE_URL="secili setup-in e vet te nderlidhjes me databaze"
+JWT_SECRET=your-super-secret-key-min-32-chars-recommended
+NODE_ENV=development
+7. Per krijimin e superuser initially, run this ne terminal:
+cd server
+npm run create-superuser
+-->ne browser login me kredencialet: 
+Username: superuser
+Password: superuser123
+8. Per krijimin e director (meqe ne superuser nuk eshte funksionale yet), run this ne terminal:
+cd server
+npm run create-director
+-->ne browser login me kredencialet:
+Username: dev_director
+Password: devdirector123
+
+9. Per te pasur casje ne dokumentimin Swagger, ne terminal:
+  - cd server
+  - npm install swagger-ui-express swagger-jsdoc
+Ne browser, mundesh m'i hap permes linkut: 
+  - http://localhost:3000/api-docs
+
 ---
 # 🏥 MedCore
 
@@ -87,7 +109,8 @@ për profesionistët mjekësorë dhe komunitetet që ata shërbejnë.
 
 ### 🔐 Siguria
 - Sistem i plotë **autentikimi (login/register)** përmes `POST /api/auth/login` dhe `POST /api/auth/register` (regjistrim vetëm për pacientë)
-- Frontend: `/` (login), `/register`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
+- Frontend: `/` (login), `/register`, `/forgot-password`, `/reset-password?token=...`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
+- Rivendosja e fjalëkalimit: `POST /api/auth/forgot-password` (email), `POST /api/auth/reset-password` (token + password). Në dev, linku kthehet në përgjigje dhe shfaqet në UI.
 - **Role-based authorization** (p.sh. pacient, superuser, doctor, nurse, director)  
 - Middleware për:
   - autentikim  

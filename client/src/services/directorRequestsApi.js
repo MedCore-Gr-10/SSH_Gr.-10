@@ -33,6 +33,14 @@ export const getDirectorRequests = async () => {
   return handleResponse(response);
 };
 
+export const getDirectorRequestRecipients = async () => {
+  const response = await fetch(`${API}/director/requests/recipients`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};
+
 export const createDirectorRequest = async (data) => {
   const response = await fetch(`${API}/director/requests`, {
     method: "POST",

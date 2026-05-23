@@ -1,13 +1,42 @@
 import userRepository from "../../repositories/user.repository.js";
 import staffScheduleRepository from "../../repositories/staff-working-schedules.repository.js";
 import logsRepository from "../../repositories/logs.repository.js";
+import hospitalsDepartmentsRepository from "../../repositories/hospitals-departments.repository.js";
 
 class DirectorStaffScheduleService {
+  async ensureHospitalDepartment(hospitalId, departmentId) {
+    const departments = await hospitalsDepartmentsRepository.findByHospital(hospitalId);
+    const belongsToHospital = departments.some(
+      (entry) => entry.department_id === Number(departmentId)
+    );
+
+    if (!belongsToHospital) {
+      throw new Error("Department does not belong to this hospital");
+    }
+  }
+
   normalizeTime(value) {
-    if (!value) return value;
-    if (typeof value !== "string") return value;
-    if (value.length === 5) return `${value}:00`;
-    return value;
+    if (!value) return null;
+    let hour = 0;
+    let minute = 0;
+    let second = 0;
+
+    if (/^\d{1,2}:\d{2}$/.test(value)) {
+      [hour, minute] = value.split(":").map(Number);
+    } else if (/^\d{1,2}:\d{2}:\d{2}$/.test(value)) {
+      [hour, minute, second] = value.split(":").map(Number);
+    } else {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        throw new Error("Invalid time format");
+      }
+      hour = parsed.getUTCHours();
+      minute = parsed.getUTCMinutes();
+      second = parsed.getUTCSeconds();
+    }
+
+    const isoString = new Date(Date.UTC(1970, 0, 1, hour, minute, second)).toISOString();
+    return isoString;
   }
 
   async getHospitalSchedules(hospitalId, currentUserId) {
@@ -26,6 +55,30 @@ class DirectorStaffScheduleService {
     return schedules;
   }
 
+  async getRelevantSchedules(userId, hospitalId, role, currentUserId) {
+    if (!hospitalId) {
+      throw new Error("Hospital ID is required to list schedules");
+    }
+
+    if (role === "director") {
+      return this.getHospitalSchedules(hospitalId, currentUserId);
+    }
+
+    if (role === "doctor" || role === "nurse") {
+      const schedules = await staffScheduleRepository.findStaffSchedule(userId, hospitalId);
+
+      await logsRepository.create({
+        user_id: currentUserId,
+        action: "view own schedule",
+        reason: "Staff member viewed own working schedule",
+      });
+
+      return schedules;
+    }
+
+    throw new Error("Insufficient permissions to view schedules");
+  }
+
   async createSchedule(data, hospitalId, currentUserId) {
     const { staff_id, department_id, day_of_week, start_time, end_time, active_schedule } = data;
 
@@ -37,6 +90,8 @@ class DirectorStaffScheduleService {
     if (!staff) {
       throw new Error("Staff member not found");
     }
+
+    await this.ensureHospitalDepartment(hospitalId, department_id);
 
     const assignment = staff.staff_hospitals_departments?.find(
       (entry) => entry.hospital_id === hospitalId && entry.department_id === Number(department_id)
@@ -74,17 +129,22 @@ class DirectorStaffScheduleService {
       throw new Error("Schedule slot does not belong to this hospital");
     }
 
-    if (data.staff_id && data.staff_id !== schedule.staff_id) {
-      const staff = await userRepository.findById(data.staff_id);
+    if (data.staff_id || data.department_id) {
+      const staff = await userRepository.findById(data.staff_id || schedule.staff_id);
       if (!staff) {
         throw new Error("Staff member not found");
       }
+      await this.ensureHospitalDepartment(hospitalId, data.department_id || schedule.department_id);
       const assignment = staff.staff_hospitals_departments?.find(
         (entry) => entry.hospital_id === hospitalId && entry.department_id === Number(data.department_id || schedule.department_id)
       );
       if (!assignment) {
         throw new Error("Staff member is not assigned to this hospital and department");
       }
+    }
+
+    if (data.department_id) {
+      await this.ensureHospitalDepartment(hospitalId, data.department_id);
     }
 
     const updateData = {};

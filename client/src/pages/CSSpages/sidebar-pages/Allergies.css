@@ -1,0 +1,162 @@
+.allergies-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #2d3748;
+  background-color: #ffffff;
+  min-height: 100%;
+  width: 100%;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.allergies-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  padding: 2.5rem;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.allergies-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.allergies-description {
+  color: #4a5568;
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0 0 1.75rem 0;
+  text-align: center;
+}
+
+.allergy-entry-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.allergy-input {
+  flex: 1;
+  min-width: 260px;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  padding: 1rem 1rem;
+  background-color: #ffffff;
+  color: #2d3748;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.allergy-input:hover,
+.add-allergy-button:hover {
+  border-color: #c3d4fd;
+  box-shadow: 0 10px 25px rgba(92, 92, 214, 0.08);
+}
+
+.allergy-input:focus {
+  outline: none;
+  border-color: #5c5cd6;
+  box-shadow: 0 0 20px rgba(92, 92, 214, 0.15);
+}
+
+.add-allergy-button {
+  background: #5c5cd6;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-allergy-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(92, 92, 214, 0.18);
+}
+
+.allergies-table-wrapper {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+.allergies-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.allergies-table th,
+.allergies-table td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.allergies-table th {
+  color: #4a5568;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.allergies-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.error-message,
+.success-message {
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: 500;
+  margin-top: 0.75rem;
+}
+
+.error-message {
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+  color: #9b2c2c;
+}
+
+.success-message {
+  background-color: #f0fff4;
+  border: 1px solid #c6f6d5;
+  color: #2f855a;
+}
+
+@media (max-width: 768px) {
+  .allergies-card {
+    padding: 2rem;
+  }
+
+  .allergies-title {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .allergy-entry-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-allergy-button {
+    width: 100%;
+  }
+
+  .allergies-table {
+    min-width: 100%;
+  }
+}

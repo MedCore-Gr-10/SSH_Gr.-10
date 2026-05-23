@@ -12,6 +12,18 @@ class EmergencyContactsRepository {
     return prisma.emergency_contacts.findMany({
       where: {
         patient_id: patientId
+      },
+      orderBy: {
+        first_name: "asc"
+      }
+    });
+  }
+
+  async findPatientContactById(patientId, contactId) {
+    return prisma.emergency_contacts.findFirst({
+      where: {
+        id: contactId,
+        patient_id: patientId
       }
     });
   }

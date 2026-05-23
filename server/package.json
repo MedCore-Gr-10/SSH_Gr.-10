@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "create-superuser": "node scripts/create_superuser.js",
+    "create-director": "node scripts/create_test_director.js",
+    "create-staff": "node scripts/create_test_staff.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -21,6 +24,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {

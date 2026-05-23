@@ -1,19 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { getDirectorRequests, createDirectorRequest } from "../../services/directorRequestsApi";
+import {
+  createDirectorRequest,
+  getDirectorRequestRecipients,
+  getDirectorRequests,
+} from "../../services/directorRequestsApi";
 import "./DirectorMakeRequest.css";
 
 export default function DirectorMakeRequest() {
   const [message, setMessage] = useState("");
+  const [receiverId, setReceiverId] = useState("");
+  const [recipients, setRecipients] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
 
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getDirectorRequests();
-      setRequests(data || []);
+      const [history, recipientList] = await Promise.all([
+        getDirectorRequests(),
+        getDirectorRequestRecipients(),
+      ]);
+      setRequests(history || []);
+      setRecipients(recipientList || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -25,14 +37,29 @@ export default function DirectorMakeRequest() {
 
   const submit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    if (!receiverId) return setError("Please select a recipient");
     if (!message.trim()) return setError("Message cannot be empty");
+    setSubmitting(true);
     try {
-      await createDirectorRequest({ message });
+      await createDirectorRequest({ receiver_id: receiverId, message: message.trim() });
       setMessage("");
+      setReceiverId("");
+      setSuccess("Request sent successfully.");
       await load();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const getPersonLabel = (user) => {
+    if (!user) return "Unknown user";
+    const role = user.role ? ` · ${user.role}` : "";
+    const email = user.email ? ` · ${user.email}` : "";
+    return `${user.name || user.username}${role}${email}`;
   };
 
   return (
@@ -44,11 +71,34 @@ export default function DirectorMakeRequest() {
         <div className="director-card">
           <h2>Create New Request</h2>
           <form onSubmit={submit} className="request-form">
-            <label>Message</label>
-            <textarea value={message} onChange={(e) => setMessage(e.target.value)} required />
+            <label htmlFor="request-recipient">Recipient</label>
+            <select
+              id="request-recipient"
+              value={receiverId}
+              onChange={(e) => setReceiverId(e.target.value)}
+              required
+            >
+              <option value="">Select recipient</option>
+              {recipients.map((recipient) => (
+                <option key={recipient.id} value={recipient.id}>
+                  {getPersonLabel(recipient)}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="request-message">Message</label>
+            <textarea
+              id="request-message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+            />
             <div className="request-actions">
-              <button className="btn-primary" type="submit">Submit Request</button>
+              <button className="btn-primary" type="submit" disabled={submitting}>
+                {submitting ? "Sending..." : "Submit Request"}
+              </button>
             </div>
+            {success && <div className="director-message success">{success}</div>}
             {error && <div className="director-message error">{error}</div>}
           </form>
         </div>
@@ -66,6 +116,9 @@ export default function DirectorMakeRequest() {
                   <div className="request-meta">
                     <strong>{r.sender?.username || r.sender_id}</strong>
                     <span>{new Date(r.created_at).toLocaleString()}</span>
+                  </div>
+                  <div className="request-recipient-line">
+                    To: {r.receiver?.username || r.receiver_id}
                   </div>
                   <p>{r.message}</p>
                 </li>

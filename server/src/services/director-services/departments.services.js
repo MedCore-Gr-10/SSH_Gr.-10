@@ -18,63 +18,86 @@ class DirectorDepartmentsService {
     return records.map((r) => r.departments);
   }
 
-  async createDepartment(data, hospitalId, currentUserId) {
-    const { department_name } = data;
-    if (!department_name) throw new Error("Department name required");
+  async listDepartmentCatalog(hospitalId, currentUserId) {
+    if (!hospitalId) throw new Error("Hospital ID required");
 
-    // Use transaction to ensure idempotent create + link
-    const result = await prisma.$transaction(async (tx) => {
-      // try to find existing department by name (case-insensitive)
-      const existing = await tx.departments.findFirst({
-        where: { department_name: { equals: department_name, mode: "insensitive" } },
-      });
-
-      let dept;
-      if (existing) {
-        dept = existing;
-      } else {
-        dept = await tx.departments.create({ data: { department_name } });
-      }
-
-      // ensure hospital link exists
-      const link = await tx.hospitals_departments.findFirst({
-        where: { hospital_id: hospitalId, department_id: dept.id },
-      });
-
-      if (!link) {
-        await tx.hospitals_departments.create({ data: { hospital_id: hospitalId, department_id: dept.id } });
-      }
-
-      // return the department record
-      return dept;
+    const records = await prisma.departments.findMany({
+      include: {
+        hospitals_departments: {
+          where: { hospital_id: Number(hospitalId) },
+          include: {
+            _count: {
+              select: { staff_hospitals_departments: true },
+            },
+          },
+        },
+      },
+      orderBy: { department_name: "asc" },
     });
 
     await logsRepository.create({
       user_id: currentUserId,
-      action: "create department",
-      reason: "Director created or linked a department (transaction)",
+      action: "view department catalog",
+      reason: "Director listed global departments with hospital activation state",
     });
 
-    return result;
+    return records.map((department) => {
+      const hospitalLink = department.hospitals_departments[0];
+
+      return {
+        id: department.id,
+        department_name: department.department_name,
+        is_active: Boolean(hospitalLink),
+        staff_count: hospitalLink?._count?.staff_hospitals_departments ?? 0,
+      };
+    });
   }
 
-  async updateDepartment(id, data, hospitalId, currentUserId) {
-    const dept = await departmentsRepository.findById(Number(id));
+  async activateDepartment(data, hospitalId, currentUserId) {
+    const departmentId = Number(data.department_id ?? data.id);
+    if (!departmentId) throw new Error("Department ID required");
+
+    const dept = await departmentsRepository.findById(departmentId);
     if (!dept) throw new Error("Department not found");
 
-    const updated = await departmentsRepository.update(Number(id), data);
+    const existingLink = await hospitalsDepartmentsRepository.findByHospitalAndDepartment(
+      hospitalId,
+      departmentId
+    );
+
+    if (!existingLink) {
+      await hospitalsDepartmentsRepository.create({
+        hospital_id: Number(hospitalId),
+        department_id: departmentId,
+      });
+    }
 
     await logsRepository.create({
       user_id: currentUserId,
-      action: "update department",
-      reason: "Director updated department",
+      action: "activate department",
+      reason: "Director activated existing department for hospital",
     });
 
-    return updated;
+    return dept;
   }
 
   async deleteDepartment(id, hospitalId, currentUserId) {
-    // remove hospital link first
+    const link = await hospitalsDepartmentsRepository.findByHospitalAndDepartment(
+      hospitalId,
+      Number(id)
+    );
+    if (!link) throw new Error("Department is not active in this hospital");
+
+    const staffCount = await hospitalsDepartmentsRepository.countStaffAssignments(
+      hospitalId,
+      Number(id)
+    );
+    if (staffCount > 0) {
+      throw new Error(
+        `Cannot deactivate department while ${staffCount} staff member(s) are assigned to it.`
+      );
+    }
+
     await hospitalsDepartmentsRepository.delete(hospitalId, Number(id));
 
     await logsRepository.create({

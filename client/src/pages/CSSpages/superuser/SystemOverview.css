@@ -1,0 +1,305 @@
+/* ==========================================
+   PAGE LAYOUT & CONTAINER RULES
+   ========================================== */
+
+.page-container {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-header {
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid #eef2f5;
+  padding-bottom: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; 
+  gap: 15px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title {
+  margin: 0;
+  color: #1a202c;
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.page-subtitle {
+  color: #718096;
+  margin: 0;
+  font-size: 13px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.page-subtitle::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #cbd5e0;
+  font-weight: bold;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* ==========================================
+   WIDGETI I MADH (CORNER TO CORNER)
+   ========================================== */
+
+.main-dashboard-widget {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.widget-row {
+  padding: 24px;
+}
+
+.row-overview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f4f8;
+  background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.main-user-count {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.border-appointments {
+  border-left: 4px solid #3182ce; 
+}
+
+.icon-bg-appointments {
+  background-color: #ebf8ff; 
+}
+
+.big-icon {
+  font-size: 40px;
+  background-color: #ebf8ff;
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.widget-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.widget-big-value {
+  margin: 4px 0 0 0;
+  font-size: 38px;
+  font-weight: 800;
+  color: #1a202c;
+  line-height: 1;
+}
+
+.status-subcounts {
+  display: flex;
+  gap: 16px;
+}
+
+.subcount-box {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 12px 20px;
+  border-radius: 10px;
+  min-width: 130px;
+}
+
+.subcount-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.subcount-value {
+  margin: 6px 0 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.status-active { border-top: 3px solid #38a169; }
+.status-inactive { border-top: 3px solid #e53e3e; }
+
+.row-roles {
+  background-color: #ffffff;
+}
+
+.roles-section-title {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.roles-inner-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); 
+  gap: 12px;
+}
+
+.role-subcard {
+  background-color: #f8fafc;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.role-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.role-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #718096;
+}
+
+.role-value {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.role-superuser { border-left: 3px solid #805ad5; }
+.role-director { border-left: 3px solid #dd6b20; }
+.role-doctor { border-left: 3px solid #319795; }
+.role-nurse { border-left: 3px solid #3182ce; }
+.role-patient { border-left: 3px solid #d69e2e; }
+
+@media (max-width: 900px) {
+  .roles-inner-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+/* ==========================================
+   WIDGETET POSHTË (INFRASTRUKTURA)
+   ========================================== */
+
+.infra-card {
+  background-color: #ffffff;
+  padding: 18px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.infra-icon {
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  background-color: #f7fafc;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.infra-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.infra-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.infra-value {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.border-requests {
+  border-left: 4px solid #805ad5; 
+}
+
+.icon-bg-requests {
+  background-color: #faf5ff;
+}
+
+.rating-max {
+  font-size: 11px;
+  color: #718096;
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+.infrastructure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.border-hospitals { border-left: 4px solid #e53e3e; }
+.border-departments { border-left: 4px solid #4a5568; }
+.border-specialties { border-left: 4px solid #00b5d8; }
+
+.page-loading {
+  font-size: 15px;
+  color: #4a5568;
+  font-weight: 500;
+  text-align: center;
+  padding: 40px;
+}

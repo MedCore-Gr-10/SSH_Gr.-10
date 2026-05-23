@@ -94,6 +94,32 @@ class ManageSpecializationsController {
       });
     }
   }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+
+      await this.manageSpecializationsService.removeSpecialization(id);
+
+      return res.status(200).json({
+        success: true,
+        message: "Specialization deleted successfully.",
+      });
+    } catch (error) {
+      let statusCode = 500;
+
+      if (error.message.includes("not found")) {
+        statusCode = 404;
+      } else if (error.message.includes("Cannot delete")) {
+        statusCode = 400; // Business rule validation failure (Doctors assigned)
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 export default ManageSpecializationsController;

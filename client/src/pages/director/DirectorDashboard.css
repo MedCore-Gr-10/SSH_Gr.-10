@@ -1,4 +1,4 @@
-/* Styles for Director Dashboard */
+
 .director-dashboard {
   padding: 20px;
   color: #222;
@@ -54,6 +54,23 @@
   margin-bottom: 10px;
 }
 
+.dd-loading,
+.dd-error,
+.dd-empty {
+  padding: 18px;
+  margin: 12px 0;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  color: #444;
+}
+
+.dd-error {
+  background: #fff4f4;
+  border-color: #f2c2c2;
+  color: #a22;
+}
+
 .dd-activities {
   list-style: none;
   padding: 0;
@@ -64,6 +81,19 @@
 .dd-activities li {
   padding: 10px 0;
   border-bottom: 1px solid #f1f1f1;
+}
+
+.dd-activity-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+
+.dd-cards--secondary {
+  margin-top: 12px;
 }
 
 @media (max-width: 700px) {

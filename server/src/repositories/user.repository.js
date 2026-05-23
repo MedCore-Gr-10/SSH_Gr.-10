@@ -8,12 +8,43 @@ class UsersRepository {
   |--------------------------------------------------------------------------
   */
 
-  async create(data) {
-    return prisma.users.create({
-      data
+  async create(userData) {
+    const { username, role_id, is_active, email, password, profile_id } = userData;
+
+    console.log("Repository mori profile_id:", profile_id, "Tipi:", typeof profile_id);
+
+    const parsedProfileId = typeof profile_id === 'string' && isNaN(profile_id) 
+      ? profile_id 
+      : parseInt(profile_id, 10); 
+
+    if (!profile_id) {
+      throw new Error("Gabim: 'profile_id' nuk erdhi në shtresën e databazës (Repository).");
+    }
+
+    return await prisma.users.create({
+      data: {
+        username,
+        role_id: parseInt(role_id, 10),
+        is_active: is_active === true || is_active === 'true',
+        hash_password: password, // 🚀 FIXED: This now naturally receives the hashed string from your service layer
+        salt: "SALT_VALUE",      // Keeps static salt parity with your password update logic
+        users_profiles: {
+          create: {
+            email: email,
+            profiles: {
+              connect: {
+                id: parsedProfileId 
+              }
+            }
+          }
+        }
+      },
+      include: {
+        roles: true,
+        users_profiles: true
+      }
     });
   }
-
   /*
   |--------------------------------------------------------------------------
   | FIND UNIQUE
@@ -31,7 +62,15 @@ class UsersRepository {
           }
         },
         patients_hospitals: true,
-        staff_hospitals_departments: true
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
+          }
+        }
       }
     });
   }
@@ -70,8 +109,9 @@ class UsersRepository {
   async findAll() {
     return prisma.users.findMany({
       include: {
-        roles: true
-      }
+        roles: true,           // Merr të dhënat e rolit (përfshirë role_name)
+        users_profiles: true,  // Merr tabelën ndërmjetëse ku ndodhet emaili
+      },
     });
   }
 
@@ -79,11 +119,18 @@ class UsersRepository {
     return prisma.users.findMany({
       where: {
         roles: {
-          role_name: "DOCTOR"
+          role_name: {
+            in: ["doctor", "DOCTOR"]
+          }
         }
       },
       include: {
         roles: true,
+        users_profiles: {
+          include: {
+            profiles: true
+          }
+        },
         staff_hospitals_departments: true
       }
     });
@@ -139,7 +186,15 @@ class UsersRepository {
             profiles: true
           }
         },
-        staff_hospitals_departments: true
+        staff_hospitals_departments: {
+          include: {
+            hospitals_departments: {
+              include: {
+                departments: true
+              }
+            }
+          }
+        }
       }
     });
   }
@@ -172,16 +227,36 @@ class UsersRepository {
 
   /*
   |--------------------------------------------------------------------------
-  | UPDATE
+  | UPDATE (Zgjidhja e saktë transaksionale)
   |--------------------------------------------------------------------------
   */
 
-  async update(id, data) {
-    return prisma.users.update({
-      where: { id },
-      data
-    });
-  }
+  async update(id, updateData) {
+  const { username, role_id, is_active, email } = updateData;
+
+  // Prisma nested write handles the transaction naturally here
+  return prisma.users.update({
+    where: { id },
+    data: {
+      ...(username !== undefined && { username }),
+      ...(role_id !== undefined && { role_id }),
+      ...(is_active !== undefined && { is_active }),
+      // If an email is provided, target the nested relation structure
+      ...(email !== undefined && {
+        users_profiles: {
+          updateMany: {
+            where: { user_id: id },
+            data: { email }
+          }
+        }
+      })
+    },
+    include: {
+      roles: true,
+      users_profiles: true
+    }
+  });
+}
 
   async activate(id) {
     return prisma.users.update({
@@ -345,6 +420,5 @@ class UsersRepository {
   }
 
 }
-
 
 export default new UsersRepository();
