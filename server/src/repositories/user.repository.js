@@ -68,6 +68,11 @@ class UsersRepository {
               include: {
                 departments: true
               }
+            },
+            staff_specializations: {
+              include: {
+                specializations: true
+              }
             }
           }
         }
@@ -191,6 +196,11 @@ class UsersRepository {
             hospitals_departments: {
               include: {
                 departments: true
+              }
+            },
+            staff_specializations: {
+              include: {
+                specializations: true
               }
             }
           }

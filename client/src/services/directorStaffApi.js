@@ -33,6 +33,14 @@ export const getDirectorStaff = async () => {
   return handleResponse(response);
 };
 
+export const getSpecializations = async () => {
+  const response = await fetch(`${API}/specializations`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};
+
 export const createDirectorStaff = async (data) => {
   const response = await fetch(`${API}/director/staff`, {
     method: "POST",
