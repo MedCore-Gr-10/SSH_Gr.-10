@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import {
+  bookPatientAppointment,
   getPatientAppointmentFilters,
   searchPatientAppointments,
 } from "../../../services/patientAppointmentsApi";
@@ -29,7 +30,9 @@ export default function Appointments() {
   const [activeAppointment, setActiveAppointment] = useState(null);
   const [loadingHospitals, setLoadingHospitals] = useState(false);
   const [loadingAppointments, setLoadingAppointments] = useState(false);
+  const [bookingAppointmentId, setBookingAppointmentId] = useState(null);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const selectedHospital = hospitals.find((hospital) => hospital.id === Number(selectedHospitalId));
   const visibleHospitals = hospitals.slice(hospitalStartIndex, hospitalStartIndex + visibleHospitalCount);
@@ -59,34 +62,34 @@ export default function Appointments() {
     loadFilters();
   }, []);
 
-  useEffect(() => {
-    const loadAppointments = async () => {
-      if (!selectedHospitalId) {
-        setAppointments([]);
-        return;
-      }
+  const loadAppointments = useCallback(async () => {
+    if (!selectedHospitalId) {
+      setAppointments([]);
+      return;
+    }
 
-      try {
-        setLoadingAppointments(true);
-        const data = await searchPatientAppointments({
-          hospitalId: selectedHospitalId,
-          doctorName: doctorSearch.trim(),
-          specialization: selectedSpecialization === allSpecializationsLabel ? "" : selectedSpecialization,
-          date: selectedDate,
-          time: selectedTime,
-        });
+    try {
+      setLoadingAppointments(true);
+      const data = await searchPatientAppointments({
+        hospitalId: selectedHospitalId,
+        doctorName: doctorSearch.trim(),
+        specialization: selectedSpecialization === allSpecializationsLabel ? "" : selectedSpecialization,
+        date: selectedDate,
+        time: selectedTime,
+      });
 
-        setAppointments(data || []);
-        setError("");
-      } catch (err) {
-        setError("Failed to load appointments: " + err.message);
-      } finally {
-        setLoadingAppointments(false);
-      }
-    };
-
-    loadAppointments();
+      setAppointments(data || []);
+      setError("");
+    } catch (err) {
+      setError("Failed to load appointments: " + err.message);
+    } finally {
+      setLoadingAppointments(false);
+    }
   }, [doctorSearch, selectedDate, selectedHospitalId, selectedSpecialization, selectedTime]);
+
+  useEffect(() => {
+    loadAppointments();
+  }, [loadAppointments]);
 
   const handlePreviousHospitals = () => {
     setHospitalStartIndex((current) => Math.max(current - 1, 0));
@@ -98,6 +101,26 @@ export default function Appointments() {
     );
   };
 
+  const handleBookAppointment = async () => {
+    if (!activeAppointment) return;
+
+    try {
+      setBookingAppointmentId(activeAppointment.id);
+      setSuccessMessage("");
+      await bookPatientAppointment(activeAppointment.id);
+      setAppointments((current) =>
+        current.filter((appointment) => appointment.id !== activeAppointment.id)
+      );
+      setSuccessMessage("Appointment booked successfully.");
+      setActiveAppointment(null);
+      await loadAppointments();
+    } catch (err) {
+      setError("Failed to book appointment: " + err.message);
+    } finally {
+      setBookingAppointmentId(null);
+    }
+  };
+
   return (
     <div className="appointments-container">
       <div className="appointments-card">
@@ -107,6 +130,7 @@ export default function Appointments() {
         </p>
 
         {error && <div className="appointments-error">{error}</div>}
+        {successMessage && <div className="appointments-success">{successMessage}</div>}
 
         <section className="hospital-picker">
           <div className="section-heading">
@@ -332,8 +356,13 @@ export default function Appointments() {
               <button type="button" className="modal-secondary" onClick={() => setActiveAppointment(null)}>
                 Close
               </button>
-              <button type="button" className="modal-primary">
-                Book appointment
+              <button
+                type="button"
+                className="modal-primary"
+                onClick={handleBookAppointment}
+                disabled={bookingAppointmentId === activeAppointment.id}
+              >
+                {bookingAppointmentId === activeAppointment.id ? "Booking..." : "Book appointment"}
               </button>
             </div>
           </div>

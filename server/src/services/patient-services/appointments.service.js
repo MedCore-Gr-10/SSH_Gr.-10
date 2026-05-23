@@ -1,8 +1,15 @@
 import appointmentsBookingSlotsRepository from "../../repositories/appointments-booking-slots.repository.js";
+import appointmentsMadeRepository from "../../repositories/appointments-made.repository.js";
 import patientHospitalsRepository from "../../repositories/patient-hospitals.repository.js";
 import specializationsRepository from "../../repositories/specializations.repository.js";
 
 class PatientAppointmentsService {
+  badRequest(message) {
+    const error = new Error(message);
+    error.status = 400;
+    return error;
+  }
+
   formatHospital(hospital) {
     return {
       id: hospital.id,
@@ -95,6 +102,17 @@ class PatientAppointmentsService {
     };
   }
 
+  formatBookedAppointment(appointment) {
+    const slot = appointment.appointments_booking_slots;
+
+    return {
+      id: appointment.id,
+      active: appointment.active_appointment_made !== false,
+      appointmentBookingSlotId: appointment.appointment_booking_slot_id,
+      appointment: slot ? this.formatAppointment(slot) : null,
+    };
+  }
+
   async getAppointmentFilters() {
     const [hospitals, specializations, timeSlots] = await Promise.all([
       patientHospitalsRepository.findAllHospitals(),
@@ -126,6 +144,34 @@ class PatientAppointmentsService {
     });
 
     return slots.map((slot) => this.formatAppointment(slot));
+  }
+
+  async bookAppointment(patientId, slotId) {
+    const appointmentSlotId = Number(slotId);
+    if (!Number.isInteger(appointmentSlotId)) {
+      throw this.badRequest("Invalid appointment slot");
+    }
+
+    const slot = await appointmentsBookingSlotsRepository.findById(appointmentSlotId);
+    if (!slot) {
+      throw this.badRequest("Appointment slot not found");
+    }
+    if (slot.active_appointment_booking_slot === false) {
+      throw this.badRequest("Appointment slot is not available");
+    }
+    if (slot.appointments_made?.length) {
+      throw this.badRequest("Appointment slot is already booked");
+    }
+
+    try {
+      const appointment = await appointmentsMadeRepository.bookSlot(patientId, appointmentSlotId);
+      return this.formatBookedAppointment(appointment);
+    } catch (err) {
+      if (err.code === "P2002") {
+        throw this.badRequest("Appointment slot is already booked");
+      }
+      throw err;
+    }
   }
 }
 

@@ -8,6 +8,50 @@ class AppointmentsMadeRepository {
     });
   }
 
+  async bookSlot(patientId, slotId) {
+    return prisma.appointments_made.create({
+      data: {
+        patient_id: patientId,
+        appointment_booking_slot_id: slotId,
+        active_appointment_made: true
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        hospitals: true,
+                        departments: true
+                      }
+                    },
+                    staff_specializations: {
+                      include: {
+                        specializations: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   async findById(id) {
     return prisma.appointments_made.findUnique({
       where: { id },
