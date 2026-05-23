@@ -34,13 +34,17 @@ class UserController {
   async updateUser(req, res, next) {
     try {
       const { id } = req.params;
-      const { username, role_id, is_active, email } = req.body;
+      // 🌟 SHTUAR: department_id dhe specialization_id merren nga req.body
+      const { username, role_id, is_active, email, department_id, specialization_id } = req.body;
 
+      // Kalojmë fushat e reja te shërbimi (UserService)
       const updatedUser = await this.userService.updateUser(id, {
         username,
         role_id,
         is_active,
         email,
+        department_id,     
+        specialization_id,
       });
 
       res.status(200).json({
@@ -55,15 +59,19 @@ class UserController {
 
   async createUser(req, res, next) {
     try {
-      const { username, role_id, is_active, email, password, profile_id } = req.body; 
+      // 🌟 SHTUAR: department_id dhe specialization_id merren nga req.body
+      const { username, role_id, is_active, email, password, profile_id, department_id, specialization_id } = req.body; 
 
+      // Kalojmë fushat e reja te shërbimi (UserService)
       const newUser = await this.userService.createUser({
         username,
         role_id: parseInt(role_id, 10),
         is_active,
         email,
         password,
-        profile_id
+        profile_id,
+        department_id,      // 🌟 SHTUAR
+        specialization_id   // 🌟 SHTUAR
       });
 
       res.status(201).json({
