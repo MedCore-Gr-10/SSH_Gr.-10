@@ -7,6 +7,7 @@ import userRoutes from "./routes/user.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import directorRoutes from "./routes/director.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
+import patientRoutes from "./routes/patient.routes.js";
 import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js";
 import manageDepartmentsRouter from "./routes/manageDepartments.routes.js"; 
 
@@ -25,6 +26,7 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/specializations", manageSpecializationRoutes);
 app.use("/api/director", directorRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/patient", patientRoutes);
 app.use("/api/departments", manageDepartmentsRouter); 
 
 app.use("/api", (req, res) => {

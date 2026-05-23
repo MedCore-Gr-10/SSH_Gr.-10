@@ -1,30 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../CSSpages/sidebar-pages/EmergencyContacts.css";
 
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+};
+
+const readResponse = async (response) => {
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error || payload.message || `Request failed (${response.status})`);
+  }
+
+  return payload.data ?? payload;
+};
+
 export default function EmergencyContacts() {
-  const [contacts, setContacts] = useState([
-    {
-      id: "contact-1",
-      firstName: "Lina",
-      lastName: "Garcia",
-      email: "lina.garcia@example.com",
-      relationship: "Spouse",
-      phoneNumber: "+1 555 123 4567",
-      idNumber: "A123456789",
-    },
-    {
-      id: "contact-2",
-      firstName: "Marcus",
-      lastName: "Jones",
-      email: "marcus.jones@example.com",
-      relationship: "Friend",
-      phoneNumber: "+1 555 987 6543",
-      idNumber: "B987654321",
-    },
-  ]);
+  const [contacts, setContacts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [pendingRemoval, setPendingRemoval] = useState(null);
-  const [currentContactId, setCurrentContactId] = useState("contact-1");
+  const [currentContactId, setCurrentContactId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -33,6 +35,28 @@ export default function EmergencyContacts() {
   const [idNumber, setIdNumber] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const fetchContacts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/patient/emergency-contacts", {
+        headers: getHeaders(),
+      });
+      const data = await readResponse(response);
+
+      setContacts(data.contacts || []);
+      setCurrentContactId(data.currentContactId || "");
+      setError("");
+    } catch (err) {
+      setError("Failed to load emergency contacts: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
 
   const openModal = () => {
     setError("");
@@ -51,29 +75,37 @@ export default function EmergencyContacts() {
     setError("");
   };
 
-  const handleAddContact = (event) => {
+  const handleAddContact = async (event) => {
     event.preventDefault();
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !relationship.trim() || !phoneNumber.trim() || !idNumber.trim()) {
       setError("Please fill in all emergency contact fields.");
       return;
     }
 
-    const newContact = {
-      id: `contact-${Date.now()}`,
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim(),
-      relationship: relationship.trim(),
-      phoneNumber: phoneNumber.trim(),
-      idNumber: idNumber.trim(),
-    };
+    try {
+      setSaving(true);
+      const response = await fetch("/api/patient/emergency-contacts", {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim(),
+          relationship: relationship.trim(),
+          phoneNumber: phoneNumber.trim(),
+          idNumber: idNumber.trim(),
+        }),
+      });
 
-    setContacts([newContact, ...contacts]);
-    if (!currentContactId) {
-      setCurrentContactId(newContact.id);
+      await readResponse(response);
+      await fetchContacts();
+      setSuccess("Emergency contact added successfully!");
+      closeModal();
+    } catch (err) {
+      setError("Failed to add emergency contact: " + err.message);
+    } finally {
+      setSaving(false);
     }
-    setSuccess("Emergency contact added successfully!");
-    closeModal();
   };
 
   const openRemoveConfirm = (contact) => {
@@ -86,22 +118,42 @@ export default function EmergencyContacts() {
     setPendingRemoval(null);
   };
 
-  const confirmRemoval = () => {
+  const confirmRemoval = async () => {
     if (!pendingRemoval) return;
-    setContacts((current) => {
-      const remainingContacts = current.filter((contact) => contact.id !== pendingRemoval.id);
-      if (currentContactId === pendingRemoval.id) {
-        setCurrentContactId(remainingContacts[0]?.id || "");
-      }
-      return remainingContacts;
-    });
-    setSuccess("Emergency contact removed successfully.");
-    setPendingRemoval(null);
+    try {
+      setSaving(true);
+      const response = await fetch(`/api/patient/emergency-contacts/${pendingRemoval.id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
+
+      await readResponse(response);
+      await fetchContacts();
+      setSuccess("Emergency contact removed successfully.");
+      setPendingRemoval(null);
+    } catch (err) {
+      setError("Failed to remove emergency contact: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const selectCurrentContact = (contact) => {
-    setCurrentContactId(contact.id);
-    setSuccess(`${contact.firstName} ${contact.lastName} is now your current emergency contact.`);
+  const selectCurrentContact = async (contact) => {
+    try {
+      setSaving(true);
+      const response = await fetch(`/api/patient/emergency-contacts/${contact.id}/current`, {
+        method: "PATCH",
+        headers: getHeaders(),
+      });
+
+      const data = await readResponse(response);
+      setCurrentContactId(data.currentContactId);
+      setSuccess(`${contact.firstName} ${contact.lastName} is now your current emergency contact.`);
+    } catch (err) {
+      setError("Failed to update current emergency contact: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -120,6 +172,7 @@ export default function EmergencyContacts() {
         </div>
 
         {success && <div className="success-message">{success}</div>}
+        {error && !showModal && <div className="error-message">{error}</div>}
 
         <div className="contacts-table-wrapper">
           <table className="contacts-table">
@@ -134,7 +187,23 @@ export default function EmergencyContacts() {
               </tr>
             </thead>
             <tbody>
-              {contacts.map((contact) => {
+              {loading && (
+                <tr>
+                  <td colSpan={6} className="no-results">
+                    Loading emergency contacts...
+                  </td>
+                </tr>
+              )}
+
+              {!loading && !contacts.length && (
+                <tr>
+                  <td colSpan={6} className="no-results">
+                    No emergency contacts yet.
+                  </td>
+                </tr>
+              )}
+
+              {!loading && contacts.map((contact) => {
                 const isCurrentContact = contact.id === currentContactId;
 
                 return (
@@ -151,13 +220,14 @@ export default function EmergencyContacts() {
                           type="button"
                           className="select-current-button"
                           onClick={() => selectCurrentContact(contact)}
+                          disabled={saving}
                         >
                           Select
                         </button>
                       )}
                     </td>
                     <td>
-                      <button type="button" className="remove-button" onClick={() => openRemoveConfirm(contact)}>
+                      <button type="button" className="remove-button" onClick={() => openRemoveConfirm(contact)} disabled={saving}>
                         Remove
                       </button>
                     </td>
@@ -264,11 +334,11 @@ export default function EmergencyContacts() {
               {error && <div className="error-message">{error}</div>}
 
               <div className="modal-actions">
-                <button type="button" className="modal-secondary" onClick={closeModal}>
+                <button type="button" className="modal-secondary" onClick={closeModal} disabled={saving}>
                   Cancel
                 </button>
-                <button type="submit" className="modal-primary">
-                  Add Contact
+                <button type="submit" className="modal-primary" disabled={saving}>
+                  {saving ? "Adding..." : "Add Contact"}
                 </button>
               </div>
             </form>
@@ -293,11 +363,11 @@ export default function EmergencyContacts() {
             </div>
 
             <div className="modal-actions">
-              <button type="button" className="modal-secondary" onClick={cancelRemoval}>
+              <button type="button" className="modal-secondary" onClick={cancelRemoval} disabled={saving}>
                 No, keep contact
               </button>
-              <button type="button" className="modal-primary" onClick={confirmRemoval}>
-                Yes, remove
+              <button type="button" className="modal-primary" onClick={confirmRemoval} disabled={saving}>
+                {saving ? "Removing..." : "Yes, remove"}
               </button>
             </div>
           </div>

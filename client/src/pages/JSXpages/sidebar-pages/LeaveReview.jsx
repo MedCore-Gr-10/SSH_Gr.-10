@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { getDoctors, submitReview } from "../../../services/patientApi.js";
-import { useAuth } from "../../../context/authContext.jsx";
 import "../../CSSpages/LeaveReview.css";
 
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+};
+
+const readResponse = async (response) => {
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error || payload.message || `Request failed (${response.status})`);
+  }
+
+  return payload.data ?? payload;
+};
+
 export default function LeaveReview() {
-  const { user } = useAuth();
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [rating, setRating] = useState(0);
@@ -22,16 +38,11 @@ export default function LeaveReview() {
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      // TEMPORARY: Mock doctors for frontend testing
-      const mockDoctors = [
-        { id: "doctor-1", first_name: "John", last_name: "Smith" },
-        { id: "doctor-2", first_name: "Sarah", last_name: "Johnson" },
-        { id: "doctor-3", first_name: "Michael", last_name: "Williams" },
-        { id: "doctor-4", first_name: "Emily", last_name: "Brown" },
-      ];
-      setDoctors(mockDoctors);
-      // const data = await getDoctors();
-      // setDoctors(data);
+      const response = await fetch("/api/patient/doctors", {
+        headers: getHeaders(),
+      });
+      const data = await readResponse(response);
+      setDoctors(data);
       setError("");
     } catch (err) {
       setError("Failed to load doctors: " + err.message);
@@ -43,10 +54,6 @@ export default function LeaveReview() {
 
   const handleStarClick = (value) => {
     setRating(value);
-  };
-
-  const handleStarHover = (value) => {
-    setHoverRating(value);
   };
 
   const handleSubmitReview = async (e) => {
@@ -72,12 +79,16 @@ export default function LeaveReview() {
       setError("");
       setSuccess("");
 
-      await submitReview({
-        patient_id: user.id,
-        doctor_id: selectedDoctor.id,
-        rating: rating,
-        comment: comment,
+      const response = await fetch("/api/patient/reviews", {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          doctor_id: selectedDoctor.id,
+          rating: rating,
+          comment: comment,
+        }),
       });
+      await readResponse(response);
 
       setSuccess("Review submitted successfully!");
       setSelectedDoctor(null);
@@ -103,19 +114,9 @@ export default function LeaveReview() {
           <div
             key={star}
             className="star-wrapper"
-            onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const isHalf = x < rect.width / 2;
-              setHoverRating(isHalf ? star - 0.5 : star);
-            }}
+            onMouseMove={() => setHoverRating(star)}
             onMouseLeave={() => setHoverRating(0)}
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const isHalf = x < rect.width / 2;
-              handleStarClick(isHalf ? star - 0.5 : star);
-            }}
+            onClick={() => handleStarClick(star)}
           >
             <span className="star-background">★</span>
             <span

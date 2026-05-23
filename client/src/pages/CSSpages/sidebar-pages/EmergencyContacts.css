@@ -161,6 +161,21 @@
   background-color: #f8fafc;
 }
 
+.no-results {
+  color: #718096;
+  text-align: center;
+  font-weight: 600;
+}
+
+.select-current-button:disabled,
+.remove-button:disabled,
+.modal-secondary:disabled,
+.modal-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
