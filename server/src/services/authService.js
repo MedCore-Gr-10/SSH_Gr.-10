@@ -3,6 +3,7 @@ import prisma from "../prisma.js";
 import userRepository from "../repositories/user.repository.js";
 import profileRepository from "../repositories/profile.repository.js";
 import rolesRepository from "../repositories/roles.repository.js";
+import logsRepository from "../repositories/logs.repository.js";
 import { JwtService } from "../utils/jwt.js";
 
 export class AuthService {
@@ -54,6 +55,18 @@ export class AuthService {
     }
   }
 
+  async #logSuccessfulLogin(userId, role) {
+    try {
+      await logsRepository.create({
+        user_id: userId,
+        action: "login",
+        reason: `${role} signed in`,
+      });
+    } catch (error) {
+      console.error("Failed to write login log:", error.message);
+    }
+  }
+
   async login(username, password) {
     const user = await this.users.findByUsername(username);
 
@@ -72,6 +85,7 @@ export class AuthService {
     if (normalizedRole === "superuser") {
       const token = this.jwt.generateToken({ user_id: user.id, role: normalizedRole });
       const authUser = await this.#buildAuthUser(user, normalizedRole);
+      await this.#logSuccessfulLogin(user.id, normalizedRole);
       return { token, role: normalizedRole, user: authUser };
     }
 
@@ -92,12 +106,14 @@ export class AuthService {
       });
 
       const authUser = await this.#buildAuthUser(user, normalizedRole, hospital_id);
+      await this.#logSuccessfulLogin(user.id, normalizedRole);
       return { token, role: normalizedRole, user: authUser };
     }
 
     if (normalizedRole === "patient") {
       const token = this.jwt.generateToken({ user_id: user.id, role: normalizedRole });
       const authUser = await this.#buildAuthUser(user, normalizedRole);
+      await this.#logSuccessfulLogin(user.id, normalizedRole);
       return { token, role: normalizedRole, user: authUser };
     }
 
