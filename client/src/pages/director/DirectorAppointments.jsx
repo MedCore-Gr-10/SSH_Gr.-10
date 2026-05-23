@@ -9,6 +9,12 @@ import "./DirectorAppointments.css";
 
 const formatTime = (value) => {
   if (!value) return "";
+  if (value.includes?.("T")) {
+    return new Date(value).toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
   return value.length === 8 ? value.slice(0, 5) : value;
 };
 
@@ -97,8 +103,8 @@ export default function DirectorAppointments() {
     }
   };
 
-  const handleCancel = async () => {
-    if (!selectedAppointment) {
+  const handleCancel = async (appointment = selectedAppointment) => {
+    if (!appointment) {
       setError("Select an appointment to cancel.");
       return;
     }
@@ -112,7 +118,7 @@ export default function DirectorAppointments() {
     setMessage(null);
 
     try {
-      await cancelDirectorAppointment(selectedAppointment.id);
+      await cancelDirectorAppointment(appointment.id);
       setMessage("Appointment canceled successfully.");
       setSelectedAppointment(null);
       setSelectedSlotId("");
@@ -128,8 +134,18 @@ export default function DirectorAppointments() {
   const renderSlotLabel = (slot) => {
     const doctor = getName(slot.users);
     const template = slot.appointments_templates;
-    const time = template ? `${formatTime(template.start_time)} - ${formatTime(template.end_time)}` : "";
+    const startTime = slot.slot_start_time || template?.start_time;
+    const endTime = slot.slot_end_time || template?.end_time;
+    const time = startTime && endTime ? `${formatTime(startTime)} - ${formatTime(endTime)}` : "";
     return `${doctor} • ${formatDate(slot.appointment_date)} ${time}`;
+  };
+
+  const getSlotStatus = (slot) => {
+    const isBooked = slot.appointments_made?.some(
+      (appointment) => appointment.active_appointment_made !== false
+    );
+
+    return isBooked ? "Booked" : "Available";
   };
 
   return (
@@ -193,7 +209,7 @@ export default function DirectorAppointments() {
                         <button className="edit-button" onClick={() => handleSelectAppointment(appointment)}>
                           Edit
                         </button>
-                        <button className="cancel-button" onClick={() => { setSelectedAppointment(appointment); handleCancel(); }}>
+                        <button className="cancel-button" onClick={() => handleCancel(appointment)}>
                           Cancel
                         </button>
                       </td>
@@ -205,11 +221,32 @@ export default function DirectorAppointments() {
         </section>
 
         <section className="director-appointments-section content-scroll">
-          <h2>Appointment templates</h2>
-          <p>
-            Creation and management of working schedules has moved to the Staff Schedule page.
-            Use the staff schedule page to create, update, and remove doctor/nurse availability.
-          </p>
+          <div className="section-heading-row">
+            <h2>Appointment Slots</h2>
+            <span>{slots.length}</span>
+          </div>
+          {slots.length === 0 ? (
+            <p className="empty-state">No appointment slots found.</p>
+          ) : (
+            <div className="slots-list">
+              {slots.map((slot) => (
+                <div className="slot-row" key={slot.id}>
+                  <div>
+                    <strong>{getName(slot.users)}</strong>
+                    <span>{formatDate(slot.appointment_date)}</span>
+                    <span>
+                      {formatTime(slot.slot_start_time || slot.appointments_templates?.start_time)}
+                      {" - "}
+                      {formatTime(slot.slot_end_time || slot.appointments_templates?.end_time)}
+                    </span>
+                  </div>
+                  <span className={getSlotStatus(slot) === "Booked" ? "slot-booked" : "slot-available"}>
+                    {getSlotStatus(slot)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="director-appointments-section content-scroll">
