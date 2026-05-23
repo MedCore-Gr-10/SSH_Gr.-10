@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Allergies.css";
+import "../../CSSpages/sidebar-pages/Allergies.css";
 
 export default function Allergies() {
   const [allergyName, setAllergyName] = useState("");

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Appointments.css";
+import "../../CSSpages/sidebar-pages/Appointments.css";
 
 const timeSlots = [
   "08:00-08:30",

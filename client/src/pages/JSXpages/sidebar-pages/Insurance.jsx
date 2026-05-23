@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Insurance.css";
+import "../../CSSpages/sidebar-pages/Insurance.css";
 
 const initialFormValues = {
   companyName: "",

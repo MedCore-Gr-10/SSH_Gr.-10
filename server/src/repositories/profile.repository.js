@@ -165,6 +165,32 @@ class ProfilesRepository {
     });
   }
 
+  async findUserProfile(userId) {
+    return prisma.users_profiles.findFirst({
+      where: {
+        user_id: userId
+      },
+      include: {
+        profiles: {
+          include: {
+            current_emergency_contact: true
+          }
+        }
+      }
+    });
+  }
+
+  async updateCurrentEmergencyContact(profileId, contactId) {
+    return prisma.profiles.update({
+      where: {
+        id: profileId
+      },
+      data: {
+        current_emergency_contact_id: contactId
+      }
+    });
+  }
+
   /*
   |--------------------------------------------------------------------------
   | PATIENT DETAILS

@@ -119,11 +119,18 @@ class UsersRepository {
     return prisma.users.findMany({
       where: {
         roles: {
-          role_name: "DOCTOR"
+          role_name: {
+            in: ["doctor", "DOCTOR"]
+          }
         }
       },
       include: {
         roles: true,
+        users_profiles: {
+          include: {
+            profiles: true
+          }
+        },
         staff_hospitals_departments: true
       }
     });
