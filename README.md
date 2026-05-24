@@ -43,29 +43,70 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName = .env
    -->ne browser login:
    Username: dev_nurse
    Password: devpassword
-10. Pasi qe Redis nuk e ben support Windows, duhet me instalu brenda WSL (Windows Subsystem Linux).
-   Nese nuk e keni WSL, instalojeni me keta hapa:
-   Open PoweShell as Administrator
-   ```wsl --install``` (ka mundesi ju thot me restart llaptopin, do it)
-   ```wsl --install -d Ubuntu```
+10. Redis setup (Windows + WSL)
 
-   Hapeni WSL duke search WSL
-   update packages: ```sudo apt update```
-   install Redis: ```sudo apt install redis-server -y```
-   Start Redis service: ```sudo service redis-server start```
-   Test if Redis is running: ```redis-cli ping``` (ta kthen PONG nese eshte duke run correctly)
+   Pasi qe Redis nuk e ben support Windows, duhet me instalu brenda WSL (Windows Subsystem Linux). 
+   Nese WSL nuk eshte i instaluar, hape PowerShell si Administrator dhe ekzekuto:
 
-   Ne .env file shtoje: 
-   `REDIS_URL=redis://127.0.0.1:6379`
-   `DOCTOR_PATIENTS_CACHE_TTL_SECONDS=900`
+   ```powershell
+   wsl --install
+   ```
+   (ka mundesi ju thot me restart llaptopin, do it)
+   Instalo Ubuntu:
+   
+   ```powershell
+   wsl --install -d Ubuntu
+   ```
 
-   REDIS_URL → Redis connection string (localhost in WSL setup)
-   DOCTOR_PATIENTS_CACHE_TTL_SECONDS → sa gjate cached doctor patients data rrin ne Redis para se te skadoj dhe te behet fetch nga DB prap
+10.1. Install Redis inside WSL
+
+   Hape WSL/Ubuntu nga Start Menu dhe ekzekuto:
+
+   ```bash
+   sudo apt update
+   sudo apt install redis-server -y
+   ```
+
+   Start Redis:
+
+   ```bash
+   sudo service redis-server start
+   ```
+
+   Test nese Redis eshte duke punu:
+
+   ```bash
+   redis-cli ping
+   ```
+
+   Nese Redis eshte ne rregull, kthen:
+
+   ```text
+   PONG
+   ```
+
+10.2. Add Redis settings to the backend `.env` file
+
+   Ne `server/.env`, shto:
+
+   ```env
+   REDIS_URL=redis://127.0.0.1:6379
+   DOCTOR_PATIENTS_CACHE_TTL_SECONDS=900
+   ```
+   `REDIS_URL` Redis connection string (localhost in WSL setup)
+
+   `DOCTOR_PATIENTS_CACHE_TTL_SECONDS` sa gjate cached doctor patients data rrin ne Redis para se te skadoj dhe te behet fetch nga DB prap
    900 sekonda = 15 minuta (mundesh me zvogelu per testing reasons)
 
-   Pasi qe Redis behet run ne WSL, duhet te startohet pas cdo PC restart:
-   ```sudo service redis-server start```
-   lidhet ne backend ne: 127.0.0.1:6379
+   Pas cdo restart te PC, Redis duhet te startohet prape. Hape WSL/Ubuntu dhe ekzekuto:
+
+   ```bash
+   sudo service redis-server start
+   ```
+   Backend lidhet me Redis ne:
+   ```text
+   127.0.0.1:6379
+   ```
 
 ### Infermier/e (nurse) — API `/api/nurse`
 
