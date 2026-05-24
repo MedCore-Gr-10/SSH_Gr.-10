@@ -167,7 +167,8 @@ CREATE TABLE appointments_made(
     id SERIAL PRIMARY KEY,
     appointment_booking_slot_id INTEGER REFERENCES appointments_booking_slots(id) ON DELETE CASCADE,
     patient_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    active_appointment_made BOOLEAN DEFAULT true
+    active_appointment_made BOOLEAN DEFAULT true,
+    appointment_is_complete BOOLEAN DEFAULT false
 );
 
 CREATE TABLE diagnoses(

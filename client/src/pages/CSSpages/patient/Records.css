@@ -126,6 +126,15 @@
   color: #4a5568;
 }
 
+.error-message {
+  color: #9b2c2c;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -206,6 +215,130 @@
   border: 1px solid #edf2f7;
   border-radius: 18px;
   padding: 1.25rem;
+}
+
+.records-detail-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.records-detail-item {
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 0.85rem;
+}
+
+.records-detail-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.records-detail-item strong {
+  display: block;
+  color: #1a202c;
+  margin-bottom: 0.35rem;
+}
+
+.records-allergy-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.records-allergy-heading h3 {
+  margin: 0;
+}
+
+.records-allergy-controls {
+  display: inline-flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.records-allergy-controls button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #edf2f7;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #5c5cd6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.records-allergy-controls button:hover {
+  border-color: #c3d4fd;
+  box-shadow: 0 8px 18px rgba(92, 92, 214, 0.1);
+  transform: translateY(-1px);
+}
+
+.records-allergy-slider {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 260px);
+  gap: 0.75rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
+  padding: 0.15rem 0 0.75rem;
+}
+
+.records-allergy-card {
+  scroll-snap-align: start;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 0.85rem;
+  min-height: 132px;
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+}
+
+.records-allergy-card div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.records-allergy-card strong {
+  color: #1a202c;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.records-allergy-card span,
+.records-allergy-card small {
+  border-radius: 999px;
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+  color: #5c5cd6;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  padding: 0.25rem 0.45rem;
+  white-space: nowrap;
+}
+
+.records-allergy-card p {
+  color: #4a5568;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.records-allergy-card small {
+  justify-self: start;
+  color: #4a5568;
 }
 
 .modal-actions {

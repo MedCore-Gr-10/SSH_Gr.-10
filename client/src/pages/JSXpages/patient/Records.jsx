@@ -1,68 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { getPatientRecords } from "../../../services/patientRecordsApi";
 import "../../CSSpages/patient/Records.css";
-
-const placeholderRecords = [
-  {
-    id: "record-1",
-    hospitalName: "City Care Hospital",
-    doctorName: "Dr. John Smith",
-    nurseName: "Nurse Ava Martinez",
-    date: "2026-02-20",
-    timeSlot: "08:00-08:30",
-    prescription: "Ibuprofen 200mg",
-    allergies: "Peanuts",
-    description: "I have a rash on my back that it itches.",
-    notes: "Recommended topical ointment and follow-up in two weeks.",
-  },
-  {
-    id: "record-2",
-    hospitalName: "City Care Hospital",
-    doctorName: "Dr. Emily Turner",
-    nurseName: "Nurse Julian Kim",
-    date: "2026-02-22",
-    timeSlot: "09:00-09:30",
-    prescription: "Vitamin D supplements",
-    allergies: "None",
-    description: "I just came for a yearly physical.",
-    notes: "General wellness check completed; labs ordered for routine blood work.",
-  },
-  {
-    id: "record-3",
-    hospitalName: "Green Valley Clinic",
-    doctorName: "Dr. Noah Brown",
-    nurseName: "Nurse Sofia Patel",
-    date: "2026-03-01",
-    timeSlot: "10:00-10:30",
-    prescription: "Cetirizine 10mg",
-    allergies: "Pollen, dust mites",
-    description: "My allergies are acting up and I have sneezing and watery eyes.",
-    notes: "Adjusted allergy medication and recommended follow-up during peak season.",
-  },
-  {
-    id: "record-4",
-    hospitalName: "Green Valley Clinic",
-    doctorName: "Dr. Mia Johnson",
-    nurseName: "Nurse Ethan Lee",
-    date: "2026-02-28",
-    timeSlot: "14:00-14:30",
-    prescription: "Amoxicillin 500mg",
-    allergies: "Penicillin",
-    description: "I have a sore throat and feel feverish.",
-    notes: "Noted penicillin allergy, used alternative antibiotic and advised hydration.",
-  },
-  {
-    id: "record-5",
-    hospitalName: "Lakeside Medical Center",
-    doctorName: "Dr. Sarah Patel",
-    nurseName: "Nurse Noah Davis",
-    date: "2026-03-05",
-    timeSlot: "16:00-16:30",
-    prescription: "Albuterol inhaler",
-    allergies: "Tree pollen",
-    description: "Wheezing at night and difficulty breathing outdoors.",
-    notes: "Prescribed inhaler for asthma symptoms and scheduled breathing test.",
-  },
-];
 
 const formatDateDisplay = (value) => {
   if (!value) return "";
@@ -70,37 +9,110 @@ const formatDateDisplay = (value) => {
   return `${day}.${month}.${year}`;
 };
 
+const formatDateTimeDisplay = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+};
+
+const listText = (items, selector) => {
+  const values = items.map(selector).filter(Boolean);
+  return values.length ? values.join(", ") : "-";
+};
+
+const firstMedication = (record) =>
+  record.prescriptions?.[0]?.medicationName || "No medication recorded";
+
+const searchableText = (record) =>
+  [
+    record.doctorName,
+    record.hospitalName,
+    record.specialization,
+    record.date,
+    record.timeSlot,
+    ...(record.prescriptions || []).flatMap((prescription) => [
+      prescription.medicationName,
+      prescription.dosage,
+      prescription.instructions,
+    ]),
+    ...(record.diagnoses || []).map((diagnosis) => diagnosis.diagnosis),
+    ...(record.allergies || []).flatMap((allergy) => [
+      allergy.name,
+      allergy.type,
+      allergy.reaction,
+      allergy.severity,
+    ]),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
 export default function Records() {
+  const [records, setRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [activeRecord, setActiveRecord] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const allergySliderRef = useRef(null);
 
-  const normalizedSearch = searchTerm.trim().toLowerCase();
+  useEffect(() => {
+    const loadRecords = async () => {
+      try {
+        setLoading(true);
+        const data = await getPatientRecords();
+        setRecords(data || []);
+        setError("");
+      } catch (err) {
+        setError("Failed to load records: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredRecords = placeholderRecords.filter((record) => {
-    const matchesDate = selectedDate ? record.date === selectedDate : true;
-    const matchesSearch = normalizedSearch
-      ? [
-          record.doctorName,
-          record.prescription,
-          record.timeSlot,
-          record.allergies,
-          record.nurseName,
-          record.hospitalName,
-          record.description,
-        ].some((field) => field.toLowerCase().includes(normalizedSearch))
-      : true;
+    loadRecords();
+  }, []);
 
-    return matchesDate && matchesSearch;
-  });
+  const filteredRecords = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return records.filter((record) => {
+      const matchesDate = selectedDate ? record.date === selectedDate : true;
+      const matchesSearch = normalizedSearch
+        ? searchableText(record).includes(normalizedSearch)
+        : true;
+
+      return matchesDate && matchesSearch;
+    });
+  }, [records, searchTerm, selectedDate]);
+
+  const scrollAllergies = (direction) => {
+    const slider = allergySliderRef.current;
+    if (!slider) return;
+
+    slider.scrollBy({
+      left: direction * 260,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <div className="records-container">
       <div className="records-card">
         <h1 className="records-title">Patient Records</h1>
         <p className="records-description">
-          Filter your medical history by date or search across doctor name, prescription, allergies, nurse, hospital, time slot, and visit description.
+          Review completed appointments, prescriptions, diagnoses, and allergy context from your care history.
         </p>
+
+        {error && <div className="error-message">{error}</div>}
 
         <div className="records-filters">
           <div className="filter-group">
@@ -111,7 +123,7 @@ export default function Records() {
               id="record-search"
               type="text"
               className="form-input"
-              placeholder="Search by doctor, prescription, allergies, nurse, hospital, time, description"
+              placeholder="Search by doctor, medication, diagnosis, allergy, hospital, or time"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -139,11 +151,20 @@ export default function Records() {
                 <th>Doctor name</th>
                 <th>Date</th>
                 <th>Time slot</th>
+                <th>Medication</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {filteredRecords.length ? (
+              {loading && (
+                <tr>
+                  <td colSpan={6} className="no-results">
+                    Loading records...
+                  </td>
+                </tr>
+              )}
+
+              {!loading && filteredRecords.length ? (
                 filteredRecords.map((record) => (
                   <tr
                     key={record.id}
@@ -156,13 +177,16 @@ export default function Records() {
                     <td>{record.doctorName}</td>
                     <td>{formatDateDisplay(record.date)}</td>
                     <td>{record.timeSlot}</td>
-                    <td className="row-arrow">→</td>
+                    <td>{firstMedication(record)}</td>
+                    <td className="row-arrow">-&gt;</td>
                   </tr>
                 ))
-              ) : (
+              ) : null}
+
+              {!loading && !filteredRecords.length && (
                 <tr>
-                  <td colSpan={5} className="no-results">
-                    No records match your search and date filter.
+                  <td colSpan={6} className="no-results">
+                    No completed appointment records match your filters.
                   </td>
                 </tr>
               )}
@@ -198,29 +222,80 @@ export default function Records() {
 
               <div className="modal-row">
                 <div>
-                  <h3>Nurse</h3>
-                  <p>{activeRecord.nurseName}</p>
+                  <h3>Specialization</h3>
+                  <p>{activeRecord.specialization || "General Medicine"}</p>
                 </div>
                 <div>
-                  <h3>Prescription</h3>
-                  <p>{activeRecord.prescription}</p>
+                  <h3>Created at</h3>
+                  <p>{formatDateTimeDisplay(activeRecord.createdAt)}</p>
                 </div>
               </div>
 
               <div className="modal-row">
                 <div>
-                  <h3>Allergies</h3>
-                  <p>{activeRecord.allergies}</p>
+                  <h3>Diagnosis</h3>
+                  <p>{listText(activeRecord.diagnoses || [], (diagnosis) => diagnosis.diagnosis)}</p>
                 </div>
                 <div>
-                  <h3>Description</h3>
-                  <p>{activeRecord.description}</p>
+                  <div className="records-allergy-heading">
+                    <h3>Allergies</h3>
+                    {activeRecord.allergies?.length > 1 && (
+                      <div className="records-allergy-controls">
+                        <button
+                          type="button"
+                          onClick={() => scrollAllergies(-1)}
+                          aria-label="Show previous allergies"
+                        >
+                          <FaChevronLeft />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => scrollAllergies(1)}
+                          aria-label="Show next allergies"
+                        >
+                          <FaChevronRight />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {activeRecord.allergies?.length ? (
+                    <div
+                      className="records-allergy-slider"
+                      aria-label="Patient allergies"
+                      ref={allergySliderRef}
+                    >
+                      {activeRecord.allergies.map((allergy) => (
+                        <article key={allergy.id} className="records-allergy-card">
+                          <div>
+                            <strong>{allergy.name}</strong>
+                            <span>{allergy.type || "Allergy"}</span>
+                          </div>
+                          <p>{allergy.reaction || "No reaction recorded"}</p>
+                          <small>{allergy.severity || "Severity not recorded"}</small>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>No allergies recorded.</p>
+                  )}
                 </div>
               </div>
 
               <div className="modal-note">
-                <h3>Visit notes</h3>
-                <p>{activeRecord.notes}</p>
+                <h3>Prescriptions</h3>
+                {activeRecord.prescriptions?.length ? (
+                  <div className="records-detail-list">
+                    {activeRecord.prescriptions.map((prescription) => (
+                      <div key={prescription.id} className="records-detail-item">
+                        <strong>{prescription.medicationName}</strong>
+                        <p>{prescription.dosage || "No dosage recorded"}</p>
+                        <p>{prescription.instructions || "No instructions recorded"}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No prescriptions recorded for this visit.</p>
+                )}
               </div>
             </div>
 

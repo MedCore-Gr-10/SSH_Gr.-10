@@ -31,6 +31,15 @@ class PatientAppointmentsController {
     }
   }
 
+  async getPatientRecords(req, res, next) {
+    try {
+      const records = await PatientAppointmentsService.getPatientRecords(req.user.user_id);
+      res.status(200).json({ success: true, data: records });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async getStaffSchedules(req, res, next) {
     try {
       const schedules = await PatientAppointmentsService.getPatientStaffSchedules(req.user.user_id);

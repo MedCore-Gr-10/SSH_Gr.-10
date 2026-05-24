@@ -255,6 +255,7 @@ class NurseService {
     return {
       id: appointment.id,
       active: appointment.active_appointment_made ?? true,
+      complete: appointment.appointment_is_complete === true,
       appointment_date: slot?.appointment_date || null,
       start_time: this.formatTimeValue(slot?.slot_start_time),
       end_time: this.formatTimeValue(slot?.slot_end_time),

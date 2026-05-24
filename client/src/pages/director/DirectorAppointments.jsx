@@ -204,7 +204,13 @@ export default function DirectorAppointments() {
                       <td data-label="Patient">{patientName}</td>
                       <td data-label="Doctor">{doctorName}</td>
                       <td data-label="Slot">{slotLabel}</td>
-                      <td data-label="Status">{appointment.active_appointment_made === false ? "Canceled" : "Confirmed"}</td>
+                      <td data-label="Status">
+                        {appointment.active_appointment_made === false
+                          ? "Canceled"
+                          : appointment.appointment_is_complete
+                            ? "Completed"
+                            : "Confirmed"}
+                      </td>
                       <td data-label="Actions">
                         <button className="edit-button" onClick={() => handleSelectAppointment(appointment)}>
                           Edit
