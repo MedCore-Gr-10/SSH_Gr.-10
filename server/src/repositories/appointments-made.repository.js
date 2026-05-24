@@ -76,6 +76,61 @@ class AppointmentsMadeRepository {
     });
   }
 
+  async findActivePatientAppointments(patientId) {
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        active_appointment_made: true
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        hospitals: true,
+                        departments: true
+                      }
+                    },
+                    staff_specializations: {
+                      include: {
+                        specializations: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        id: "desc"
+      }
+    });
+  }
+
+  async findPatientAppointmentById(id, patientId) {
+    return prisma.appointments_made.findFirst({
+      where: {
+        id,
+        patient_id: patientId
+      }
+    });
+  }
+
   async findPatientHistoryAtHospital(patientId, hospitalId, filters = {}) {
     const templateWhere = { hospital_id: hospitalId };
     if (filters.departmentId) {
@@ -243,6 +298,12 @@ class AppointmentsMadeRepository {
       data: {
         active_appointment_made: false
       }
+    });
+  }
+
+  async delete(id) {
+    return prisma.appointments_made.delete({
+      where: { id }
     });
   }
 

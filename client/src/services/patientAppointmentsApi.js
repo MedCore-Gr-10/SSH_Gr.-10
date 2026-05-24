@@ -50,3 +50,28 @@ export const bookPatientAppointment = async (slotId) => {
 
   return readResponse(response);
 };
+
+export const getPatientBookedAppointments = async () => {
+  const response = await fetch("/api/patient/appointments/booked", {
+    headers: getHeaders(),
+  });
+
+  return readResponse(response);
+};
+
+export const cancelPatientAppointment = async (appointmentId) => {
+  const response = await fetch(`/api/patient/appointments/${appointmentId}`, {
+    method: "DELETE",
+    headers: getHeaders(),
+  });
+
+  return readResponse(response);
+};
+
+export const getPatientStaffSchedules = async () => {
+  const response = await fetch("/api/patient/appointments/staff-schedules", {
+    headers: getHeaders(),
+  });
+
+  return readResponse(response);
+};

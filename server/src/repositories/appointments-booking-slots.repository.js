@@ -185,6 +185,7 @@ class AppointmentsBookingSlotsRepository {
   async searchAvailablePatientSlots(filters) {
     const {
       hospitalId,
+      hospitalIds,
       doctorName,
       specialization,
       date,
@@ -201,6 +202,7 @@ class AppointmentsBookingSlotsRepository {
         ...(startTime && { slot_start_time: startTime }),
         appointments_templates: {
           ...(hospitalId && { hospital_id: hospitalId }),
+          ...(!hospitalId && hospitalIds?.length && { hospital_id: { in: hospitalIds } }),
           active_appointment_template: true,
           ...(specialization && {
             staff_hospitals_departments: {
@@ -285,6 +287,32 @@ class AppointmentsBookingSlotsRepository {
         active_appointment_booking_slot: true,
         appointments_made: {
           none: {}
+        }
+      },
+      distinct: ["slot_start_time", "slot_end_time"],
+      select: {
+        slot_start_time: true,
+        slot_end_time: true
+      },
+      orderBy: [
+        { slot_start_time: "asc" },
+        { slot_end_time: "asc" }
+      ]
+    });
+  }
+
+  async findAvailablePatientTimeSlotsForHospitals(hospitalIds) {
+    return prisma.appointments_booking_slots.findMany({
+      where: {
+        active_appointment_booking_slot: true,
+        appointments_made: {
+          none: {}
+        },
+        appointments_templates: {
+          hospital_id: {
+            in: hospitalIds
+          },
+          active_appointment_template: true
         }
       },
       distinct: ["slot_start_time", "slot_end_time"],
