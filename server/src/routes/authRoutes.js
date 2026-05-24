@@ -81,59 +81,6 @@ router.post("/register", authController.register);
  *         description: Invalid credentials
  */
 router.post("/login", authController.login);
-/**
- * @swagger
- * /api/auth/forgot-password:
- *   post:
- *     summary: Request password reset
- *     description: Sends password reset instructions to the user's email
- *     tags:
- *       - Authentication
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: john@example.com
- *     responses:
- *       200:
- *         description: Password reset request processed
- *       404:
- *         description: User not found
- */
-router.post("/forgot-password", authController.forgotPassword);
-/**
- * @swagger
- * /api/auth/reset-password:
- *   post:
- *     summary: Reset password
- *     description: Resets the user password using reset token
- *     tags:
- *       - Authentication
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               token:
- *                 type: string
- *                 example: reset_token_example
- *               newPassword:
- *                 type: string
- *                 example: NewPassword123!
- *     responses:
- *       200:
- *         description: Password reset successfully
- *       400:
- *         description: Invalid or expired token
- */
-router.post("/reset-password", authController.resetPassword);
 
 // Dev-only: create a mock JWT for frontend testing when backend runs in non-production
 if (process.env.NODE_ENV !== "production") {

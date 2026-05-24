@@ -43,15 +43,70 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName = .env
    -->ne browser login:
    Username: dev_nurse
    Password: devpassword
+10. Redis setup (Windows + WSL)
 
-**Full nurse test data** (patients, allergies, insurance, contacts, visits, schedules):
+   Pasi qe Redis nuk e ben support Windows, duhet me instalu brenda WSL (Windows Subsystem Linux). 
+   Nese WSL nuk eshte i instaluar, hape PowerShell si Administrator dhe ekzekuto:
 
-```bash
-cd server
-npm run seed:nurse-test
-```
+   ```powershell
+   wsl --install
+   ```
+   (ka mundesi ju thot me restart llaptopin, do it)
+   Instalo Ubuntu:
+   
+   ```powershell
+   wsl --install -d Ubuntu
+   ```
 
-Login: `dev_nurse` / `devpassword` — search patients: Anna, Ben, Clara (or personal numbers PAT-ANNA-1001, etc.)
+10.1. Install Redis inside WSL
+
+   Hape WSL/Ubuntu nga Start Menu dhe ekzekuto:
+
+   ```bash
+   sudo apt update
+   sudo apt install redis-server -y
+   ```
+
+   Start Redis:
+
+   ```bash
+   sudo service redis-server start
+   ```
+
+   Test nese Redis eshte duke punu:
+
+   ```bash
+   redis-cli ping
+   ```
+
+   Nese Redis eshte ne rregull, kthen:
+
+   ```text
+   PONG
+   ```
+
+10.2. Add Redis settings to the backend `.env` file
+
+   Ne `server/.env`, shto:
+
+   ```env
+   REDIS_URL=redis://127.0.0.1:6379
+   DOCTOR_PATIENTS_CACHE_TTL_SECONDS=900
+   ```
+   `REDIS_URL` Redis connection string (localhost in WSL setup)
+
+   `DOCTOR_PATIENTS_CACHE_TTL_SECONDS` sa gjate cached doctor patients data rrin ne Redis para se te skadoj dhe te behet fetch nga DB prap
+   900 sekonda = 15 minuta (mundesh me zvogelu per testing reasons)
+
+   Pas cdo restart te PC, Redis duhet te startohet prape. Hape WSL/Ubuntu dhe ekzekuto:
+
+   ```bash
+   sudo service redis-server start
+   ```
+   Backend lidhet me Redis ne:
+   ```text
+   127.0.0.1:6379
+   ```
 
 ### Infermier/e (nurse) — API `/api/nurse`
 
@@ -143,8 +198,7 @@ për profesionistët mjekësorë dhe komunitetet që ata shërbejnë.
 ### 🔐 Siguria
 
 - Sistem i plotë **autentikimi (login/register)** përmes `POST /api/auth/login` dhe `POST /api/auth/register` (regjistrim vetëm për pacientë)
-- Frontend: `/` (login), `/register`, `/forgot-password`, `/reset-password?token=...`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
-- Rivendosja e fjalëkalimit: `POST /api/auth/forgot-password` (email), `POST /api/auth/reset-password` (token + password). Në dev, linku kthehet në përgjigje dhe shfaqet në UI.
+- Frontend: `/` (login), `/register`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
 - **Role-based authorization** (p.sh. pacient, superuser, doctor, nurse, director)
 - Middleware për:
   - autentikim

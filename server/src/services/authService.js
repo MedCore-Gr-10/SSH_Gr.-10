@@ -5,6 +5,7 @@ import profileRepository from "../repositories/profile.repository.js";
 import rolesRepository from "../repositories/roles.repository.js";
 import logsRepository from "../repositories/logs.repository.js";
 import { JwtService } from "../utils/jwt.js";
+import { validateRegistrationProfile } from "../utils/registerValidation.js";
 
 export class AuthService {
   /**
@@ -35,6 +36,14 @@ export class AuthService {
       first_name: link?.profiles?.first_name ?? null,
       last_name: link?.profiles?.last_name ?? null,
     };
+  }
+
+  #assertUserActive(user) {
+    if (user.is_active !== true) {
+      throw new Error(
+        "Your account is not active. Please contact an administrator.",
+      );
+    }
   }
 
   #validatePassword(password) {
@@ -68,13 +77,19 @@ export class AuthService {
   }
 
   async login(username, password) {
-    const user = await this.users.findByUsername(username);
+    const normalizedUsername = username?.trim();
+    if (!normalizedUsername || !password) {
+      throw new Error("Username and password are required");
+    }
+
+    const user = await this.users.findByUsername(normalizedUsername);
 
     if (!user) throw new Error("User not found");
-    if (user.is_active === false) throw new Error("Account is disabled");
 
     const isValid = await bcrypt.compare(password, user.hash_password);
     if (!isValid) throw new Error("Invalid password");
+
+    this.#assertUserActive(user);
 
     const role = user.roles?.role_name;
     if (!role) throw new Error("Invalid role");
@@ -139,6 +154,14 @@ export class AuthService {
     if (!username || !password || !email || !first_name || !resolvedLastName) {
       throw new Error("Missing required registration fields");
     }
+
+    const profileError = validateRegistrationProfile({
+      birth,
+      personal_no,
+      phone_number,
+    });
+    if (profileError) throw new Error(profileError);
+
     this.#validatePassword(password);
 
     const existingUser = await this.users.findByUsername(username);
@@ -192,58 +215,6 @@ export class AuthService {
       user_id: result.id,
     };
   }
-
-  async requestPasswordReset(email) {
-    if (!email?.trim()) {
-      throw new Error("Email is required");
-    }
-
-    const user = await this.users.findByEmail(email.trim());
-
-    const genericMessage =
-      "If an account exists for this email, password reset instructions have been sent.";
-
-    if (!user || user.is_active === false) {
-      return { message: genericMessage };
-    }
-
-    const resetToken = this.jwt.generatePasswordResetToken(user.id);
-    const clientOrigin = process.env.CLIENT_URL || "http://localhost:5173";
-    const resetLink = `${clientOrigin}/reset-password?token=${encodeURIComponent(resetToken)}`;
-
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[dev] Password reset link:", resetLink);
-      return {
-        message: genericMessage,
-        reset_link: resetLink,
-      };
-    }
-
-    // Production: integrate email provider here (e.g. nodemailer).
-    return { message: genericMessage };
-  }
-
-  async resetPassword(token, password) {
-    if (!token) throw new Error("Reset token is required");
-
-    this.#validatePassword(password);
-
-    let payload;
-    try {
-      payload = this.jwt.verifyPasswordResetToken(token);
-    } catch {
-      throw new Error("Invalid or expired reset link");
-    }
-
-    const user = await this.users.findById(payload.user_id);
-    if (!user) throw new Error("User not found");
-    if (user.is_active === false) throw new Error("Account is disabled");
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await this.users.updatePassword(user.id, hashedPassword);
-
-    return { message: "Password updated successfully. You can sign in now." };
-  }
 }
 
 const defaultAuthService = new AuthService(
@@ -260,12 +231,4 @@ export function loginUser(username, password) {
 
 export function registerPatient(data) {
   return defaultAuthService.registerPatient(data);
-}
-
-export function requestPasswordReset(email) {
-  return defaultAuthService.requestPasswordReset(email);
-}
-
-export function resetPassword(token, password) {
-  return defaultAuthService.resetPassword(token, password);
 }

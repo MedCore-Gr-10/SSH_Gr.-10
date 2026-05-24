@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authContext.jsx";
-import SuperuserSystemLogs from "../../superuser/SystemLogs.jsx";
+import SuperuserSystemLogs from "../superuser/SystemLogs.jsx";
 
 export default function SystemLogs() {
     const location = useLocation();

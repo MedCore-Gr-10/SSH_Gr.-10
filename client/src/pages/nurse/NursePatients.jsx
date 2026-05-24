@@ -39,6 +39,29 @@ const formatTimeRange = (start, end) => {
   return start || end || "";
 };
 
+const todayDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const validateHistoryDateRange = (from, to) => {
+  const today = todayDateString();
+
+  if (from && from > today) {
+    return "The start date cannot be after today.";
+  }
+  if (to && to > today) {
+    return "The end date cannot be after today.";
+  }
+  if (from && to && from > to) {
+    return 'The "From" date cannot be after the "To" date.';
+  }
+  return null;
+};
+
 export default function NursePatients() {
   const [allPatients, setAllPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -187,6 +210,12 @@ export default function NursePatients() {
         const data = await getNursePatientAppointments(selectedId, reason);
         setDetail((d) => ({ ...d, appointments: data }));
       } else if (tab === "history") {
+        const dateError = validateHistoryDateRange(historyFrom, historyTo);
+        if (dateError) {
+          setError(dateError);
+          setLoading(false);
+          return;
+        }
         const data = await getNursePatientHistory(selectedId, reason, {
           from: historyFrom || undefined,
           to: historyTo || undefined,
@@ -202,6 +231,25 @@ export default function NursePatients() {
   };
 
   const visits = detail.history?.visits || [];
+  const historyMaxDate = todayDateString();
+
+  const handleHistoryFromChange = (value) => {
+    let next = value;
+    if (next > historyMaxDate) next = historyMaxDate;
+    setHistoryFrom(next);
+    if (historyTo && next && historyTo < next) {
+      setHistoryTo(next);
+    }
+  };
+
+  const handleHistoryToChange = (value) => {
+    let next = value;
+    if (next > historyMaxDate) next = historyMaxDate;
+    if (historyFrom && next && next < historyFrom) {
+      next = historyFrom;
+    }
+    setHistoryTo(next);
+  };
 
   return (
     <div className="nurse-page">
@@ -385,12 +433,16 @@ export default function NursePatients() {
               <h3>Patient history (hospital visits)</h3>
 
               <div className="nurse-history-filters">
+                <p className="nurse-detail-hint nurse-history-date-hint">
+                  Filter dates cannot be later than today.
+                </p>
                 <label>
                   From
                   <input
                     type="date"
                     value={historyFrom}
-                    onChange={(e) => setHistoryFrom(e.target.value)}
+                    max={historyMaxDate}
+                    onChange={(e) => handleHistoryFromChange(e.target.value)}
                   />
                 </label>
                 <label>
@@ -398,7 +450,9 @@ export default function NursePatients() {
                   <input
                     type="date"
                     value={historyTo}
-                    onChange={(e) => setHistoryTo(e.target.value)}
+                    min={historyFrom || undefined}
+                    max={historyMaxDate}
+                    onChange={(e) => handleHistoryToChange(e.target.value)}
                   />
                 </label>
                 <button
@@ -562,15 +616,58 @@ export default function NursePatients() {
               ) : detail.appointments.length === 0 ? (
                 <p>No appointments on record.</p>
               ) : (
-                <ul className="nurse-list">
-                  {detail.appointments.map((a) => (
-                    <li key={a.id}>
-                      Appointment #{a.id} — slot #
-                      {a.appointment_booking_slot_id}{" "}
-                      {a.active_appointment_made ? "(active)" : "(inactive)"}
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <p className="nurse-detail-hint">
+                    {detail.appointments.length} appointment
+                    {detail.appointments.length === 1 ? "" : "s"} — newest
+                    first.
+                  </p>
+                  <div className="nurse-appointments-list">
+                    {detail.appointments.map((appointment) => (
+                      <article
+                        key={appointment.id}
+                        className={`nurse-appointment-card ${
+                          appointment.active
+                            ? ""
+                            : "nurse-appointment-card--inactive"
+                        }`}
+                      >
+                        <div className="nurse-appointment-card-head">
+                          <span className="nurse-appointment-date">
+                            {formatVisitDate(appointment.appointment_date)}
+                          </span>
+                          {formatTimeRange(
+                            appointment.start_time,
+                            appointment.end_time,
+                          ) && (
+                            <span className="nurse-appointment-time">
+                              {formatTimeRange(
+                                appointment.start_time,
+                                appointment.end_time,
+                              )}
+                            </span>
+                          )}
+                          <span
+                            className={`nurse-timeline-badge ${
+                              appointment.active
+                                ? ""
+                                : "nurse-timeline-badge--inactive"
+                            }`}
+                          >
+                            {appointment.active ? "Active" : "Cancelled"}
+                          </span>
+                        </div>
+                        <p className="nurse-appointment-meta">
+                          {appointment.hospital_name || "Hospital"} ·{" "}
+                          {appointment.department_name || "Department —"} ·{" "}
+                          {appointment.doctor_name
+                            ? `Dr. ${appointment.doctor_name}`
+                            : "Doctor —"}
+                        </p>
+                      </article>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           )}
