@@ -34,12 +34,12 @@ const Sidebar = () => {
     ],
     patient: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
+      { label: "Book an Appointment", path: "/main/appointments" },
+      { label: "My Appointments", path: "/main/my-appointments" },
       { label: "My Records", path: "/main/records" },
-      { label: "Appointments", path: "/main/appointments" },
+      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
       { label: "My Insurance", path: "/main/insurance" },
       { label: "My Allergies", path: "/main/allergies" },
-      { label: "Leave a Review", path: "/main/leave-review" },
       { label: "Make a Request", path: "/main/make-request" }
     ],
     doctor: [

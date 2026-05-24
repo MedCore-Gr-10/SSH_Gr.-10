@@ -2,6 +2,7 @@ import appointmentsBookingSlotsRepository from "../../repositories/appointments-
 import appointmentsMadeRepository from "../../repositories/appointments-made.repository.js";
 import patientHospitalsRepository from "../../repositories/patient-hospitals.repository.js";
 import specializationsRepository from "../../repositories/specializations.repository.js";
+import staffWorkingSchedulesRepository from "../../repositories/staff-working-schedules.repository.js";
 
 class PatientAppointmentsService {
   badRequest(message) {
@@ -113,15 +114,50 @@ class PatientAppointmentsService {
     };
   }
 
-  async getAppointmentFilters() {
-    const [hospitals, specializations, timeSlots] = await Promise.all([
-      patientHospitalsRepository.findAllHospitals(),
+  async getBookedAppointments(patientId) {
+    const appointments = await appointmentsMadeRepository.findActivePatientAppointments(patientId);
+    return appointments.map((appointment) => this.formatBookedAppointment(appointment));
+  }
+
+  async getPatientStaffSchedules(patientId) {
+    const patientHospitals = await patientHospitalsRepository.findPatientHospitals(patientId);
+    const hospitalIds = patientHospitals.map((entry) => entry.hospital_id);
+
+    if (!hospitalIds.length) {
+      return [];
+    }
+
+    const scheduleGroups = await Promise.all(
+      hospitalIds.map((hospitalId) =>
+        staffWorkingSchedulesRepository.findActiveHospitalSchedules(hospitalId)
+      )
+    );
+
+    return scheduleGroups.flat();
+  }
+
+  async getAppointmentFilters(patientId) {
+    const patientHospitals = await patientHospitalsRepository.findPatientHospitals(patientId);
+    const hospitalIds = patientHospitals.map((entry) => entry.hospital_id);
+
+    if (!hospitalIds.length) {
+      const specializations = await specializationsRepository.findAll();
+      return {
+        hospitals: [],
+        specializations: specializations.map((specialization) =>
+          this.formatSpecialization(specialization)
+        ),
+        timeSlots: [],
+      };
+    }
+
+    const [specializations, timeSlots] = await Promise.all([
       specializationsRepository.findAll(),
-      appointmentsBookingSlotsRepository.findAvailablePatientTimeSlots(),
+      appointmentsBookingSlotsRepository.findAvailablePatientTimeSlotsForHospitals(hospitalIds),
     ]);
 
     return {
-      hospitals: hospitals.map((hospital) => this.formatHospital(hospital)),
+      hospitals: patientHospitals.map((entry) => this.formatHospital(entry.hospitals)),
       specializations: specializations.map((specialization) =>
         this.formatSpecialization(specialization)
       ),
@@ -130,13 +166,23 @@ class PatientAppointmentsService {
   }
 
   async searchAppointments(patientId, query) {
+    const patientHospitals = await patientHospitalsRepository.findPatientHospitals(patientId);
+    const hospitalIds = patientHospitals.map((entry) => entry.hospital_id);
+    if (!hospitalIds.length) {
+      return [];
+    }
+
     const requestedHospitalId = query.hospitalId ? Number(query.hospitalId) : null;
     if (query.hospitalId && !Number.isInteger(requestedHospitalId)) {
       throw new Error("Invalid hospital filter");
     }
+    if (requestedHospitalId && !hospitalIds.includes(requestedHospitalId)) {
+      return [];
+    }
 
     const slots = await appointmentsBookingSlotsRepository.searchAvailablePatientSlots({
       hospitalId: requestedHospitalId,
+      hospitalIds,
       doctorName: query.doctorName?.trim(),
       specialization: query.specialization?.trim(),
       date: this.normalizeDate(query.date),
@@ -163,6 +209,13 @@ class PatientAppointmentsService {
       throw this.badRequest("Appointment slot is already booked");
     }
 
+    const patientHospitals = await patientHospitalsRepository.findPatientHospitals(patientId);
+    const hospitalIds = patientHospitals.map((entry) => entry.hospital_id);
+    const slotHospitalId = slot.appointments_templates?.hospital_id;
+    if (!slotHospitalId || !hospitalIds.includes(slotHospitalId)) {
+      throw this.badRequest("Select this hospital on your dashboard before booking an appointment");
+    }
+
     try {
       const appointment = await appointmentsMadeRepository.bookSlot(patientId, appointmentSlotId);
       return this.formatBookedAppointment(appointment);
@@ -172,6 +225,22 @@ class PatientAppointmentsService {
       }
       throw err;
     }
+  }
+
+  async cancelAppointment(patientId, appointmentId) {
+    const id = Number(appointmentId);
+    if (!Number.isInteger(id)) {
+      throw this.badRequest("Invalid appointment");
+    }
+
+    const appointment = await appointmentsMadeRepository.findPatientAppointmentById(id, patientId);
+    if (!appointment) {
+      throw this.badRequest("Appointment not found");
+    }
+
+    await appointmentsMadeRepository.delete(id);
+
+    return { id };
   }
 }
 

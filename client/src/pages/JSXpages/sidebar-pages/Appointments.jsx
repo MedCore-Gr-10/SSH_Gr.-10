@@ -9,6 +9,7 @@ import "../../CSSpages/sidebar-pages/Appointments.css";
 
 const visibleHospitalCount = 3;
 const allSpecializationsLabel = "All specializations";
+const allHospitalsFilter = "all";
 
 const formatDateDisplay = (value) => {
   if (!value) return "";
@@ -19,7 +20,7 @@ const formatDateDisplay = (value) => {
 export default function Appointments() {
   const [hospitalStartIndex, setHospitalStartIndex] = useState(0);
   const [hospitals, setHospitals] = useState([]);
-  const [selectedHospitalId, setSelectedHospitalId] = useState("");
+  const [selectedHospitalId, setSelectedHospitalId] = useState(allHospitalsFilter);
   const [doctorSearch, setDoctorSearch] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
@@ -34,7 +35,10 @@ export default function Appointments() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const selectedHospital = hospitals.find((hospital) => hospital.id === Number(selectedHospitalId));
+  const selectedHospital =
+    selectedHospitalId === allHospitalsFilter
+      ? null
+      : hospitals.find((hospital) => hospital.id === Number(selectedHospitalId));
   const visibleHospitals = hospitals.slice(hospitalStartIndex, hospitalStartIndex + visibleHospitalCount);
   const canMoveHospitalsLeft = hospitalStartIndex > 0;
   const canMoveHospitalsRight = hospitalStartIndex + visibleHospitalCount < hospitals.length;
@@ -49,7 +53,7 @@ export default function Appointments() {
         setHospitals(availableHospitals);
         setSpecializations(data.specializations || []);
         setTimeSlots(data.timeSlots || []);
-        setSelectedHospitalId(availableHospitals[0]?.id ? String(availableHospitals[0].id) : "");
+        setSelectedHospitalId(allHospitalsFilter);
         setHospitalStartIndex(0);
         setError("");
       } catch (err) {
@@ -63,7 +67,7 @@ export default function Appointments() {
   }, []);
 
   const loadAppointments = useCallback(async () => {
-    if (!selectedHospitalId) {
+    if (!hospitals.length) {
       setAppointments([]);
       return;
     }
@@ -71,7 +75,7 @@ export default function Appointments() {
     try {
       setLoadingAppointments(true);
       const data = await searchPatientAppointments({
-        hospitalId: selectedHospitalId,
+        hospitalId: selectedHospitalId === allHospitalsFilter ? "" : selectedHospitalId,
         doctorName: doctorSearch.trim(),
         specialization: selectedSpecialization === allSpecializationsLabel ? "" : selectedSpecialization,
         date: selectedDate,
@@ -85,7 +89,7 @@ export default function Appointments() {
     } finally {
       setLoadingAppointments(false);
     }
-  }, [doctorSearch, selectedDate, selectedHospitalId, selectedSpecialization, selectedTime]);
+  }, [doctorSearch, hospitals.length, selectedDate, selectedHospitalId, selectedSpecialization, selectedTime]);
 
   useEffect(() => {
     loadAppointments();
@@ -124,7 +128,7 @@ export default function Appointments() {
   return (
     <div className="appointments-container">
       <div className="appointments-card">
-        <h1 className="appointments-title">Appointments</h1>
+        <h1 className="appointments-title">Book an Appointment</h1>
         <p className="appointments-description">
           Search available appointments by doctor, specialization, date, time slot, and selected hospital.
         </p>
@@ -135,11 +139,13 @@ export default function Appointments() {
         <section className="hospital-picker">
           <div className="section-heading">
             <div>
-              <h2>Select hospital</h2>
+              <h2>Filter by hospital</h2>
               <p>
                 {selectedHospital
-                  ? `${selectedHospital.name} is currently selected.`
-                  : "Select a hospital before searching appointments."}
+                  ? `${selectedHospital.name} appointments are shown.`
+                  : hospitals.length
+                    ? "Showing appointments from your dashboard-selected hospitals."
+                    : "Select hospitals on your dashboard before booking appointments."}
               </p>
             </div>
             {hospitals.length > visibleHospitalCount && (
@@ -171,7 +177,7 @@ export default function Appointments() {
 
             {!loadingHospitals && !hospitals.length && (
               <div className="appointments-empty-state">
-                No hospitals are available yet.
+                You have not selected any hospitals yet. Go to your dashboard and choose where you would like to receive care.
               </div>
             )}
 
@@ -189,6 +195,16 @@ export default function Appointments() {
               </button>
             ))}
           </div>
+
+          {!loadingHospitals && hospitals.length > 1 && (
+            <button
+              type="button"
+              className={`hospital-clear-filter ${selectedHospitalId === allHospitalsFilter ? "selected" : ""}`}
+              onClick={() => setSelectedHospitalId(allHospitalsFilter)}
+            >
+              All selected hospitals
+            </button>
+          )}
         </section>
 
         <div className="appointments-filters">
@@ -301,7 +317,9 @@ export default function Appointments() {
               {!loadingAppointments && !appointments.length && (
                 <tr>
                   <td colSpan={6} className="no-results">
-                    No available appointments match your filters.
+                    {hospitals.length
+                      ? "No available appointments match your filters."
+                      : "No appointments are shown until you select hospitals on your dashboard."}
                   </td>
                 </tr>
               )}

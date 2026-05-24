@@ -152,6 +152,30 @@
   text-transform: uppercase;
 }
 
+.hospital-clear-filter {
+  margin-top: 1rem;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #5c5cd6;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.hospital-clear-filter:hover {
+  border-color: #c3d4fd;
+  box-shadow: 0 10px 25px rgba(92, 92, 214, 0.08);
+  transform: translateY(-1px);
+}
+
+.hospital-clear-filter.selected {
+  border-color: #5c5cd6;
+  box-shadow: 0 10px 25px rgba(92, 92, 214, 0.12);
+}
+
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -190,6 +214,195 @@
 .appointments-table-wrapper {
   overflow-x: auto;
   margin-top: 1rem;
+}
+
+.patient-staff-section {
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  padding: 2rem;
+  max-width: 1100px;
+  width: 100%;
+  margin: 1.5rem auto 0;
+  box-sizing: border-box;
+}
+
+.patient-staff-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.patient-staff-section-heading h2 {
+  margin: 0;
+  color: #1a202c;
+  font-size: 22px;
+}
+
+.patient-staff-section-heading p {
+  margin: 0.4rem 0 0;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.patient-staff-section-heading span {
+  color: #5c5cd6;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.patient-staff-day-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.patient-staff-day-tabs button {
+  min-width: 48px;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  background: #ffffff;
+  color: #4a5568;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.patient-staff-day-tabs button:hover {
+  background: #f8fafc;
+}
+
+.patient-staff-day-tabs button.active {
+  border-color: #5c5cd6;
+  background: #5c5cd6;
+  color: #ffffff;
+}
+
+.patient-staff-filter-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(230px, 280px) minmax(190px, 240px) minmax(190px, 240px);
+  gap: 0.9rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.patient-staff-search,
+.patient-staff-role-filter,
+.patient-staff-select-filter {
+  display: grid;
+  gap: 0.5rem;
+  color: #2d3748;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.patient-staff-role-filter {
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  min-height: 46px;
+}
+
+.patient-staff-role-filter legend {
+  padding: 0 0.25rem;
+}
+
+.patient-staff-role-filter label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.75rem;
+  color: #4a5568;
+}
+
+.patient-staff-role-filter input {
+  accent-color: #5c5cd6;
+}
+
+.patient-staff-search input,
+.patient-staff-select-filter select {
+  width: 100%;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 0.75rem;
+  color: #2d3748;
+  background: #ffffff;
+  font: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.patient-staff-search input:focus,
+.patient-staff-select-filter select:focus {
+  border-color: #5c5cd6;
+  box-shadow: 0 0 16px rgba(92, 92, 214, 0.12);
+}
+
+.patient-staff-role-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.patient-staff-role-counts span {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+  color: #4a5568;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.patient-staff-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+}
+
+.patient-staff-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.patient-staff-table th,
+.patient-staff-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+.patient-staff-table th {
+  background: #f8fafc;
+  color: #1a202c;
+  font-weight: 700;
+}
+
+.patient-staff-table tr:last-child td {
+  border-bottom: none;
+}
+
+.patient-staff-table td {
+  color: #2d3748;
+}
+
+.patient-staff-table td strong {
+  color: #1a202c;
+}
+
+.patient-staff-empty-row {
+  text-align: center;
+  color: #718096;
 }
 
 .schedule-table-wrapper {
@@ -364,6 +577,23 @@
   padding: 1.25rem;
 }
 
+.modal-confirmation {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 18px;
+  padding: 1.25rem;
+}
+
+.modal-confirmation h3 {
+  color: #9b2c2c;
+  margin: 0 0 0.5rem 0;
+}
+
+.modal-confirmation p {
+  color: #742a2a;
+  margin: 0;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -392,15 +622,32 @@
   color: white;
 }
 
-.modal-primary:disabled {
+.modal-danger {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-primary:disabled,
+.modal-danger:disabled {
   cursor: not-allowed;
   opacity: 0.65;
   transform: none;
 }
 
 .modal-secondary:hover,
-.modal-primary:hover {
+.modal-primary:hover,
+.modal-danger:hover {
   transform: translateY(-1px);
+}
+
+.modal-danger:hover {
+  box-shadow: 0 10px 20px rgba(217, 70, 72, 0.12);
 }
 
 @media (max-width: 768px) {
@@ -415,8 +662,20 @@
     flex-direction: column;
   }
 
+  .patient-staff-section-heading {
+    flex-direction: column;
+  }
+
+  .patient-staff-filter-row {
+    grid-template-columns: 1fr;
+  }
+
   .appointments-card {
     padding: 2rem;
+  }
+
+  .patient-staff-section {
+    padding: 1.5rem;
   }
 }
 
@@ -427,7 +686,8 @@
 
   .form-input,
   .modal-secondary,
-  .modal-primary {
+  .modal-primary,
+  .modal-danger {
     width: 100%;
   }
 
