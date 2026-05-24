@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authContext.jsx";
 import DirectorAppointments from "../../director/DirectorAppointments.jsx";
+import SuperuserAppointments from "../superuser/AppoitmentsMade.jsx";
 import DoctorBookedAppointments from "../../doctor/DoctorBookedAppointments.jsx";
 
 export default function BookedAppointments() {
@@ -11,6 +12,9 @@ export default function BookedAppointments() {
 
   if (role === "director") {
     return <DirectorAppointments />;
+  }
+    if (role === "superuser") {
+    return <SuperuserAppointments />;
   }
 
   if (role === "doctor") {
