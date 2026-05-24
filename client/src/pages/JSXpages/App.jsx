@@ -105,7 +105,7 @@ export default function App() {
           {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
           {/* <Route path="make-request" element={<MakeRequest />} /> */}
           {/* ===================== DOCTOR ===================== */}
-          {/* <Route path="dashboard" element={<Dashboard />} /> */}
+          <Route path="dashboard" element={<Dashboard />} />
           {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
           <Route path="patients" element={<Patients />} />
           <Route
