@@ -43,6 +43,29 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName = .env
    -->ne browser login:
    Username: dev_nurse
    Password: devpassword
+10. Pasi qe Redis nuk e ben support Windows, duhet me instalu brenda WSL (Windows Subsystem Linux).
+   Nese nuk e keni WSL, instalojeni me keta hapa:
+   Open PoweShell as Administrator
+   ```wsl --install``` (ka mundesi ju thot me restart llaptopin, do it)
+   ```wsl --install -d Ubuntu```
+
+   Hapeni WSL duke search WSL
+   update packages: ```sudo apt update```
+   install Redis: ```sudo apt install redis-server -y```
+   Start Redis service: ```sudo service redis-server start```
+   Test if Redis is running: ```redis-cli ping``` (ta kthen PONG nese eshte duke run correctly)
+
+   Ne .env file shtoje: 
+   `REDIS_URL=redis://127.0.0.1:6379`
+   `DOCTOR_PATIENTS_CACHE_TTL_SECONDS=900`
+
+   REDIS_URL → Redis connection string (localhost in WSL setup)
+   DOCTOR_PATIENTS_CACHE_TTL_SECONDS → sa gjate cached doctor patients data rrin ne Redis para se te skadoj dhe te behet fetch nga DB prap
+   900 sekonda = 15 minuta (mundesh me zvogelu per testing reasons)
+
+   Pasi qe Redis behet run ne WSL, duhet te startohet pas cdo PC restart:
+   ```sudo service redis-server start```
+   lidhet ne backend ne: 127.0.0.1:6379
 
 ### Infermier/e (nurse) — API `/api/nurse`
 
