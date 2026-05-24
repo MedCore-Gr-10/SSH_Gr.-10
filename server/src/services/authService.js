@@ -37,6 +37,14 @@ export class AuthService {
     };
   }
 
+  #assertUserActive(user) {
+    if (user.is_active !== true) {
+      throw new Error(
+        "Your account is not active. Please contact an administrator.",
+      );
+    }
+  }
+
   #validatePassword(password) {
     if (!password || password.length < 8) {
       throw new Error(
@@ -68,13 +76,19 @@ export class AuthService {
   }
 
   async login(username, password) {
-    const user = await this.users.findByUsername(username);
+    const normalizedUsername = username?.trim();
+    if (!normalizedUsername || !password) {
+      throw new Error("Username and password are required");
+    }
+
+    const user = await this.users.findByUsername(normalizedUsername);
 
     if (!user) throw new Error("User not found");
-    if (user.is_active === false) throw new Error("Account is disabled");
 
     const isValid = await bcrypt.compare(password, user.hash_password);
     if (!isValid) throw new Error("Invalid password");
+
+    this.#assertUserActive(user);
 
     const role = user.roles?.role_name;
     if (!role) throw new Error("Invalid role");
@@ -237,7 +251,7 @@ export class AuthService {
 
     const user = await this.users.findById(payload.user_id);
     if (!user) throw new Error("User not found");
-    if (user.is_active === false) throw new Error("Account is disabled");
+    this.#assertUserActive(user);
 
     const hashedPassword = await bcrypt.hash(password, 10);
     await this.users.updatePassword(user.id, hashedPassword);

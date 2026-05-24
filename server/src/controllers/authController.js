@@ -13,7 +13,8 @@ export class AuthController {
       const result = await this.authService.login(username, password);
       res.json(result);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      const isInactiveAccount = String(err.message || "").includes("not active");
+      res.status(isInactiveAccount ? 403 : 400).json({ error: err.message });
     }
   };
 
