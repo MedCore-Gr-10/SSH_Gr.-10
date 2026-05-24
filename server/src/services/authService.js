@@ -5,6 +5,7 @@ import profileRepository from "../repositories/profile.repository.js";
 import rolesRepository from "../repositories/roles.repository.js";
 import logsRepository from "../repositories/logs.repository.js";
 import { JwtService } from "../utils/jwt.js";
+import { validateRegistrationProfile } from "../utils/registerValidation.js";
 
 export class AuthService {
   /**
@@ -153,6 +154,14 @@ export class AuthService {
     if (!username || !password || !email || !first_name || !resolvedLastName) {
       throw new Error("Missing required registration fields");
     }
+
+    const profileError = validateRegistrationProfile({
+      birth,
+      personal_no,
+      phone_number,
+    });
+    if (profileError) throw new Error(profileError);
+
     this.#validatePassword(password);
 
     const existingUser = await this.users.findByUsername(username);
