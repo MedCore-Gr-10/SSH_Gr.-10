@@ -24,7 +24,7 @@ router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * tags:
  * - name: Superuser Users
  * description: Core user management
@@ -45,7 +45,7 @@ router.use((req, res, next) => roleMiddleware.handle(req, res, next));
    ========================================================================= */
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/users:
  * get:
  * summary: Retrieve all system users
@@ -62,7 +62,7 @@ router.use((req, res, next) => roleMiddleware.handle(req, res, next));
 router.get("/users", (req, res, next) => userController.getAllUsers(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/users:
  * post:
  * summary: Register a new system user account
@@ -86,7 +86,7 @@ router.get("/users", (req, res, next) => userController.getAllUsers(req, res, ne
 router.post("/users", (req, res, next) => userController.createUser(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/users/{id}/password:
  * put:
  * summary: Change password for a user
@@ -113,7 +113,7 @@ router.post("/users", (req, res, next) => userController.createUser(req, res, ne
 router.put("/users/:id/password", (req, res, next) => userController.updatePassword(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/users/{id}:
  * get:
  * summary: Get user details by ID
@@ -131,7 +131,7 @@ router.put("/users/:id/password", (req, res, next) => userController.updatePassw
 router.get("/users/:id", (req, res, next) => userController.getUserById(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/users/{id}:
  * put:
  * summary: Update generic user attributes
@@ -162,7 +162,7 @@ router.put("/users/:id", (req, res, next) => userController.updateUser(req, res,
    ========================================================================= */
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles/me:
  * get:
  * summary: Fetch current authenticated superuser profile
@@ -175,7 +175,7 @@ router.put("/users/:id", (req, res, next) => userController.updateUser(req, res,
 router.get("/profiles/me", (req, res, next) => profileController.getMe(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles/me:
  * put:
  * summary: Modify current superuser profile details
@@ -197,7 +197,7 @@ router.get("/profiles/me", (req, res, next) => profileController.getMe(req, res,
 router.put("/profiles/me", (req, res, next) => profileController.updateMe(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles/personal/{personal_no}:
  * get:
  * summary: Locate a general profile via unique personal identification token
@@ -215,7 +215,7 @@ router.put("/profiles/me", (req, res, next) => profileController.updateMe(req, r
 router.get("/profiles/personal/:personal_no", (req, res, next) => profileController.getByPersonalNo(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles/director/{personal_no}:
  * get:
  * summary: Locate a clinic director's profile by personal identification number
@@ -233,7 +233,7 @@ router.get("/profiles/personal/:personal_no", (req, res, next) => profileControl
 router.get("/profiles/director/:personal_no", (req, res, next) => profileController.getDirectorByPersonalNo(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles:
  * get:
  * summary: Read list of all profiles
@@ -246,7 +246,7 @@ router.get("/profiles/director/:personal_no", (req, res, next) => profileControl
 router.get("/profiles", (req, res, next) => profileController.getAllProfiles(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles:
  * post:
  * summary: Establish a profile record binded to an unassigned user
@@ -271,7 +271,7 @@ router.get("/profiles", (req, res, next) => profileController.getAllProfiles(req
 router.post("/profiles", (req, res, next) => profileController.createProfile(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles/{id}:
  * get:
  * summary: Access distinct profile file by structural key ID
@@ -289,7 +289,7 @@ router.post("/profiles", (req, res, next) => profileController.createProfile(req
 router.get("/profiles/:id", (req, res, next) => profileController.getProfileById(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles/{id}:
  * put:
  * summary: Overwrite designated details on an existing user profile record
@@ -316,7 +316,7 @@ router.get("/profiles/:id", (req, res, next) => profileController.getProfileById
 router.put("/profiles/:id", (req, res, next) => profileController.updateProfile(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/profiles/{id}:
  * delete:
  * summary: Delete profile index record
@@ -338,7 +338,7 @@ router.delete("/profiles/:id", (req, res, next) => profileController.deleteProfi
    ========================================================================= */
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/specializations:
  * get:
  * summary: Request system medical specialization catalogs
@@ -351,7 +351,7 @@ router.delete("/profiles/:id", (req, res, next) => profileController.deleteProfi
 router.get("/specializations", (req, res, next) => manageSpecializationsController.getAll(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/specializations:
  * post:
  * summary: Append a new specialized field option to medical categorizations
@@ -373,7 +373,7 @@ router.get("/specializations", (req, res, next) => manageSpecializationsControll
 router.post("/specializations", (req, res, next) => manageSpecializationsController.create(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/specializations/{id}:
  * put:
  * summary: Edit specialized option denomination field
@@ -400,7 +400,7 @@ router.post("/specializations", (req, res, next) => manageSpecializationsControl
 router.put("/specializations/:id", (req, res, next) => manageSpecializationsController.update(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/specializations/{id}:
  * delete:
  * summary: Drop a medical classification option from application database registers
@@ -422,7 +422,7 @@ router.delete("/specializations/:id", (req, res, next) => manageSpecializationsC
    ========================================================================= */
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/departments:
  * get:
  * summary: Read comprehensive listing of departments
@@ -454,7 +454,7 @@ router
   .post((req, res, next) => manageDepartmentsController.create(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/departments/{id}/hospitals:
  * get:
  * summary: Map out hospitals housing a given department type ID
@@ -472,7 +472,7 @@ router
 router.get("/departments/:id/hospitals", (req, res, next) => manageDepartmentsController.getHospitals(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/departments/{id}/doctors:
  * get:
  * summary: Discover active medical practitioners within an assigned department scope ID
@@ -490,7 +490,7 @@ router.get("/departments/:id/hospitals", (req, res, next) => manageDepartmentsCo
 router.get("/departments/:id/doctors", (req, res, next) => manageDepartmentsController.getDoctors(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/departments/{id}:
  * get:
  * summary: Fetch singular department asset profile metadata by index key ID
@@ -548,7 +548,7 @@ router
    ========================================================================= */
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/hospitals:
  * post:
  * summary: Register a new primary facility unit complex to structural database context
@@ -579,7 +579,7 @@ router.post("/hospitals", (req, res) => hospitalsController.create(req, res));
 router.get("/hospitals", (req, res) => hospitalsController.findAll(req, res));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/hospitals/{id}:
  * get:
  * summary: Extract profile metadata concerning a physical hospital site ID
@@ -636,7 +636,7 @@ router.delete("/hospitals/:id", (req, res) => hospitalsController.delete(req, re
    ========================================================================= */
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/system-overview:
  * get:
  * summary: Aggregate real-time diagnostic indicators monitoring application state
@@ -649,7 +649,7 @@ router.delete("/hospitals/:id", (req, res) => hospitalsController.delete(req, re
 router.get("/system-overview", (req, res) => manageSystemOverviewController.getOverview(req, res));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/system-logs:
  * get:
  * summary: Retrieve formatted global system logs
@@ -687,7 +687,7 @@ router.get("/system-overview", (req, res) => manageSystemOverviewController.getO
 router.get("/system-logs", (req, res, next) => logsController.getSystemLogs(req, res, next));
 
 /**
- * @swagger
+ * @swaggerIgnore
  * /api/superuser/appointments-made:
  * get:
  * summary: Inspect global metrics covering all booking objects recorded system-wide
