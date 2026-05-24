@@ -141,10 +141,14 @@ export default function DirectorAppointments() {
   };
 
   const getSlotStatus = (slot) => {
+    const isCompleted = slot.appointments_made?.some(
+      (appointment) => appointment.appointment_is_complete === true
+    );
     const isBooked = slot.appointments_made?.some(
-      (appointment) => appointment.active_appointment_made !== false
+      (appointment) => appointment.appointment_is_complete !== true
     );
 
+    if (isCompleted) return "Completed";
     return isBooked ? "Booked" : "Available";
   };
 
@@ -161,7 +165,7 @@ export default function DirectorAppointments() {
         <div className="overview-cards">
           <div className="overview-card">
             <h3>Booked Appointments</h3>
-            <p>{appointments.filter((item) => item.active_appointment_made !== false).length}</p>
+            <p>{appointments.filter((item) => item.appointment_is_complete !== true).length}</p>
           </div>
           <div className="overview-card">
             <h3>Appointment Slots</h3>
@@ -204,7 +208,11 @@ export default function DirectorAppointments() {
                       <td data-label="Patient">{patientName}</td>
                       <td data-label="Doctor">{doctorName}</td>
                       <td data-label="Slot">{slotLabel}</td>
-                      <td data-label="Status">{appointment.active_appointment_made === false ? "Canceled" : "Confirmed"}</td>
+                      <td data-label="Status">
+                        {appointment.appointment_is_complete
+                            ? "Completed"
+                            : "Confirmed"}
+                      </td>
                       <td data-label="Actions">
                         <button className="edit-button" onClick={() => handleSelectAppointment(appointment)}>
                           Edit

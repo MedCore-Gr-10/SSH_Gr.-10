@@ -144,8 +144,8 @@ export default function PatientAppointments() {
                 {selectedHospital
                   ? `${selectedHospital.name} appointments are shown.`
                   : hospitals.length
-                    ? "Showing appointments from your dashboard-selected hospitals."
-                    : "Select hospitals on your dashboard before booking appointments."}
+                    ? "Showing the list of appointments from your selection of hospitals."
+                    : "Choose your preferred hospitals on your dashboard before booking appointments."}
               </p>
             </div>
             {hospitals.length > visibleHospitalCount && (
@@ -177,7 +177,7 @@ export default function PatientAppointments() {
 
             {!loadingHospitals && !hospitals.length && (
               <div className="appointments-empty-state">
-                You have not selected any hospitals yet. Go to your dashboard and choose where you would like to receive care.
+                You have not been registered in any hospitals yet. Go to your dashboard and choose where you would like to receive care.
               </div>
             )}
 
@@ -364,10 +364,6 @@ export default function PatientAppointments() {
                 </div>
               </div>
 
-              <div className="modal-note">
-                <h3>Notes</h3>
-                <p>{activeAppointment.notes}</p>
-              </div>
             </div>
 
             <div className="modal-actions">

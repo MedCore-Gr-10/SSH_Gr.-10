@@ -31,7 +31,7 @@ class SystemOverviewRepository {
   async countActiveAppointments(hospitalId) {
     return prisma.appointments_made.count({
       where: {
-        active_appointment_made: true,
+        appointment_is_complete: false,
         appointments_booking_slots: {
           appointments_templates: {
             hospital_id: hospitalId,
@@ -41,10 +41,10 @@ class SystemOverviewRepository {
     });
   }
 
-  async countCancelledAppointments(hospitalId) {
+  async countCompletedAppointments(hospitalId) {
     return prisma.appointments_made.count({
       where: {
-        active_appointment_made: false,
+        appointment_is_complete: true,
         appointments_booking_slots: {
           appointments_templates: {
             hospital_id: hospitalId,

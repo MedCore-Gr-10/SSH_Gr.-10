@@ -36,7 +36,7 @@ class AppointmentsMadeRepository {
       data: {
         patient_id: patientId,
         appointment_booking_slot_id: slotId,
-        active_appointment_made: true
+        appointment_is_complete: false
       },
       include: {
         appointments_booking_slots: {
@@ -332,9 +332,65 @@ class AppointmentsMadeRepository {
     return prisma.appointments_made.findMany({
       where: {
         patient_id: patientId,
-        active_appointment_made: true
+        appointment_is_complete: false
       },
       include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        hospitals: true,
+                        departments: true
+                      }
+                    },
+                    staff_specializations: {
+                      include: {
+                        specializations: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        id: "desc"
+      }
+    });
+  }
+
+  async findCompletedPatientRecords(patientId) {
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        appointment_is_complete: true
+      },
+      include: {
+        diagnoses: {
+          orderBy: {
+            created_at: "desc"
+          }
+        },
+        prescriptions: {
+          orderBy: {
+            created_at: "desc"
+          }
+        },
         appointments_booking_slots: {
           include: {
             appointments_templates: {
@@ -556,11 +612,8 @@ class AppointmentsMadeRepository {
   }
 
   async cancel(id) {
-    const appointment = await prisma.appointments_made.update({
+    const appointment = await prisma.appointments_made.delete({
       where: { id },
-      data: {
-        active_appointment_made: false
-      },
       include: {
         appointments_booking_slots: {
           include: {
@@ -590,7 +643,6 @@ class AppointmentsMadeRepository {
 
  async getAllBookedAppointments() {
   return prisma.appointments_made.findMany({
-    where: { active_appointment_made: true },
     include: {
       users: { // The Patient
         include: { users_profiles: { include: { profiles: true } } }

@@ -496,7 +496,7 @@ export default function NursePatients() {
                               visit.active ? "" : "nurse-timeline-badge--inactive"
                             }`}
                           >
-                            {visit.active ? "Active" : "Inactive"}
+                            {visit.active ? "Not completed" : "Completed"}
                           </span>
                         </div>
                         <p className="nurse-timeline-meta">
@@ -654,7 +654,7 @@ export default function NursePatients() {
                                 : "nurse-timeline-badge--inactive"
                             }`}
                           >
-                            {appointment.active ? "Active" : "Cancelled"}
+                            {appointment.active ? "Not completed" : "Completed"}
                           </span>
                         </div>
                         <p className="nurse-appointment-meta">

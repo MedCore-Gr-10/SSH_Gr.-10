@@ -22,7 +22,7 @@ class AppointmentsMadeService {
         date: slot?.appointment_date,
         time: slot?.slot_start_time,
         endTime: slot?.slot_end_time,
-        active_appointment_made: appt.active_appointment_made,
+        appointment_is_complete: appt.appointment_is_complete === true,
       };
     });
   }

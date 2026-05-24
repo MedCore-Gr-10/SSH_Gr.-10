@@ -50,7 +50,7 @@ export default function DirectorSystemOverview() {
                 <li>Appointment completion rate: {overview.metrics.appointmentCompletionRate}%</li>
                 <li>Staff utilization: {overview.metrics.staffUtilization}</li>
                 <li>Active appointments: {overview.statistics.activeAppointments}</li>
-                <li>Canceled appointments: {overview.statistics.cancelledAppointments}</li>
+                <li>Completed appointments: {overview.statistics.completedAppointments}</li>
               </ul>
             </div>
           </div>

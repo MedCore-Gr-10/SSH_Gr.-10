@@ -56,8 +56,8 @@ class DirectorAppointmentsService {
       }
       updateData.appointment_booking_slot_id = Number(data.appointment_booking_slot_id);
     }
-    if (typeof data.active_appointment_made !== "undefined") {
-      updateData.active_appointment_made = data.active_appointment_made;
+    if (typeof data.appointment_is_complete !== "undefined") {
+      updateData.appointment_is_complete = data.appointment_is_complete;
     }
 
     const updated = await appointmentsMadeRepository.update(Number(id), updateData);
