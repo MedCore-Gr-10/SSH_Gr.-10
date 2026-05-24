@@ -1,6 +1,7 @@
 import "../../CSSpages/superuser/SystemLogs.css";
 import React, { useState, useEffect } from "react";
 import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
+import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function SystemLogs() {
   const [logs, setLogs] = useState([]);
@@ -26,7 +27,7 @@ export default function SystemLogs() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/system-logs");
+      const response = await superuserFetch("/system-logs");
       const result = await response.json();
       if (result.success) {
         setLogs(result.data);

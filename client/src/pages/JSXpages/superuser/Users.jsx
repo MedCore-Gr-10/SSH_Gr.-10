@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "../../CSSpages/superuser/Users.css";
 import Button1 from "../../../components/JSXcomponents/Button1.jsx";
 import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
+import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -69,7 +70,7 @@ export default function Users() {
   // Function to fetch Users 🔄
   const fetchUsers = async () => {
     try {
-      const res = await fetch("/api/users");
+      const res = await superuserFetch("/users");
       const data = await res.json();
       setUsers(data.data || data || []);
     } catch (error) {
@@ -80,7 +81,7 @@ export default function Users() {
   // Function to fetch Profiles
   const fetchProfiles = async () => {
     try {
-      const res = await fetch("/api/profiles");
+      const res = await superuserFetch("/profiles");
       const data = await res.json();
       setProfiles(data.data || data || []);
       setLoading(false);
@@ -94,9 +95,9 @@ export default function Users() {
   const fetchInfrastructureData = async () => {
     try {
       const [hospRes, deptRes, specRes] = await Promise.all([
-        fetch("/api/hospitals"),
-        fetch("/api/departments"),
-        fetch("/api/specializations")
+        superuserFetch("/hospitals"),
+        superuserFetch("/departments"),
+        superuserFetch("/specializations")
       ]);
       const hospData = await hospRes.json();
       const deptData = await deptRes.json();
@@ -128,7 +129,7 @@ export default function Users() {
     }
 
     try {
-      const res = await fetch(`/api/profiles/personal/${searchPersonalNo.trim()}`);
+      const res = await superuserFetch(`/profiles/personal/${searchPersonalNo.trim()}`);
       const result = await res.json();
 
       if (res.ok && result.data) {
@@ -316,11 +317,11 @@ export default function Users() {
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    const url = isProfileEditMode ? `/api/profiles/${selectedProfileId}` : "/api/profiles";
+    const url = isProfileEditMode ? `/profiles/${selectedProfileId}` : "/profiles";
     const method = isProfileEditMode ? "PUT" : "POST";
 
     try {
-      const res = await fetch(url, {
+      const res = await superuserFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProfile)
@@ -347,7 +348,7 @@ export default function Users() {
       return;
     }
 
-    const url = isUserEditMode ? `/api/users/${selectedUserId}` : "/api/users";
+    const url = isUserEditMode ? `/users/${selectedUserId}` : "/users";
     const method = isUserEditMode ? "PUT" : "POST";
 
     const isDirector = String(newUser.role_id) === "2";
@@ -368,7 +369,7 @@ export default function Users() {
     };
 
     try {
-      const res = await fetch(url, {
+      const res = await superuserFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -399,7 +400,7 @@ export default function Users() {
     if (!confirmAction) return;
 
     try {
-      const res = await fetch(`/api/users/${selectedUserId}/password`, {
+      const res = await superuserFetch(`/users/${selectedUserId}/password`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: newPasswordValue })

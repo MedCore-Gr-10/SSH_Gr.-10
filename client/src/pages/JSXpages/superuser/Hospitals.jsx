@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
 import "../../CSSpages/superuser/Hospitals.css";
+import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function ManageHospitals() {
   const [hospitals, setHospitals] = useState([]);
@@ -38,14 +39,14 @@ export default function ManageHospitals() {
     departments: [] 
   });
 
-  const API_URL = 'http://localhost:3000/api/hospitals'; 
-  const DEPARTMENTS_API_URL = 'http://localhost:3000/api/departments';
+  const API_URL = '/hospitals'; 
+  const DEPARTMENTS_API_URL = '/departments';
 
   // 1. Merr spitalet nga Backend-i
   const fetchHospitals = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_URL);
+      const response = await superuserFetch(API_URL);
       const resData = await response.json();
       if (resData.success) {
         setHospitals(resData.data);
@@ -62,7 +63,7 @@ export default function ManageHospitals() {
   // Funksioni për të marrë departamentet nga Backend-i
   const fetchDepartments = async () => {
     try {
-      const response = await fetch(DEPARTMENTS_API_URL);
+      const response = await superuserFetch(DEPARTMENTS_API_URL);
       const resData = await response.json();
       if (resData.success) {
         setDepartments(resData.data);
@@ -136,7 +137,7 @@ export default function ManageHospitals() {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/api/profiles/director/${personalNoToSearch}`);
+      const res = await superuserFetch(`/profiles/director/${personalNoToSearch}`);
       const result = await res.json();
 
       if (res.ok && result.data) {
@@ -178,7 +179,7 @@ export default function ManageHospitals() {
     }
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await superuserFetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -206,7 +207,7 @@ export default function ManageHospitals() {
     setError('');
 
     try {
-      const response = await fetch(`${API_URL}/${selectedHospital.id}`, {
+      const response = await superuserFetch(`${API_URL}/${selectedHospital.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editFormData),

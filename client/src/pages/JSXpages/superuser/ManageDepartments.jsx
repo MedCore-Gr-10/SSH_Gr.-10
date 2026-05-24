@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
 import "../../CSSpages/superuser/ManageDepartments.css";
+import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function ManageDepartments() {
   const [departments, setDepartments] = useState([]);
@@ -35,7 +36,7 @@ export default function ManageDepartments() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/departments");
+      const response = await superuserFetch("/departments");
       const result = await response.json();
       if (result.success) setDepartments(result.data);
       else setError(result.message || "Failed to load departments.");
@@ -49,11 +50,11 @@ export default function ManageDepartments() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
-    const url = isEditing ? `/api/departments/${selectedItem.id}` : "/api/departments";
+    const url = isEditing ? `/departments/${selectedItem.id}` : "/departments";
     const method = isEditing ? "PUT" : "POST";
 
     try {
-      const response = await fetch(url, {
+      const response = await superuserFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ department_name: inputValue }),
@@ -71,7 +72,7 @@ export default function ManageDepartments() {
   const handleDelete = async () => {
     if (!selectedItem || !window.confirm(`Delete ${selectedItem.department_name}?`)) return;
     try {
-      const response = await fetch(`/api/departments/${selectedItem.id}`, { method: "DELETE" });
+      const response = await superuserFetch(`/departments/${selectedItem.id}`, { method: "DELETE" });
       const result = await response.json();
       if (result.success) {
         await fetchDepartments();

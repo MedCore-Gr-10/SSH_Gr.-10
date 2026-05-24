@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
 import "../../CSSpages/superuser/AppointmentsMade.css";
+import { superuserFetch } from "../../../services/superuserApi.js";
+
 export default function AppointmentsList() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ export default function AppointmentsList() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
-    fetch("/api/appointments/appointments-made")
+    superuserFetch("/appointments-made")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();

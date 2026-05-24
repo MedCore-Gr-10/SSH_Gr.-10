@@ -11,6 +11,7 @@ import AppointmentsTemplatesController from "../controllers/director-controllers
 import DepartmentsController from "../controllers/director-controllers/departments.controller.js";
 import SystemOverviewController from "../controllers/director-controllers/systemOverview.controller.js";
 import RequestsController from "../controllers/director-controllers/requests.controller.js";
+import specializationsRepository from "../repositories/specializations.repository.js";
 
 const router = express.Router();
 const jwtService = new JwtService();
@@ -29,6 +30,22 @@ const requestsController = new RequestsController();
 router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => hospitalMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
+
+router.get("/specializations", async (req, res, next) => {
+  try {
+    const specializations = await specializationsRepository.findAll();
+    res.status(200).json({
+      success: true,
+      data: specializations.map((specialization) => ({
+        id: specialization.id,
+        specialization_name: specialization.specialization_name,
+        total_doctors: specialization._count?.staff_specializations ?? 0,
+      })),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * @swagger

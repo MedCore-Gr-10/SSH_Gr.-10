@@ -85,7 +85,7 @@ class UserController {
 
   /**
    * Përditëson fjalëkalimin e një përdoruesi nga paneli i Superuser-it 🔑
-   * Maps to: PUT /api/users/:id/password
+   * Maps to: PUT /api/superuser/users/:id/password
    */
   async updatePassword(req, res, next) {
     try {

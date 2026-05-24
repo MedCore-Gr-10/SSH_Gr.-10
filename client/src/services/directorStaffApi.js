@@ -34,7 +34,7 @@ export const getDirectorStaff = async () => {
 };
 
 export const getSpecializations = async () => {
-  const response = await fetch(`${API}/specializations`, {
+  const response = await fetch(`${API}/director/specializations`, {
     method: "GET",
     headers: getHeaders(),
   });
