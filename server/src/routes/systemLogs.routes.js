@@ -26,10 +26,8 @@ router.get("/", async (req, res, next) => {
       data: logs.map((log) => ({
         id: log.id,
         timestamp: log.timestamp,
-        level: "INFO",
         username: log.user?.username || log.user_id,
         action: log.action,
-        module: "system",
         details: log.reason || "",
       })),
     });
