@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import GenericTable from "../../components/JSXcomponents/GenericTable.jsx";
-import "./../CSSpages/superuser/ManageDepartments.css";
+import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
+import "../../CSSpages/superuser/ManageDepartments.css";
 
 export default function ManageDepartments() {
   const [departments, setDepartments] = useState([]);
@@ -81,39 +81,7 @@ export default function ManageDepartments() {
       setError("Failed to delete.");
     }
   };
-
-  const handleViewDoctors = async () => {
-    if (!selectedItem) return;
-    setModalType("doctors");
-    setIsModalOpen(true);
-    setLoadingDoctors(true);
-    try {
-      const response = await fetch(`/api/departments/${selectedItem.id}/doctors`);
-      const result = await response.json();
-      if (result.success) setDoctorsList(result.data);
-    } catch (err) {
-      alert("Error fetching doctors.");
-    } finally {
-      setLoadingDoctors(false);
-    }
-  };
-
-  const handleViewHospitals = async () => {
-    if (!selectedItem) return;
-    setModalType("hospitals");
-    setIsModalOpen(true);
-    setLoadingHospitals(true);
-    try {
-      const response = await fetch(`/api/departments/${selectedItem.id}/hospitals`);
-      const result = await response.json();
-      if (result.success) setHospitalsList(result.data);
-    } catch (err) {
-      alert("Error fetching hospitals.");
-    } finally {
-      setLoadingHospitals(false);
-    }
-  };
-
+  
   const handleMoreClick = (item) => {
     setSelectedItem(item);
     setInputValue(item.department_name);
@@ -169,12 +137,6 @@ export default function ManageDepartments() {
             
             {isEditing && (
               <>
-                <button type="button" onClick={handleViewHospitals} className="btn btn-warning">
-                  🏢 View Hospitals ({selectedItem?.total_hospitals || 0})
-                </button>
-                <button type="button" onClick={handleViewDoctors} className="btn btn-info">
-                  👁️ View Doctors ({selectedItem?.total_doctors || 0})
-                </button>
                 <button type="button" onClick={handleDelete} className="btn btn-danger">
                   Delete
                 </button>

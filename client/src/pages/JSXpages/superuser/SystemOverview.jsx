@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import "./../CSSpages/superuser/SystemOverview.css"; 
+import "../../CSSpages/superuser/SystemOverview.css"; 
 
 export default function SystemOverview() {
   const [stats, setStats] = useState({
@@ -49,8 +49,10 @@ export default function SystemOverview() {
             nurses: result.data.nurses,
             patients: result.data.patients,
             hospitals: result.data.hospitals,
-            departments: result.data.departments,          // 🌟 Ngarkimi dinamik i departamenteve
-            specializations: result.data.specializations   // 🌟 Ngarkimi dinamik i specializimeve
+            departments: result.data.departments,          
+            specializations: result.data.specializations,
+            appointments: result.data.totalAppointments,
+            //totalRequests: result.data.totalRequests
           }));
         } else {
           setError(result.error || "Nuk u mundësua ngarkimi i të dhënave.");
@@ -107,11 +109,11 @@ export default function SystemOverview() {
               
               <div className="status-subcounts">
                 <div className="subcount-box status-active">
-                  <span className="subcount-label">🟢 Active Users</span>
+                  <span className="subcount-label">🟢 Enabled Users</span>
                   <h4 className="subcount-value">{stats.activeUsers.toLocaleString()}</h4>
                 </div>
                 <div className="subcount-box status-inactive">
-                  <span className="subcount-label">🔴 Inactive Users</span>
+                  <span className="subcount-label">🔴 Disabled Users</span>
                   <h4 className="subcount-value">{stats.inactiveUsers.toLocaleString()}</h4>
                 </div>
               </div>
@@ -179,31 +181,19 @@ export default function SystemOverview() {
                 
                 <div className="role-subcard infra-card-dept">
                   <span className="role-icon">🗂️</span>
-                  <span className="role-label">Departments</span>
+                  <span className="role-label">Existing Departments</span>
                   <h3 className="role-value">{stats.departments}</h3>
                 </div>
 
                 <div className="role-subcard infra-card-spec">
                   <span className="role-icon">📚</span>
-                  <span className="role-label">Specialties</span>
+                  <span className="role-label">Existing Specialties</span>
                   <h3 className="role-value">{stats.specializations}</h3> {/* 🌟 Ndryshuar këtu në stats.specializations */}
-                </div>
-
-                <div className="role-subcard infra-card-rating">
-                  <span className="role-icon">⭐</span>
-                  <span className="role-label">Avg Rating</span>
-                  <h3 className="role-value">{stats.hospitalRating} <span className="rating-max-small">/ 5.0</span></h3>
-                </div>
-
-                <div className="role-subcard infra-card-total-ratings">
-                  <span className="role-icon">💬</span>
-                  <span className="role-label">Total Ratings</span>
-                  <h3 className="role-value">{stats.totalRatings.toLocaleString()}</h3>
                 </div>
 
                 <div className="role-subcard infra-card-appointments">
                   <span className="role-icon">📅</span>
-                  <span className="role-label">Appointments</span>
+                  <span className="role-label">Total Appointments Made</span>
                   <h3 className="role-value">{stats.appointments.toLocaleString()}</h3>
                 </div>
 
@@ -211,21 +201,6 @@ export default function SystemOverview() {
             </div>
           </div>
 
-          {/* =========================================================
-              WIDGETET POSHTË: OPERACIONET KRYESORE ADMINISTRATIVE
-             ========================================================= */}
-          <div className="infrastructure-grid">
-            
-            <div className="infra-card border-requests">
-              <div className="infra-icon icon-bg-requests">📩</div>
-              <div className="infra-info">
-                <span className="infra-label">Pending System Requests</span>
-                <h3 className="infra-value">{stats.totalRequests.toLocaleString()}</h3>
-              </div>
-            </div>
-
-          </div>
-          
         </div>
       )}
     </div>

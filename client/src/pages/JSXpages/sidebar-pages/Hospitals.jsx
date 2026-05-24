@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authContext.jsx";
-import SuperuserHospitals from "../../superuser/Hospitals.jsx";
+import SuperuserHospitals from "../superuser/Hospitals.jsx";
 
 export default function Hospitals() {
   const location = useLocation();

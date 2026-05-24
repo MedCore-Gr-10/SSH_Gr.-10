@@ -307,6 +307,35 @@ class AppointmentsMadeRepository {
     });
   }
 
+ async getAllBookedAppointments() {
+  return prisma.appointments_made.findMany({
+    where: { active_appointment_made: true },
+    include: {
+      users: { // The Patient
+        include: { users_profiles: { include: { profiles: true } } }
+      },
+      appointments_booking_slots: {
+        include: {
+          users: { // The Doctor
+            include: { users_profiles: { include: { profiles: true } } }
+          },
+          appointments_templates: {
+            include: {
+              staff_hospitals_departments: {
+                include: {
+                  hospitals_departments: {
+                    include: { hospitals: true, departments: true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    orderBy: { id: "desc" }
+  });
+}
 }
 
 export default new AppointmentsMadeRepository();

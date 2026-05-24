@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import GenericTable from "../../components/JSXcomponents/GenericTable.jsx";
-import "./../CSSpages/superuser/ManageSpecializatoins.css"; 
+import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
+import "../../CSSpages/superuser/ManageSpecializatoins.css"; 
 
 export default function ManageSpecialization() {
   // Data and structural states
@@ -101,28 +101,6 @@ export default function ManageSpecialization() {
     }
   };
 
-  const handleViewDoctors = async () => {
-    if (!selectedItem) return;
-    
-    setIsModalOpen(true);
-    setLoadingDoctors(true);
-    setDoctorsList([]);
-    
-    try {
-      const response = await fetch(`/api/specializations/${selectedItem.id}/doctors`);
-      const result = await response.json();
-      
-      if (result.success) {
-        setDoctorsList(result.data);
-      } else {
-        alert(result.message || "Failed to load doctors list.");
-      }
-    } catch (err) {
-      alert("Error fetching doctors data.");
-    } finally {
-      setLoadingDoctors(false);
-    }
-  };
 
   const handleMoreClick = (item) => {
     setSelectedItem(item);
@@ -180,9 +158,6 @@ export default function ManageSpecialization() {
             
             {isEditing && (
               <>
-                <button type="button" onClick={handleViewDoctors} className="btn btn-info">
-                  👁️ View Doctors ({selectedItem?.total_doctors})
-                </button>
                 
                 <button type="button" onClick={handleDelete} className="btn btn-danger">
                   Delete
