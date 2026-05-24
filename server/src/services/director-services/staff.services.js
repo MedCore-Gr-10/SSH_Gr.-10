@@ -28,6 +28,16 @@ class DirectorStaffService {
     }
   }
 
+  async ensureSpecialization(specializationId) {
+    const specialization = await prisma.specializations.findUnique({
+      where: { id: Number(specializationId) },
+    });
+
+    if (!specialization) {
+      throw new Error("Specialization not found");
+    }
+  }
+
   async getHospitalStaff(hospitalId, currentUserId) {
     if (!hospitalId) {
       throw new Error("Hospital ID is required to list staff");
@@ -51,6 +61,7 @@ class DirectorStaffService {
       password,
       role,
       department_id,
+      specialization_id,
       first_name,
       last_name,
       birth,
@@ -67,6 +78,7 @@ class DirectorStaffService {
       !password ||
       !role ||
       !department_id ||
+      !specialization_id ||
       !first_name ||
       !last_name ||
       !birth ||
@@ -103,6 +115,7 @@ class DirectorStaffService {
     }
 
     await this.ensureHospitalDepartment(hospitalId, department_id);
+    await this.ensureSpecialization(specialization_id);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -222,6 +235,15 @@ class DirectorStaffService {
         },
       });
 
+      await tx.staff_specializations.create({
+        data: {
+          staff_id: user.id,
+          hospital_id: hospitalId,
+          department_id: Number(department_id),
+          specialization_id: Number(specialization_id),
+        },
+      });
+
       return user;
     });
 
@@ -268,6 +290,9 @@ class DirectorStaffService {
 
     if (data.department_id) {
       await this.ensureHospitalDepartment(hospitalId, data.department_id);
+    }
+    if (data.specialization_id) {
+      await this.ensureSpecialization(data.specialization_id);
     }
 
     const normalizedPersonalNo = this.normalizePersonalNo(data.personal_no);
@@ -344,6 +369,25 @@ class DirectorStaffService {
             staff_id: id,
             hospital_id: hospitalId,
             department_id: Number(data.department_id),
+          },
+        });
+      }
+
+      if (data.specialization_id) {
+        const departmentId = Number(data.department_id || staff.staff_hospitals_departments?.[0]?.department_id);
+        await tx.staff_specializations.deleteMany({
+          where: {
+            staff_id: id,
+            hospital_id: hospitalId,
+          },
+        });
+
+        await tx.staff_specializations.create({
+          data: {
+            staff_id: id,
+            hospital_id: hospitalId,
+            department_id: departmentId,
+            specialization_id: Number(data.specialization_id),
           },
         });
       }

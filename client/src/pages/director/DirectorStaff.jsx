@@ -4,6 +4,7 @@ import {
   createDirectorStaff,
   updateDirectorStaff,
   deleteDirectorStaff,
+  getSpecializations,
 } from "../../services/directorStaffApi";
 import { getDirectorDepartments } from "../../services/directorDepartmentsApi";
 import { allPasswordRulesMet, passwordRulesMet } from "../../utils/passwordRules";
@@ -16,6 +17,7 @@ const initialFormState = {
   confirmPassword: "",
   role: "doctor",
   department_id: "",
+  specialization_id: "",
   first_name: "",
   last_name: "",
   birth: "",
@@ -27,6 +29,7 @@ const initialFormState = {
 export default function DirectorStaff() {
   const [staffList, setStaffList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
+  const [specializationList, setSpecializationList] = useState([]);
   const [formValues, setFormValues] = useState(initialFormState);
   const [selectedStaffId, setSelectedStaffId] = useState(null);
   const [message, setMessage] = useState(null);
@@ -35,12 +38,14 @@ export default function DirectorStaff() {
 
   const loadData = async () => {
     try {
-      const [staff, departments] = await Promise.all([
+      const [staff, departments, specializations] = await Promise.all([
         getDirectorStaff(),
         getDirectorDepartments(),
+        getSpecializations(),
       ]);
       setStaffList(staff || []);
       setDepartmentList(departments || []);
+      setSpecializationList(specializations || []);
     } catch (err) {
       setError(err.message);
     }
@@ -59,6 +64,16 @@ export default function DirectorStaff() {
     departmentList.find((department) => department.id === assignment?.department_id)?.department_name ||
     "—";
 
+  const getStaffAssignment = (staff) => staff.staff_hospitals_departments?.[0] || {};
+
+  const getSpecializationName = (assignment) =>
+    assignment?.staff_specializations?.[0]?.specializations?.specialization_name ||
+    specializationList.find(
+      (specialization) =>
+        specialization.id === assignment?.staff_specializations?.[0]?.specialization_id
+    )?.specialization_name ||
+    "—";
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
@@ -66,6 +81,7 @@ export default function DirectorStaff() {
 
   const handleEdit = (staff) => {
     const profile = getProfile(staff);
+    const assignment = getStaffAssignment(staff);
     setSelectedStaffId(staff.id);
     setFormValues({
       username: staff.username || "",
@@ -73,7 +89,10 @@ export default function DirectorStaff() {
       password: "",
       confirmPassword: "",
       role: staff.roles?.role_name?.toLowerCase() || "doctor",
-      department_id: staff.staff_hospitals_departments?.[0]?.department_id || "",
+      department_id: assignment.department_id ? String(assignment.department_id) : "",
+      specialization_id: assignment.staff_specializations?.[0]?.specialization_id
+        ? String(assignment.staff_specializations[0].specialization_id)
+        : "",
       first_name: profile.first_name || "",
       last_name: profile.last_name || "",
       birth: profile.birth ? profile.birth.slice(0, 10) : "",
@@ -107,8 +126,16 @@ export default function DirectorStaff() {
       if (formValues.password && formValues.password !== formValues.confirmPassword) {
         throw new Error("Passwords do not match");
       }
+      if (!formValues.department_id) {
+        throw new Error("Select a department");
+      }
+      if (!formValues.specialization_id) {
+        throw new Error("Select a specialization");
+      }
 
       const { confirmPassword: _confirmPassword, ...payload } = formValues;
+      payload.department_id = Number(payload.department_id);
+      payload.specialization_id = Number(payload.specialization_id);
 
       if (selectedStaffId) {
         await updateDirectorStaff(selectedStaffId, payload);
@@ -152,7 +179,7 @@ export default function DirectorStaff() {
 
       <div className="director-staff-grid">
         <section className="director-staff-section content-scroll">
-          <h2>Staff roster</h2>
+          <h2>Staff list</h2>
           <table className="director-staff-table">
             <thead>
               <tr>
@@ -160,18 +187,19 @@ export default function DirectorStaff() {
                 <th>Email</th>
                 <th>Role</th>
                 <th>Department</th>
+                <th>Specialization</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {staffList.length === 0 ? (
                 <tr>
-                  <td colSpan="5">No staff members found.</td>
+                  <td colSpan="6">No staff members found.</td>
                 </tr>
               ) : (
                 staffList.map((staff) => {
                   const profile = getProfile(staff);
-                  const assignment = staff.staff_hospitals_departments?.[0] || {};
+                  const assignment = getStaffAssignment(staff);
 
                   return (
                     <tr key={staff.id}>
@@ -179,6 +207,7 @@ export default function DirectorStaff() {
                       <td data-label="Email">{getEmail(staff) || "—"}</td>
                       <td data-label="Role">{staff.roles?.role_name || "—"}</td>
                       <td data-label="Department">{getDepartmentName(assignment)}</td>
+                      <td data-label="Specialization">{getSpecializationName(assignment)}</td>
                       <td data-label="Actions">
                         <button className="edit-button" onClick={() => handleEdit(staff)}>
                           Edit
@@ -260,6 +289,22 @@ export default function DirectorStaff() {
                 {departmentList.map((department) => (
                   <option key={department.id} value={department.id}>
                     {department.department_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Specialization
+              <select
+                name="specialization_id"
+                value={formValues.specialization_id}
+                onChange={handleChange}
+              >
+                <option value="">Select specialization</option>
+                {specializationList.map((specialization) => (
+                  <option key={specialization.id} value={specialization.id}>
+                    {specialization.specialization_name}
                   </option>
                 ))}
               </select>

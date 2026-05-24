@@ -32,3 +32,11 @@ export const getStaffSchedules = async () => {
   });
   return handleResponse(response);
 };
+
+export const getDoctorHospitalStaffSchedules = async () => {
+  const response = await fetch(`${API}/staff/schedules?scope=hospital`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};

@@ -1,225 +1,64 @@
-.director-appointments-page {
-  padding: 24px;
-  max-width: 1180px;
-  margin: 0 auto;
-}
-
-.director-appointments-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.director-appointments-header h1 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-.director-appointments-header p {
-  margin: 8px 0 0;
-  color: #4b5563;
-}
+@import "./DirectorShared.css";
 
 .director-appointments-overview {
-  margin-top: 28px;
+  margin-bottom: 30px;
 }
 
-.overview-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr));
-  gap: 16px;
-  margin-top: 18px;
-}
-
-.overview-card {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 18px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
-}
-
-.overview-card h3 {
-  margin: 0;
-  font-size: 1rem;
-  color: #6b7280;
-}
-
-.overview-card p {
-  margin: 12px 0 0;
-  font-size: 1.55rem;
-  color: #111827;
-}
-
-.director-appointments-grid {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 24px;
-  margin-top: 28px;
-}
-
-.director-appointments-section {
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-  padding: 24px;
+.section-heading-row {
   display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 230px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
-.director-appointments-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  table-layout: fixed;
+.section-heading-row h2 {
+  margin: 0;
 }
 
-.director-appointments-table th,
-.director-appointments-table td {
-  padding: 14px 12px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
+.slots-list {
+  display: grid;
+  gap: 12px;
 }
 
-.director-appointments-table th {
-  font-weight: 700;
-  color: #111827;
+.slot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  background: #ffffff;
 }
 
-.director-appointments-table td {
-  color: #374151;
-  word-break: break-word;
+.slot-row div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.slot-row strong,
+.slot-row span {
+  overflow-wrap: anywhere;
+}
+
+.slot-row div span {
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.empty-state {
+  color: #4a5568;
 }
 
 .director-appointments-table td button {
-  margin-right: 8px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-button.edit-button {
-  background: #2563eb;
-  color: white;
-}
-
-button.cancel-button {
-  background: #ef4444;
-  color: white;
-}
-
-.director-appointments-form label {
-  display: block;
-  margin-bottom: 14px;
-  color: #111827;
-  font-weight: 600;
-}
-
-.director-appointments-form input,
-.director-appointments-form select {
-  width: 100%;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-top: 8px;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-}
-
-.director-appointments-actions {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
-
-.director-appointments-actions button {
-  border: none;
-  border-radius: 12px;
-  padding: 12px 18px;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.director-appointments-actions button.primary {
-  background: #2563eb;
-  color: white;
-}
-
-.director-appointments-actions button.secondary {
-  background: #6b7280;
-  color: white;
-}
-
-.director-message {
-  margin-top: 18px;
-  padding: 14px 16px;
-  border-radius: 12px;
-}
-
-.director-message.success {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.director-message.error {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.content-scroll {
-  overflow-y: auto;
-}
-
-@media screen and (max-width: 1050px) {
-  .director-appointments-grid {
-    grid-template-columns: 1fr;
-  }
+  margin: 2px 8px 2px 0;
 }
 
 @media screen and (max-width: 760px) {
-  .overview-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .director-appointments-table,
-  .director-appointments-table thead,
-  .director-appointments-table tbody,
-  .director-appointments-table th,
-  .director-appointments-table td,
-  .director-appointments-table tr {
-    display: block;
-  }
-
-  .director-appointments-table thead tr {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-  }
-
-  .director-appointments-table tr {
-    margin-bottom: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    padding: 14px;
-  }
-
-  .director-appointments-table td {
-    border: none;
-    padding-left: 50%;
-    position: relative;
-  }
-
-  .director-appointments-table td:before {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    width: 45%;
-    padding-right: 10px;
-    white-space: nowrap;
-    font-weight: 700;
-    content: attr(data-label);
+  .slot-row {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

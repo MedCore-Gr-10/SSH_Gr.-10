@@ -225,6 +225,35 @@ class HospitalsRepository {
       }
     });
   }
+
+  async findHospitalByDirectorId(userId) {
+    // 🚀 RREGULLIMI: Hoqëm Number(userId) sepse ID-të tuaja janë UUID (String)
+    if (!userId) return null;
+
+    const assignment = await prisma.staff_hospitals_departments.findFirst({
+      where: {
+        staff_id: String(userId), // Sigurohemi që shkon si String/UUID e pastër
+        hospitals_departments: {
+          departments: {
+            department_name: "General"
+          }
+        }
+      },
+      include: {
+        hospitals_departments: {
+          include: {
+            hospitals: true
+          }
+        }
+      }
+    });
+
+    if (!assignment || !assignment.hospitals_departments?.hospitals) {
+      return null;
+    }
+
+    return assignment.hospitals_departments.hospitals;
+  }
 }
 
 export default new HospitalsRepository();

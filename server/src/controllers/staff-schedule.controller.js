@@ -3,12 +3,19 @@ import DirectorStaffScheduleService from "../services/director-services/staffSch
 class StaffScheduleController {
   async getStaffSchedules(req, res, next) {
     try {
-      const schedules = await DirectorStaffScheduleService.getRelevantSchedules(
-        req.user.user_id,
-        req.user.hospital_id,
-        req.user.role,
-        req.user.user_id
-      );
+      const schedules =
+        req.user.role === "doctor" && req.query.scope === "hospital"
+          ? await DirectorStaffScheduleService.getHospitalSchedulesForStaff(
+              req.user.hospital_id,
+              req.user.user_id
+            )
+          : await DirectorStaffScheduleService.getRelevantSchedules(
+              req.user.user_id,
+              req.user.hospital_id,
+              req.user.role,
+              req.user.user_id
+            );
+
       res.status(200).json({ success: true, data: schedules });
     } catch (err) {
       next(err);

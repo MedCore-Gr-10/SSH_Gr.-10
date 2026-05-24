@@ -6,7 +6,7 @@ async function parseJsonResponse(res) {
     if (res.status === 404) {
       return {
         error:
-          "API route not found. Restart the backend (npm start in server/) so forgot-password routes are loaded.",
+          "API route not found. Restart the backend (npm start in server/).",
       };
     }
     return {
@@ -57,36 +57,6 @@ export const loginUser = async (credentials) => {
 
 export const registerUser = async (payload) => {
   const res = await apiFetch("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res) {
-    return {
-      error:
-        "Cannot reach the server. Start the backend: cd server && npm install && node src/index.js",
-    };
-  }
-  return parseJsonResponse(res);
-};
-
-export const requestPasswordReset = async (email) => {
-  const res = await apiFetch("/auth/forgot-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-  if (!res) {
-    return {
-      error:
-        "Cannot reach the server. Start the backend: cd server && npm install && node src/index.js",
-    };
-  }
-  return parseJsonResponse(res);
-};
-
-export const resetPassword = async (payload) => {
-  const res = await apiFetch("/auth/reset-password", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

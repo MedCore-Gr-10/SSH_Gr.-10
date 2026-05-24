@@ -4,14 +4,11 @@ import Sidebar from "../../components/layout/Sidebar.jsx";
 import Home from "./header-pages/Home.jsx";
 import About from "./header-pages/About.jsx";
 import Notifications from "./header-pages/Notifications.jsx";
-import Settings from "./header-pages/Settings.jsx";
 import Profile from "./header-pages/Profile.jsx";
 import LogOut from "./header-pages/LogOut.jsx";
 
 import Login from "../auth/login.jsx";
 import Register from "../auth/register.jsx";
-import ForgotPassword from "../auth/ForgotPassword.jsx";
-import ResetPassword from "../auth/ResetPassword.jsx";
 import ProtectedRoute from "../../components/auth/ProtectedRoute.jsx";
 import "../CSSpages/App.css";
 
@@ -31,13 +28,16 @@ import MakeRequest from "./sidebar-pages/MakeRequest";
 
 import Records from "./sidebar-pages/Records";
 import Appointments from "./sidebar-pages/Appointments";
+import MyAppointments from "./sidebar-pages/MyAppointments";
 import Insurance from "./sidebar-pages/Insurance";
 import Allergies from "./sidebar-pages/Allergies";
-import LeaveReview from "./sidebar-pages/LeaveReview";
 import EmergencyContacts from "./sidebar-pages/EmergencyContacts";
 
 import AppointmentsSchedule from "./sidebar-pages/AppointmentsSchedule";
 
+import NurseMySchedule from "../nurse/NurseMySchedule.jsx";
+import NurseStaffSchedules from "../nurse/NurseStaffSchedules.jsx";
+import NursePatients from "../nurse/NursePatients.jsx";
 function MainLayout() {
   return (
     <div className="App">
@@ -63,8 +63,6 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/main" element={<MainLayout />}>
           <Route index element={<Home />} />
@@ -72,11 +70,8 @@ export default function App() {
           <Route path="home" element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
           <Route path="logout" element={<LogOut />} />
-          // SIDE
-          BAR-------------------------------------------------------------------
           {/* ===================== SUPERUSER ===================== */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="hospitals" element={<Hospitals />} />
@@ -92,6 +87,7 @@ export default function App() {
           {/* ===================== DIRECTOR ===================== */}
           {/* <Route path="dashboard" element={<Dashboard />} /> */}
           <Route path="staff-schedule" element={<StaffSchedule />} />
+          <Route path="doctor-staff-schedule" element={<StaffSchedule />} />
           <Route path="staff" element={<Staff />} />
           <Route path="patients" element={<Patients />} />
           {/* <Route path="booked-appointments" element={<BookedAppointments />} /> */}
@@ -102,9 +98,9 @@ export default function App() {
           {/* <Route path="dashboard" element={<Dashboard />} /> */}
           <Route path="records" element={<Records />} />
           <Route path="appointments" element={<Appointments />} />
+          <Route path="my-appointments" element={<MyAppointments />} />
           <Route path="insurance" element={<Insurance />} />
           <Route path="allergies" element={<Allergies />} />
-          <Route path="leave-review" element={<LeaveReview />} />
           <Route path="emergency-contacts" element={<EmergencyContacts />} />
           {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
           {/* <Route path="make-request" element={<MakeRequest />} /> */}
@@ -119,9 +115,9 @@ export default function App() {
           <Route path="booked-appointments" element={<BookedAppointments />} />
           <Route path="make-request" element={<MakeRequest />} />
           {/* ===================== NURSE ===================== */}
-          {/* <Route path="dashboard" element={<Dashboard />} /> */}
-          {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
-          {/* <Route path="patients" element={<Patients />} /> */}
+          <Route path="nurse/schedule" element={<NurseMySchedule />} />
+          <Route path="nurse/staff-schedules" element={<NurseStaffSchedules />} />
+          <Route path="nurse/patients" element={<NursePatients />} />
           <Route path="make-request" element={<MakeRequest />} />
         </Route>
       </Route>

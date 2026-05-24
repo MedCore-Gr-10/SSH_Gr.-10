@@ -6,7 +6,8 @@ class RequestsController {
       const created = await DirectorRequestsService.createRequest(
         req.body,
         req.user.user_id,
-        req.user.hospital_id
+        req.user.hospital_id,
+        req.user.role
       );
       res.status(201).json({ success: true, data: created });
     } catch (err) {
@@ -18,7 +19,12 @@ class RequestsController {
     try {
       const data = await DirectorRequestsService.getRequestRecipients(
         req.user.user_id,
-        req.user.hospital_id
+        req.user.hospital_id,
+        req.user.role,
+        {
+          type: req.query.type,
+          search: req.query.search,
+        }
       );
       res.status(200).json({ success: true, data });
     } catch (err) {

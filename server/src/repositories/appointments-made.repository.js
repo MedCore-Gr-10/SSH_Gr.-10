@@ -8,6 +8,50 @@ class AppointmentsMadeRepository {
     });
   }
 
+  async bookSlot(patientId, slotId) {
+    return prisma.appointments_made.create({
+      data: {
+        patient_id: patientId,
+        appointment_booking_slot_id: slotId,
+        active_appointment_made: true
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        hospitals: true,
+                        departments: true
+                      }
+                    },
+                    staff_specializations: {
+                      include: {
+                        specializations: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   async findById(id) {
     return prisma.appointments_made.findUnique({
       where: { id },
@@ -29,6 +73,177 @@ class AppointmentsMadeRepository {
       where: {
         patient_id: patientId
       }
+    });
+  }
+
+  async findActivePatientAppointments(patientId) {
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        active_appointment_made: true
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        hospitals: true,
+                        departments: true
+                      }
+                    },
+                    staff_specializations: {
+                      include: {
+                        specializations: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        id: "desc"
+      }
+    });
+  }
+
+  async findPatientAppointmentById(id, patientId) {
+    return prisma.appointments_made.findFirst({
+      where: {
+        id,
+        patient_id: patientId
+      }
+    });
+  }
+
+  async findPatientHistoryAtHospital(patientId, hospitalId, filters = {}) {
+    const templateWhere = { hospital_id: hospitalId };
+    if (filters.departmentId) {
+      templateWhere.department_id = Number(filters.departmentId);
+    }
+
+    const slotWhere = {
+      appointments_templates: templateWhere,
+    };
+
+    if (filters.dateFrom || filters.dateTo) {
+      slotWhere.appointment_date = {};
+      if (filters.dateFrom) {
+        slotWhere.appointment_date.gte = new Date(filters.dateFrom);
+      }
+      if (filters.dateTo) {
+        slotWhere.appointment_date.lte = new Date(filters.dateTo);
+      }
+    }
+
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        appointments_booking_slots: slotWhere,
+      },
+      include: {
+        diagnoses: {
+          orderBy: { created_at: "desc" },
+        },
+        prescriptions: {
+          orderBy: { created_at: "desc" },
+        },
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true,
+                        hospitals: true,
+                      },
+                    },
+                    users: {
+                      include: {
+                        users_profiles: {
+                          include: {
+                            profiles: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async findPatientAppointmentsAtHospital(patientId, hospitalId) {
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        appointments_booking_slots: {
+          appointments_templates: {
+            hospital_id: hospitalId,
+          },
+        },
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true,
+                      },
+                    },
+                    users: {
+                      include: {
+                        users_profiles: {
+                          include: {
+                            profiles: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
+      },
     });
   }
 
@@ -86,40 +301,30 @@ class AppointmentsMadeRepository {
     });
   }
 
-  async findDoctorPatients(doctorId) {
-    const appointments = await prisma.appointments_made.findMany({
-      where: {
-        active_appointment_made: {
-          not: false
-        },
-        appointments_booking_slots: {
-          doctor_id: doctorId,
-          appointment_date: {
-            lte: new Date()
-          }
-        }
+  async delete(id) {
+    return prisma.appointments_made.delete({
+      where: { id }
+    });
+  }
+
+ async getAllBookedAppointments() {
+  return prisma.appointments_made.findMany({
+    where: { active_appointment_made: true },
+    include: {
+      users: { // The Patient
+        include: { users_profiles: { include: { profiles: true } } }
       },
-      include: {
-        users: {
-          include: {
-            users_profiles: {
-              include: {
-                profiles: true
-              }
-            }
-          }
-        },
-        appointments_booking_slots: {
-          include: {
-            appointments_templates: {
-              include: {
-                staff_hospitals_departments: {
-                  include: {
-                    hospitals_departments: {
-                      include: {
-                        departments: true
-                      }
-                    }
+      appointments_booking_slots: {
+        include: {
+          users: { // The Doctor
+            include: { users_profiles: { include: { profiles: true } } }
+          },
+          appointments_templates: {
+            include: {
+              staff_hospitals_departments: {
+                include: {
+                  hospitals_departments: {
+                    include: { hospitals: true, departments: true }
                   }
                 }
               }
@@ -127,55 +332,10 @@ class AppointmentsMadeRepository {
           }
         }
       }
-    });
-
-    appointments.sort((first, second) => {
-      const firstDate = first.appointments_booking_slots?.appointment_date?.getTime?.() || 0;
-      const secondDate = second.appointments_booking_slots?.appointment_date?.getTime?.() || 0;
-      return secondDate - firstDate;
-    });
-
-    const patientMap = new Map();
-
-    for (const appointment of appointments) {
-      const patient = appointment.users;
-      if (!patient?.id) continue;
-
-      const slot = appointment.appointments_booking_slots;
-      const profileLink = patient.users_profiles?.[0];
-      const current = patientMap.get(patient.id);
-      const appointmentDate = slot?.appointment_date || null;
-      const department =
-        slot?.appointments_templates?.staff_hospitals_departments?.hospitals_departments?.departments
-          ?.department_name || null;
-
-      if (current) {
-        current.appointment_count += 1;
-        if (appointmentDate && (!current.last_appointment_date || appointmentDate > current.last_appointment_date)) {
-          current.last_appointment_date = appointmentDate;
-          current.last_appointment = appointment;
-        }
-        if (department && !current.departments.includes(department)) {
-          current.departments.push(department);
-        }
-        continue;
-      }
-
-      patientMap.set(patient.id, {
-        id: patient.id,
-        username: patient.username,
-        email: profileLink?.email || null,
-        profile: profileLink?.profiles || null,
-        appointment_count: 1,
-        last_appointment_date: appointmentDate,
-        last_appointment: appointment,
-        departments: department ? [department] : []
-      });
-    }
-
-    return Array.from(patientMap.values());
-  }
-
+    },
+    orderBy: { id: "desc" }
+  });
+}
 }
 
 export default new AppointmentsMadeRepository();

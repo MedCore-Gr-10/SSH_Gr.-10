@@ -182,6 +182,151 @@ class AppointmentsBookingSlotsRepository {
     });
   }
 
+  async searchAvailablePatientSlots(filters) {
+    const {
+      hospitalId,
+      hospitalIds,
+      doctorName,
+      specialization,
+      date,
+      startTime,
+    } = filters;
+
+    return prisma.appointments_booking_slots.findMany({
+      where: {
+        active_appointment_booking_slot: true,
+        appointments_made: {
+          none: {}
+        },
+        ...(date && { appointment_date: date }),
+        ...(startTime && { slot_start_time: startTime }),
+        appointments_templates: {
+          ...(hospitalId && { hospital_id: hospitalId }),
+          ...(!hospitalId && hospitalIds?.length && { hospital_id: { in: hospitalIds } }),
+          active_appointment_template: true,
+          ...(specialization && {
+            staff_hospitals_departments: {
+              staff_specializations: {
+                some: {
+                  specializations: {
+                    specialization_name: {
+                      contains: specialization,
+                      mode: "insensitive"
+                    }
+                  }
+                }
+              }
+            }
+          })
+        },
+        ...(doctorName && {
+          users: {
+            users_profiles: {
+              some: {
+                profiles: {
+                  OR: [
+                    {
+                      first_name: {
+                        contains: doctorName,
+                        mode: "insensitive"
+                      }
+                    },
+                    {
+                      last_name: {
+                        contains: doctorName,
+                        mode: "insensitive"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        })
+      },
+      include: {
+        users: {
+          include: {
+            users_profiles: {
+              include: {
+                profiles: true
+              }
+            }
+          }
+        },
+        appointments_templates: {
+          include: {
+            staff_hospitals_departments: {
+              include: {
+                hospitals_departments: {
+                  include: {
+                    hospitals: true,
+                    departments: true
+                  }
+                },
+                staff_specializations: {
+                  include: {
+                    specializations: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      orderBy: [
+        { appointment_date: "asc" },
+        { slot_start_time: "asc" }
+      ]
+    });
+  }
+
+  async findAvailablePatientTimeSlots() {
+    return prisma.appointments_booking_slots.findMany({
+      where: {
+        active_appointment_booking_slot: true,
+        appointments_made: {
+          none: {}
+        }
+      },
+      distinct: ["slot_start_time", "slot_end_time"],
+      select: {
+        slot_start_time: true,
+        slot_end_time: true
+      },
+      orderBy: [
+        { slot_start_time: "asc" },
+        { slot_end_time: "asc" }
+      ]
+    });
+  }
+
+  async findAvailablePatientTimeSlotsForHospitals(hospitalIds) {
+    return prisma.appointments_booking_slots.findMany({
+      where: {
+        active_appointment_booking_slot: true,
+        appointments_made: {
+          none: {}
+        },
+        appointments_templates: {
+          hospital_id: {
+            in: hospitalIds
+          },
+          active_appointment_template: true
+        }
+      },
+      distinct: ["slot_start_time", "slot_end_time"],
+      select: {
+        slot_start_time: true,
+        slot_end_time: true
+      },
+      orderBy: [
+        { slot_start_time: "asc" },
+        { slot_end_time: "asc" }
+      ]
+    });
+  }
+
   /**
    * Check for duplicate slots (exact same doctor, date, times)
    * @param {string} doctorId - Doctor UUID

@@ -12,14 +12,14 @@ const Sidebar = () => {
 
   const sidebarConfig = {
     superuser: [
-      { label: "Dashboard", path: "/main/dashboard" },
+      { label: "System Overview", path: "/main/system-overview" },
       { label: "Hospitals", path: "/main/hospitals" },
       { label: "Users", path: "/main/users" },
-      { label: "Appointments", path: "/main/booked-appointments" },
+      { label: "Appointments Made", path: "/main/booked-appointments" },
       { label: "Manage Departments", path: "/main/manage-departments" },
       { label: "Manage Specialization", path: "/main/manage-specializations" },
-      { label: "System Overview", path: "/main/system-overview" },
-      { label: "System Logs", path: "/main/system-logs" }
+      { label: "System Logs", path: "/main/system-logs" },
+      { label: "Make a Request", path: "/main/make-request" }
     ],
     director: [
       { label: "Dashboard", path: "/main/dashboard" },
@@ -33,17 +33,17 @@ const Sidebar = () => {
     ],
     patient: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
+      { label: "Book an Appointment", path: "/main/appointments" },
+      { label: "My Appointments", path: "/main/my-appointments" },
       { label: "My Records", path: "/main/records" },
-      { label: "Appointments", path: "/main/appointments" },
+      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
       { label: "My Insurance", path: "/main/insurance" },
       { label: "My Allergies", path: "/main/allergies" },
-      { label: "Leave a Review", path: "/main/leave-review" },
       { label: "Make a Request", path: "/main/make-request" }
     ],
     doctor: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Staff Schedule", path: "/main/staff-schedule" },
+      { label: "Staff Schedule", path: "/main/doctor-staff-schedule" },
       { label: "Patients", path: "/main/patients" },
       { label: "Appointments Schedule", path: "/main/appointments-schedule" },
       { label: "Booked Appointments", path: "/main/booked-appointments" },
@@ -51,9 +51,10 @@ const Sidebar = () => {
     ],
     nurse: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Staff Schedule", path: "/main/staff-schedule" },
-      { label: "Patients", path: "/main/patients" },
-      { label: "Make a Request", path: "/main/make-request" }
+      { label: "My Schedule", path: "/main/nurse/schedule" },
+      { label: "Staff Schedules", path: "/main/nurse/staff-schedules" },
+      { label: "My Patients", path: "/main/nurse/patients" },
+      { label: "Make a Request", path: "/main/make-request" },
     ],
   };
   

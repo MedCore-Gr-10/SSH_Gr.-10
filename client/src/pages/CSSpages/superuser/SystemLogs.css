@@ -1,0 +1,39 @@
+/* SystemLogs.css */
+.page-container { padding: 20px; font-family: sans-serif; }
+.page-header { margin-bottom: 20px; }
+.page-title { font-size: 24px; color: #333; margin: 0; }
+.page-subtitle { color: #666; margin: 5px 0 0 0; }
+
+.error-banner { background: #fee; color: #c00; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #fcc; }
+
+.controls-wrapper { display: flex; justify-content: flex-end; margin-bottom: 15px; }
+.search-bar-container { width: 100%; display: flex; gap: 10px; align-items: center; }
+.entries-counter { flex-shrink: 0; color: #555; }
+.search-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.date-input { width: 150px; }
+.text-input { flex-grow: 1; }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white; padding: 30px; border-radius: 12px;
+  width: 90%; max-width: 600px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  display: flex; flex-direction: column; gap: 15px;
+}
+
+.modal-title-text { margin: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; font-size: 1.5rem; }
+.modal-table-container { display: flex; flex-direction: column; gap: 12px; }
+.log-details-pre { 
+  background: #f7fafc; padding: 12px; border-radius: 6px; 
+  overflow-y: auto; max-height: 200px; border: 1px solid #edf2f7; 
+  font-family: monospace; white-space: pre-wrap; word-wrap: break-word;
+}
+.modal-footer { margin-top: 20px; border-top: 1px solid #eef2f5; padding-top: 15px; text-align: right; }
+.btn-secondary { padding: 10px 20px; cursor: pointer; background-color: #6c757d; color: white; border: none; border-radius: 4px; }

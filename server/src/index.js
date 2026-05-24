@@ -3,26 +3,34 @@ import express from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
-
+import { JwtService } from "./utils/jwt.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/user.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import directorRoutes from "./routes/director.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
+import nurseRoutes from "./routes/nurse.routes.js";
 import patientRoutes from "./routes/patient.routes.js";
 import manageSpecializationRoutes from "./routes/manageSpecialization.routes.js";
 import manageDepartmentsRouter from "./routes/manageDepartments.routes.js";
 import hospitalsRoutes from "./routes/hospital.routes.js";
 import doctorRoutes from "./routes/doctor.routes.js";
-import { initializeCronJobs, stopCronJobs } from "./services/cronJobs.service.js";
+import requestsRoutes from "./routes/requests.routes.js";
+import appointmentsRoutes from './routes/appointmentsMade.routes.js';
+
+import {
+  initializeCronJobs,
+  stopCronJobs,
+} from "./services/cronJobs.service.js";
 
 import systemOverviewRoutes from "./routes/systemOverview.routes.js";
+import systemLogsRoutes from "./routes/systemLogs.routes.js";
 const app = express();
 
 app.use(
   cors({
     origin: "http://localhost:5173",
-  })
+  }),
 );
 
 app.use(express.json());
@@ -34,11 +42,16 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/specializations", manageSpecializationRoutes);
 app.use("/api/director", directorRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/nurse", nurseRoutes);
+app.use("/api/departments", manageDepartmentsRouter);
 app.use("/api/patient", patientRoutes);
 app.use("/api/departments", manageDepartmentsRouter);
 app.use("/api/hospitals", hospitalsRoutes);
 app.use("/api/doctor", doctorRoutes);
+app.use("/api/requests", requestsRoutes);
 app.use("/api/system-overview", systemOverviewRoutes);
+app.use("/api/system-logs", systemLogsRoutes);
+app.use("/api/appointments", appointmentsRoutes);
 
 // 404 handler MUST be last
 app.use("/api", (req, res) => {
@@ -51,7 +64,7 @@ app.use("/api", (req, res) => {
 app.use((err, req, res, next) => {
   console.error(err);
   res
-    .status(err.status || 500)
+    .status(err.status || err.statusCode || 500)
     .json({ error: err.message || "Internal server error" });
 });
 

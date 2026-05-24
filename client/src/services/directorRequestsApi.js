@@ -26,15 +26,18 @@ const handleResponse = async (response) => {
 };
 
 export const getDirectorRequests = async () => {
-  const response = await fetch(`${API}/director/requests`, {
+  const response = await fetch(`${API}/requests`, {
     method: "GET",
     headers: getHeaders(),
   });
   return handleResponse(response);
 };
 
-export const getDirectorRequestRecipients = async () => {
-  const response = await fetch(`${API}/director/requests/recipients`, {
+export const getDirectorRequestRecipients = async ({ type = "staff", search = "" } = {}) => {
+  const params = new URLSearchParams({ type });
+  if (search) params.set("search", search);
+
+  const response = await fetch(`${API}/requests/recipients?${params.toString()}`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -42,7 +45,7 @@ export const getDirectorRequestRecipients = async () => {
 };
 
 export const createDirectorRequest = async (data) => {
-  const response = await fetch(`${API}/director/requests`, {
+  const response = await fetch(`${API}/requests`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify(data),
