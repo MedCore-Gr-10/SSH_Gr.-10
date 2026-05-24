@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { getPatientEmergencyContacts } from "../../services/patientEmergencyContactsApi";
-import { getPatientHospitals, updatePatientHospitals } from "../../services/patientHospitalsApi";
-import "./PatientDashboard.css";
+import { getPatientEmergencyContacts } from "../../../services/patientEmergencyContactsApi";
+import { getPatientHospitals, updatePatientHospitals } from "../../../services/patientHospitalsApi";
+import "../../CSSpages/patient/PatientDashboard.css";
 
 const visibleHospitalCount = 3;
 
