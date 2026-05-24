@@ -8,15 +8,16 @@ Ky dokument përmbush kërkesën **13. Dokumentimi i Projektit**: arkitekturë, 
 
 ## Përmbledhje
 
-| Aspekti             | Përshkrim                                               |
-| ------------------- | ------------------------------------------------------- |
-| **Arkitekturë**     | Klient–server (React + Express), REST API               |
-| **Backend**         | Node.js, Express 5, Prisma ORM, PostgreSQL              |
-| **Frontend**        | React 19, Vite, React Router, Context API               |
-| **Autentikim**      | JWT (Bearer), role-based access                         |
-| **Cache**           | Redis (opsional, p.sh. lista e pacientëve të mjekut)    |
-| **Dokumentim API**  | Swagger UI në `/api-docs`                               |
-| **Detyra në sfond** | `node-cron` — gjenerim automatik i sloteve të termineve |
+| Aspekti             | Përshkrim                                                 |
+| ------------------- | --------------------------------------------------------- |
+| **Arkitekturë**     | Klient–server (React + Express), REST API                 |
+| **Backend**         | Node.js, Express 5, Prisma ORM, PostgreSQL                |
+| **Frontend**        | React 19, Vite, React Router, Context API                 |
+| **Autentikim**      | JWT (Bearer), role-based access                           |
+| **Cache**           | Redis (opsional, p.sh. lista e pacientëve të mjekut)      |
+| **Dokumentim API**  | Swagger UI në `/api-docs`                                 |
+| **Detyra në sfond** | `node-cron` — gjenerim automatik i sloteve të termineve   |
+| **Asistent AI**     | Google Gemini — ndihmë për pacientët (përdorimi i app-it) |
 
 ---
 
@@ -29,7 +30,7 @@ SSH_Gr.-10/
 │   │   ├── components/     # UI: layout, auth, tabela
 │   │   ├── context/        # AuthContext
 │   │   ├── pages/          # Faqe sipas rolit (patient, doctor, nurse, …)
-│   │   └── services/       # Thirrje HTTP drejt API
+│   │   └── services/       # api.js, superuserApi.js, patientAiApi.js, …
 │   └── vite.config.js      # Proxy /api → backend
 │
 └── server/                 # API REST
@@ -41,7 +42,7 @@ SSH_Gr.-10/
         ├── services/       # Logjika e biznesit
         ├── repositories/   # Akses në databazë (Prisma)
         ├── middlewares/    # Auth, role, hospital
-        ├── routes/         # Definimi i endpoint-eve
+        ├── routes/         # auth, patient, doctor, director, nurse, superuser, ai, …
         ├── utils/          # JWT, validime
         └── index.js        # Hyrja e serverit
 ```
@@ -91,7 +92,15 @@ Klasa përdoren për middleware (`AuthMiddleware`, `RoleMiddleware`, `HospitalMi
 - **React Router** — rrugët publike (`/`, `/register`) dhe të mbrojtura (`/main/*`).
 - **Context API** (`authContext`) — token JWT, roli, hospital_id.
 - **Sidebar** dinamik sipas rolit (`Sidebar.jsx`).
-- Shërbimet në `client/src/services/*` encapsulojnë fetch drejt API.
+- Shërbimet në `client/src/services/*` encapsulojnë fetch drejt API (`superuserApi.js` për superuser, `patientAiApi.js` për asistentin).
+- **Dashboard** (`Dashboard.jsx`) zgjedh UI sipas rolit: `PatientDashboard` (asistent + spitale Care), `DoctorDashboard`, `DirectorDashboard`, `NurseDashboard`.
+
+### Integrimi AI (Gemini)
+
+- Shërbimi: `server/src/services/ai.service.js` — model default `gemini-2.5-flash`.
+- Asistenti përgjigjet vetëm për **si të përdoret MedCore** (navigim, termine, kontakte, etj.), jo diagnozë/trajtim.
+- Endpoint: `POST /api/ai/chat` (rol: `patient`), body: `{ message, history? }`.
+- Endpoint i montuar në `server/src/index.js`: `app.use("/api/ai", aiRoutes)`.
 
 ### Performancë dhe sfond
 
@@ -106,13 +115,13 @@ Klasa përdoren për middleware (`AuthMiddleware`, `RoleMiddleware`, `HospitalMi
 
 ## Rolet dhe autorizimi
 
-| Rol         | Përshkrim                                         | Prefix API kryesor                |
-| ----------- | ------------------------------------------------- | --------------------------------- |
-| `patient`   | Regjistrim, termine, profil, alergji, sigurim     | `/api/patient`                    |
-| `doctor`    | Template/slote termine, pacientë, diagnoza/receta | `/api/doctor`                     |
-| `nurse`     | Lexim i kufizuar pacientësh në spital, orare      | `/api/nurse`                      |
-| `director`  | Staf, pacientë, departamente, termine në spital   | `/api/director`                   |
-| `superuser` | Spitale, përdorues, departamente globale, logje   | `/api/hospitals`, `/api/users`, … |
+| Rol         | Përshkrim                                         | Prefix API kryesor |
+| ----------- | ------------------------------------------------- | ------------------ |
+| `patient`   | Regjistrim, termine, profil, alergji, sigurim     | `/api/patient`     |
+| `doctor`    | Template/slote termine, pacientë, diagnoza/receta | `/api/doctor`      |
+| `nurse`     | Lexim i kufizuar pacientësh në spital, orare      | `/api/nurse`       |
+| `director`  | Staf, pacientë, departamente, termine në spital   | `/api/director`    |
+| `superuser` | Spitale, përdorues, departamente globale, logje   | `/api/superuser`   |
 
 **Autentikim:** header `Authorization: Bearer <token>` pas `POST /api/auth/login`.
 
@@ -191,28 +200,29 @@ Për endpoint-e me të dhëna sensitive (nurse/doctor), shpesh kërkohet query `
 
 ### `/api/doctor` — Mjek (rol: doctor)
 
-| Metoda              | Rrugë                                       | Përshkrim                             |
-| ------------------- | ------------------------------------------- | ------------------------------------- |
-| GET                 | `/patients`                                 | Pacientë të trajtuar (me cache Redis) |
-| GET                 | `/patients/:id/history`                     | Histori (+ `reason`)                  |
-| GET                 | `/patients/:id/allergies`                   | Alergji                               |
-| GET                 | `/patients/:id/insurance`                   | Sigurim                               |
-| GET                 | `/patients/:id/emergency-contacts`          | Kontakte                              |
-| GET                 | `/patients/:id/appointments`                | Termine                               |
-| GET                 | `/appointments/assignments`                 | Caktimet spital/departament           |
-| GET/POST/PUT/DELETE | `/appointments/templates`                   | Template javore                       |
-| GET                 | `/appointments/templates/summary`           | Përmbledhje                           |
-| GET                 | `/appointments/templates/by-day/:day`       | Sipas ditës                           |
-| GET                 | `/appointments/slots`                       | Slote                                 |
-| GET                 | `/appointments/slots/available`             | Slote të lira (`?date=`)              |
-| GET                 | `/appointments/slots/:id`                   | Slot i vetëm                          |
-| GET                 | `/appointments/slots/generation/status`     | Status gjenerimi                      |
-| POST                | `/appointments/slots/generate/week`         | Gjenerim javor manual                 |
-| POST                | `/appointments/slots/generate/range`        | Gjenerim për interval                 |
-| POST                | `/appointments/slots/generate/template/:id` | Gjenerim nga template                 |
-| DELETE              | `/appointments/slots/:id`                   | Çaktivizim slot                       |
-| PATCH               | `/appointments/:appointmentId/complete`     | Përfundim vizite                      |
-| POST                | `/appointments/:appointmentId/record`       | Diagnozë + recetë                     |
+| Metoda              | Rrugë                                       | Përshkrim                               |
+| ------------------- | ------------------------------------------- | --------------------------------------- |
+| GET                 | `/dashboard`                                | Përmbledhje dashboard (alarme, metrika) |
+| GET                 | `/patients`                                 | Pacientë të trajtuar (me cache Redis)   |
+| GET                 | `/patients/:id/history`                     | Histori (+ `reason`)                    |
+| GET                 | `/patients/:id/allergies`                   | Alergji                                 |
+| GET                 | `/patients/:id/insurance`                   | Sigurim                                 |
+| GET                 | `/patients/:id/emergency-contacts`          | Kontakte                                |
+| GET                 | `/patients/:id/appointments`                | Termine                                 |
+| GET                 | `/appointments/assignments`                 | Caktimet spital/departament             |
+| GET/POST/PUT/DELETE | `/appointments/templates`                   | Template javore                         |
+| GET                 | `/appointments/templates/summary`           | Përmbledhje                             |
+| GET                 | `/appointments/templates/by-day/:day`       | Sipas ditës                             |
+| GET                 | `/appointments/slots`                       | Slote                                   |
+| GET                 | `/appointments/slots/available`             | Slote të lira (`?date=`)                |
+| GET                 | `/appointments/slots/:id`                   | Slot i vetëm                            |
+| GET                 | `/appointments/slots/generation/status`     | Status gjenerimi                        |
+| POST                | `/appointments/slots/generate/week`         | Gjenerim javor manual                   |
+| POST                | `/appointments/slots/generate/range`        | Gjenerim për interval                   |
+| POST                | `/appointments/slots/generate/template/:id` | Gjenerim nga template                   |
+| DELETE              | `/appointments/slots/:id`                   | Çaktivizim slot                         |
+| PATCH               | `/appointments/:appointmentId/complete`     | Përfundim vizite                        |
+| POST                | `/appointments/:appointmentId/record`       | Diagnozë + recetë                       |
 
 ---
 
@@ -262,58 +272,84 @@ Qasje vetëm në tenancën e spitalit (`staff_hospitals_departments` + `patients
 
 ---
 
-### `/api/hospitals` — Spitale (superuser / menaxhim)
+### `/api/profiles` — Profili im (të gjithë rolet e autentikuar)
 
-| Metoda | Rrugë   | Përshkrim      |
-| ------ | ------- | -------------- |
-| POST   | `/`     | Krijim spitali |
-| GET    | `/`     | Lista          |
-| GET    | `/ :id` | Sipas ID       |
-| PUT    | `/ :id` | Përditësim     |
-| DELETE | `/ :id` | Fshirje        |
+| Metoda | Rrugë | Përshkrim                    |
+| ------ | ----- | ---------------------------- |
+| GET    | `/me` | Profili i përdoruesit loguar |
+| PUT    | `/me` | Përditësim profili           |
 
----
-
-### `/api/users` — Përdorues
-
-| Metoda | Rrugë           | Përshkrim             |
-| ------ | --------------- | --------------------- |
-| GET    | `/`             | Të gjithë përdoruesit |
-| GET    | `/:id`          | Sipas ID              |
-| POST   | `/`             | Krijim                |
-| PUT    | `/:id`          | Përditësim            |
-| PUT    | `/:id/password` | Ndryshim fjalëkalimi  |
+> Menaxhimi i plotë i profileve (kërkim me `personal_no`, CRUD) është te **`/api/superuser/profiles`**.
 
 ---
 
-### `/api/profiles` — Profile
+### `/api/superuser` — Superuser (rol: superuser / SUPERUSER)
 
-| Metoda              | Rrugë                    | Përshkrim                              |
-| ------------------- | ------------------------ | -------------------------------------- |
-| GET/PUT             | `/me`                    | Profili i përdoruesit të loguar (auth) |
-| GET                 | `/personal/:personal_no` | Kërkim me numër personal               |
-| GET                 | `/director/:personal_no` | Profil për drejtor                     |
-| GET/POST/PUT/DELETE | `/`, `/:id`              | CRUD profile                           |
+Të gjitha kërkesat kërkojnë JWT + rol superuser. Frontend përdor `superuserFetch("/…")` → `/api/superuser/…`.
+
+**Përdorues**
+
+| Metoda | Rrugë                 | Përshkrim            |
+| ------ | --------------------- | -------------------- |
+| GET    | `/users`              | Lista përdoruesish   |
+| POST   | `/users`              | Krijim përdoruesi    |
+| GET    | `/users/:id`          | Detaje               |
+| PUT    | `/users/:id`          | Përditësim           |
+| PUT    | `/users/:id/password` | Ndryshim fjalëkalimi |
+
+**Profile**
+
+| Metoda  | Rrugë                             | Përshkrim                  |
+| ------- | --------------------------------- | -------------------------- |
+| GET/PUT | `/profiles/me`                    | Profili i superuser-it     |
+| GET     | `/profiles`                       | Të gjitha profilet         |
+| POST    | `/profiles`                       | Krijim profili             |
+| GET     | `/profiles/:id`                   | Sipas ID                   |
+| PUT     | `/profiles/:id`                   | Përditësim                 |
+| DELETE  | `/profiles/:id`                   | Fshirje                    |
+| GET     | `/profiles/personal/:personal_no` | Kërkim me numër personal   |
+| GET     | `/profiles/director/:personal_no` | Profil drejtori për spital |
+
+**Specializime**
+
+| Metoda     | Rrugë                  | Përshkrim            |
+| ---------- | ---------------------- | -------------------- |
+| GET/POST   | `/specializations`     | Lista / krijim       |
+| PUT/DELETE | `/specializations/:id` | Përditësim / fshirje |
+
+**Departamente (globale)**
+
+| Metoda         | Rrugë                        | Përshkrim                   |
+| -------------- | ---------------------------- | --------------------------- |
+| GET/POST       | `/departments`               | Lista / krijim              |
+| GET/PUT/DELETE | `/departments/:id`           | CRUD                        |
+| GET            | `/departments/:id/hospitals` | Spitale me këtë departament |
+| GET            | `/departments/:id/doctors`   | Mjekë në departament        |
+
+**Spitale**
+
+| Metoda         | Rrugë            | Përshkrim      |
+| -------------- | ---------------- | -------------- |
+| GET/POST       | `/hospitals`     | Lista / krijim |
+| GET/PUT/DELETE | `/hospitals/:id` | CRUD           |
+
+**Sistemi**
+
+| Metoda | Rrugë                | Përshkrim                       |
+| ------ | -------------------- | ------------------------------- |
+| GET    | `/system-overview`   | Metrika globale                 |
+| GET    | `/system-logs`       | Logje me username               |
+| GET    | `/appointments-made` | Të gjitha terminet e rezervuara |
 
 ---
 
-### `/api/departments` — Departamente (globale)
+### `/api/ai` — Asistent pacienti (rol: patient)
 
-| Metoda         | Rrugë            | Përshkrim                       |
-| -------------- | ---------------- | ------------------------------- |
-| GET/POST       | `/`              | Lista / krijim                  |
-| GET/PUT/DELETE | `/:id`           | CRUD                            |
-| GET            | `/:id/hospitals` | Spitale që e kanë departamentin |
-| GET            | `/:id/doctors`   | Mjekë në departament            |
+| Metoda | Rrugë   | Përshkrim                                                           |
+| ------ | ------- | ------------------------------------------------------------------- |
+| POST   | `/chat` | Dërgon mesazh; përgjigje nga Gemini (`message`, `history` opsional) |
 
----
-
-### `/api/specializations` — Specializime
-
-| Metoda     | Rrugë  | Përshkrim            |
-| ---------- | ------ | -------------------- |
-| GET/POST   | `/`    | Lista / krijim       |
-| PUT/DELETE | `/:id` | Përditësim / fshirje |
+Kufizime: pa këshilla mjekësore; vetëm ndihmë për navigimin në MedCore. Kërkon `GEMINI_API_KEY` në `server/.env`.
 
 ---
 
@@ -327,20 +363,23 @@ Qasje vetëm në tenancën e spitalit (`staff_hospitals_departments` + `patients
 
 ---
 
-### `/api/system-overview` & `/api/system-logs`
+### Rrugët e montuara në `server/src/index.js`
 
-| Metoda | Rrugë                   | Përshkrim           |
-| ------ | ----------------------- | ------------------- |
-| GET    | `/api/system-overview/` | Përmbledhje sistemi |
-| GET    | `/api/system-logs/`     | Logje sistemi       |
+```
+/api/auth
+/api/profiles      → vetëm /me
+/api/director
+/api/staff
+/api/nurse
+/api/patient
+/api/doctor
+/api/superuser     → users, profiles, hospitals, departments, specializations, system-*, appointments-made
+/api/requests
+/api/ai            → /chat
+/api-docs
+```
 
----
-
-### `/api/appointments`
-
-| Metoda | Rrugë                | Përshkrim                               |
-| ------ | -------------------- | --------------------------------------- |
-| GET    | `/appointments-made` | Të gjitha terminet e kryera (superuser) |
+Skedarët e vjetër `user.routes.js`, `hospital.routes.js`, etj. mund të ekzistojnë ende në repo por **nuk janë të lidhura** me aplikacionin.
 
 ---
 
@@ -356,9 +395,9 @@ Pas login, përdoruesi ridrejtohet në `/main/dashboard` (ose faqe sipas rolit).
 
 Shembuj rrugësh:
 
-- Superuser: `/main/hospitals`, `/main/users`, `/main/system-logs`
-- Pacient: `/main/appointments`, `/main/my-appointments`, `/main/records`
-- Mjek: `/main/appointments-schedule`, `/main/patients`
+- Superuser: `/main/hospitals`, `/main/users`, `/main/system-logs` (API: `superuserFetch`)
+- Pacient: `/main/dashboard` (asistent AI + Care hospitals), `/main/appointments`, `/main/records`
+- Mjek: `/main/dashboard`, `/main/appointments-schedule`, `/main/booked-appointments`
 - Infermier: `/main/nurse/schedule`, `/main/nurse/patients`
 
 ---
@@ -432,10 +471,11 @@ Pas çdo restart të PC-së: `sudo service redis-server start` në WSL.
 
 ### 5. Nisja e serverit
 
-````bash
+```bash
 cd server
 cd src
-node src/index.js
+node index.js
+```
 
 Serveri dëgjon në **portin 3000**.
 
@@ -444,22 +484,35 @@ Serveri dëgjon në **portin 3000**.
 ```bash
 cd client
 npm run dev
-````
+```
 
 Aplikacioni hapet zakonisht në **http://localhost:5173**.
 
-### 7. Përdorues test (skripte)
+### 7. Asistenti AI (opsional)
+
+1. Merrni API key nga [Google AI Studio](https://aistudio.google.com/apikey).
+2. Shtoni në `server/.env`:
+
+```env
+GEMINI_API_KEY=your-key-here
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+3. Rinisni serverin pas shtimit të key-it.
+
+### 8. Përdorues test (skripte)
 
 ```bash
 cd server
 npm run create-superuser
 npm run create-director
+npm run create-nurse
 npm run create-staff
 ```
 
 Pacientët regjistrohen nga UI: **`/register`**.
 
-### 8. Swagger
+### 9. Swagger
 
 Pas nisjes së serverit:
 
@@ -471,13 +524,15 @@ Varësitë `swagger-ui-express` dhe `swagger-jsdoc` janë në `server/package.js
 
 ## Variablat e mjedisit (`server/.env`)
 
-| Variabël                            | Detyrueshmëria                      |
-| ----------------------------------- | ----------------------------------- |
-| `DATABASE_URL`                      | Lidhja PostgreSQL                   |
-| `JWT_SECRET`                        | Sekret për JWT (min. ~32 karaktere) |
-| `NODE_ENV`                          | `development` / `production`        |
-| `REDIS_URL`                         | Lidhja Redis (opsional)             |
-| `DOCTOR_PATIENTS_CACHE_TTL_SECONDS` | TTL cache pacientë mjek (sekonda)   |
+| Variabël                            | Detyrueshmëria                             |
+| ----------------------------------- | ------------------------------------------ |
+| `DATABASE_URL`                      | Lidhja PostgreSQL                          |
+| `JWT_SECRET`                        | Sekret për JWT (min. ~32 karaktere)        |
+| `NODE_ENV`                          | `development` / `production`               |
+| `REDIS_URL`                         | Lidhja Redis (opsional)                    |
+| `DOCTOR_PATIENTS_CACHE_TTL_SECONDS` | TTL cache pacientë mjek (sekonda)          |
+| `GEMINI_API_KEY`                    | API key për asistentin (pacient)           |
+| `GEMINI_MODEL`                      | Model Gemini (default: `gemini-2.5-flash`) |
 
 ---
 
@@ -495,6 +550,8 @@ Varësitë `swagger-ui-express` dhe `swagger-jsdoc` janë në `server/package.js
 
 ### Për pacientët
 
+- Dashboard me **Care hospitals**, kontakt urgjent aktual, lidhje te Records
+- **MedCore Assistant** — pyetje për përdorimin e aplikacionit (Gemini)
 - Zgjedhje spitalesh, kërkim dhe rezervim terminesh
 - Menaxhim alergjish, sigurimi, kontakteve urgjente
 - Histori vizitash, diagnozash dhe recetash
@@ -502,15 +559,17 @@ Varësitë `swagger-ui-express` dhe `swagger-jsdoc` janë në `server/package.js
 
 ### Për spitalet / stafin
 
+- **Dashboard mjeku** — përmbledhje nga `GET /api/doctor/dashboard`
 - Menaxhim stafi, orareve dhe departamenteve (drejtor)
-- Template dhe slote terminesh (mjek)
+- Template dhe slote terminesh; termine të rezervuara me diagnozë/recetë (mjek)
 - Mbikëqyrje terminesh dhe pacientësh në spital
 - Kërkesa ndër-përdorues (`requests`)
 
 ### Për superuser
 
-- CRUD spitale, përdorues, departamente globale, specializime
-- Pamje sistemi dhe logje
+- Një API e vetme `/api/superuser` për spitale, përdorues, profile, departamente, specializime
+- Pamje sistemi (`/system-overview`) dhe logje (`/system-logs`)
+- Lista globale e termineve (`/appointments-made`)
 
 ---
 
