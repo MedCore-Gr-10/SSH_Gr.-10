@@ -286,6 +286,16 @@ router.delete(
   (req, res, next) => templatesController.deleteTemplate(req, res, next)
 );
 
+router.patch(
+  "/appointments/:appointmentId/complete",
+  (req, res, next) => slotsController.markAppointmentComplete(req, res, next)
+);
+
+router.post(
+  "/appointments/:appointmentId/record",
+  (req, res, next) => slotsController.saveAppointmentRecord(req, res, next)
+);
+
 /**
  * @swagger
  * /api/doctor/appointments/slots:

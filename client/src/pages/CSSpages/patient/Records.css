@@ -149,6 +149,8 @@
 .modal-card {
   width: min(96vw, 840px);
   max-width: 100%;
+  max-height: min(90vh, 820px);
+  overflow-y: auto;
   background: #ffffff;
   border-radius: 24px;
   border: 1px solid #edf2f7;
@@ -187,16 +189,38 @@
 .modal-details {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .modal-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.25rem;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.records-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.modal-row-record-context {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.records-info-panel {
+  min-height: 100%;
+  border: 1px solid #edf2f7;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 1rem;
 }
 
 .modal-row h3,
+.records-summary-row h3,
 .modal-note h3 {
   margin: 0 0 0.5rem 0;
   font-size: 16px;
@@ -204,6 +228,7 @@
 }
 
 .modal-row p,
+.records-summary-row p,
 .modal-note p {
   margin: 0;
   color: #4a5568;
@@ -211,31 +236,50 @@
 }
 
 .modal-note {
-  background: #f8fafc;
+  background: #ffffff;
   border: 1px solid #edf2f7;
   border-radius: 18px;
-  padding: 1.25rem;
+  padding: 1.1rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.03);
 }
 
 .records-detail-list {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .records-detail-item {
-  border-bottom: 1px solid #edf2f7;
-  padding-bottom: 0.85rem;
-}
-
-.records-detail-item:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 1rem;
 }
 
 .records-detail-item strong {
   display: block;
   color: #1a202c;
-  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+
+.records-prescription-meta {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.records-prescription-meta span {
+  color: #5c5cd6;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.records-prescription-meta p {
+  margin: 0;
+  color: #4a5568;
+  line-height: 1.55;
 }
 
 .records-allergy-heading {
@@ -243,7 +287,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
 }
 
 .records-allergy-heading h3 {
@@ -284,7 +328,7 @@
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
-  padding: 0.15rem 0 0.75rem;
+  padding: 0 0 0.55rem;
 }
 
 .records-allergy-card {
@@ -376,12 +420,19 @@
 
 @media (max-width: 768px) {
   .records-filters,
-  .modal-row {
+  .modal-row,
+  .modal-row-record-context {
     grid-template-columns: 1fr;
   }
 
   .records-card {
     padding: 2rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .records-summary-row {
+    grid-template-columns: 1fr;
   }
 }
 

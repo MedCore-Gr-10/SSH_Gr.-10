@@ -114,3 +114,20 @@ export const deactivateDoctorSlot = async (slotId) => {
   });
   return handleResponse(res);
 };
+
+export const markDoctorAppointmentComplete = async (appointmentId) => {
+  const res = await fetch(`${API}/doctor/appointments/${appointmentId}/complete`, {
+    method: "PATCH",
+    headers: getHeaders(),
+  });
+  return handleResponse(res);
+};
+
+export const saveDoctorAppointmentRecord = async (appointmentId, record) => {
+  const res = await fetch(`${API}/doctor/appointments/${appointmentId}/record`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(record),
+  });
+  return handleResponse(res);
+};

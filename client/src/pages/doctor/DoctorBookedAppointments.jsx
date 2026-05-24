@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getDoctorSlots } from "../../services/doctorAppointmentsApi.js";
+import {
+  getDoctorSlots,
+  saveDoctorAppointmentRecord,
+} from "../../services/doctorAppointmentsApi.js";
 import "../CSSpages/sidebar-pages/BookedAppointments.css";
 
 const formatDate = (value) => {
@@ -46,16 +49,28 @@ const getPatientName = (appointment) => {
 const getPatientEmail = (appointment) =>
   getPatientProfileLink(appointment)?.email || "No email recorded";
 
+const emptyRecordForm = () => ({
+  description: "",
+  medicationName: "",
+  dosage: "",
+  prescription: "",
+});
+
 export default function DoctorBookedAppointments() {
   const [slots, setSlots] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [recordAppointment, setRecordAppointment] = useState(null);
+  const [recordForm, setRecordForm] = useState(emptyRecordForm());
   const [loading, setLoading] = useState(true);
+  const [savingRecordId, setSavingRecordId] = useState(null);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       setError(null);
+      setSuccessMessage("");
 
       try {
         const data = await getDoctorSlots();
@@ -70,11 +85,65 @@ export default function DoctorBookedAppointments() {
     load();
   }, []);
 
+  const openRecordModal = (appointment, event) => {
+    event.stopPropagation();
+    setRecordAppointment(appointment);
+    setRecordForm(emptyRecordForm());
+    setError(null);
+    setSuccessMessage("");
+  };
+
+  const closeRecordModal = () => {
+    setRecordAppointment(null);
+    setRecordForm(emptyRecordForm());
+  };
+
+  const updateRecordForm = (field, value) => {
+    setRecordForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const markAppointmentCompleteLocally = (appointmentId) => {
+    setSlots((currentSlots) =>
+      currentSlots.map((slot) => ({
+        ...slot,
+        appointments_made: (slot.appointments_made || []).map((booking) =>
+          booking.id === appointmentId
+            ? { ...booking, appointment_is_complete: true }
+            : booking
+        ),
+      }))
+    );
+    setSelectedAppointment((current) =>
+      current?.id === appointmentId
+        ? { ...current, appointment_is_complete: true }
+        : current
+    );
+  };
+
+  const handleSaveRecord = async (event) => {
+    event.preventDefault();
+    if (!recordAppointment) return;
+
+    try {
+      setSavingRecordId(recordAppointment.id);
+      setError(null);
+      setSuccessMessage("");
+      await saveDoctorAppointmentRecord(recordAppointment.id, recordForm);
+      markAppointmentCompleteLocally(recordAppointment.id);
+      closeRecordModal();
+      setSuccessMessage("Appointment record has been saved and marked complete.");
+    } catch (err) {
+      setError(err.message || "Unable to save appointment record.");
+    } finally {
+      setSavingRecordId(null);
+    }
+  };
+
   const bookedAppointments = useMemo(() => {
     return slots
       .flatMap((slot) =>
         (slot.appointments_made || [])
-          .filter((a) => a.active_appointment_made !== false)
+          .filter((a) => a.appointment_is_complete !== true)
           .map((a) => ({ ...a, slot }))
       )
       .sort((a, b) => {
@@ -107,6 +176,10 @@ export default function DoctorBookedAppointments() {
       </div>
 
       <section className="doctor-booked-card">
+        {successMessage && (
+          <p className="doctor-booked-message success">{successMessage}</p>
+        )}
+
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
@@ -121,7 +194,9 @@ export default function DoctorBookedAppointments() {
                 <th>Date</th>
                 <th>Time</th>
                 <th>Email</th>
+                <th>Status</th>
                 <th>Details</th>
+                <th>Record</th>
               </tr>
             </thead>
 
@@ -134,19 +209,44 @@ export default function DoctorBookedAppointments() {
                     key={appointment.id}
                     onClick={() => setSelectedAppointment(appointment)}
                   >
-                    <td>{getPatientName(appointment)}</td>
-                    <td>{formatDate(slot?.appointment_date)}</td>
-                    <td>
+                    <td data-label="Patient">{getPatientName(appointment)}</td>
+                    <td data-label="Date">{formatDate(slot?.appointment_date)}</td>
+                    <td data-label="Time">
                       {formatTime(slot?.slot_start_time)} -{" "}
                       {formatTime(slot?.slot_end_time)}
                     </td>
-                    <td>{getPatientEmail(appointment)}</td>
-                    <td>
+                    <td data-label="Email">{getPatientEmail(appointment)}</td>
+                    <td data-label="Status">
+                      <span
+                        className={`doctor-booked-status ${
+                          appointment.appointment_is_complete ? "complete" : ""
+                        }`}
+                      >
+                        {appointment.appointment_is_complete ? "Completed" : "Booked"}
+                      </span>
+                    </td>
+                    <td data-label="Details">
                       <button
                         type="button"
-                        onClick={() => setSelectedAppointment(appointment)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setSelectedAppointment(appointment);
+                        }}
                       >
                         View
+                      </button>
+                    </td>
+                    <td data-label="Record">
+                      <button
+                        type="button"
+                        className="doctor-booked-record-button"
+                        onClick={(event) => openRecordModal(appointment, event)}
+                        disabled={
+                          appointment.appointment_is_complete ||
+                          savingRecordId === appointment.id
+                        }
+                      >
+                        {savingRecordId === appointment.id ? "Saving..." : "Add record"}
                       </button>
                     </td>
                   </tr>
@@ -227,6 +327,92 @@ export default function DoctorBookedAppointments() {
             <button onClick={() => setSelectedAppointment(null)}>
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {recordAppointment && (
+        <div className="doctor-booked-modal-backdrop" onClick={closeRecordModal}>
+          <div
+            className="doctor-booked-modal doctor-booked-record-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="doctor-booked-modal-header">
+              <div>
+                <h2>Add appointment record</h2>
+                <p>{getPatientName(recordAppointment)}</p>
+              </div>
+              <button type="button" onClick={closeRecordModal}>
+                X
+              </button>
+            </div>
+
+            <form className="doctor-booked-record-form" onSubmit={handleSaveRecord}>
+              <label>
+                Description
+                <textarea
+                  rows={5}
+                  value={recordForm.description}
+                  onChange={(event) => updateRecordForm("description", event.target.value)}
+                  placeholder="Describe the visit, diagnosis, or clinical notes"
+                  required
+                />
+              </label>
+
+              <div className="doctor-booked-record-grid">
+                <label>
+                  Medication name
+                  <input
+                    type="text"
+                    value={recordForm.medicationName}
+                    onChange={(event) =>
+                      updateRecordForm("medicationName", event.target.value)
+                    }
+                    placeholder="Medication"
+                  />
+                </label>
+
+                <label>
+                  Dosage
+                  <input
+                    type="text"
+                    value={recordForm.dosage}
+                    onChange={(event) => updateRecordForm("dosage", event.target.value)}
+                    placeholder="e.g. 500mg twice daily"
+                  />
+                </label>
+              </div>
+
+              <label>
+                Prescription instructions
+                <textarea
+                  rows={4}
+                  value={recordForm.prescription}
+                  onChange={(event) => updateRecordForm("prescription", event.target.value)}
+                  placeholder="Instructions for the patient"
+                />
+              </label>
+
+              <div className="doctor-booked-record-actions">
+                <button
+                  type="button"
+                  className="doctor-booked-secondary-button"
+                  onClick={closeRecordModal}
+                  disabled={savingRecordId === recordAppointment.id}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="doctor-booked-save-record-button"
+                  disabled={savingRecordId === recordAppointment.id}
+                >
+                  {savingRecordId === recordAppointment.id
+                    ? "Saving..."
+                    : "Save and complete"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

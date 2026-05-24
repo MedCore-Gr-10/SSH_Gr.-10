@@ -9,20 +9,6 @@ const formatDateDisplay = (value) => {
   return `${day}.${month}.${year}`;
 };
 
-const formatDateTimeDisplay = (value) => {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-};
-
 const listText = (items, selector) => {
   const values = items.map(selector).filter(Boolean);
   return values.length ? values.join(", ") : "-";
@@ -209,7 +195,7 @@ export default function Records() {
             </div>
 
             <div className="modal-details">
-              <div className="modal-row">
+              <div className="records-summary-row">
                 <div>
                   <h3>Date</h3>
                   <p>{formatDateDisplay(activeRecord.date)}</p>
@@ -218,25 +204,18 @@ export default function Records() {
                   <h3>Time slot</h3>
                   <p>{activeRecord.timeSlot}</p>
                 </div>
-              </div>
-
-              <div className="modal-row">
                 <div>
                   <h3>Specialization</h3>
                   <p>{activeRecord.specialization || "General Medicine"}</p>
                 </div>
-                <div>
-                  <h3>Created at</h3>
-                  <p>{formatDateTimeDisplay(activeRecord.createdAt)}</p>
-                </div>
               </div>
 
-              <div className="modal-row">
-                <div>
+              <div className="modal-row modal-row-record-context">
+                <div className="records-info-panel">
                   <h3>Diagnosis</h3>
                   <p>{listText(activeRecord.diagnoses || [], (diagnosis) => diagnosis.diagnosis)}</p>
                 </div>
-                <div>
+                <div className="records-info-panel records-allergy-panel">
                   <div className="records-allergy-heading">
                     <h3>Allergies</h3>
                     {activeRecord.allergies?.length > 1 && (
@@ -288,8 +267,14 @@ export default function Records() {
                     {activeRecord.prescriptions.map((prescription) => (
                       <div key={prescription.id} className="records-detail-item">
                         <strong>{prescription.medicationName}</strong>
-                        <p>{prescription.dosage || "No dosage recorded"}</p>
-                        <p>{prescription.instructions || "No instructions recorded"}</p>
+                        <div className="records-prescription-meta">
+                          <span>Dosage</span>
+                          <p>{prescription.dosage || "No dosage recorded"}</p>
+                        </div>
+                        <div className="records-prescription-meta">
+                          <span>Instructions</span>
+                          <p>{prescription.instructions || "No instructions recorded"}</p>
+                        </div>
                       </div>
                     ))}
                   </div>

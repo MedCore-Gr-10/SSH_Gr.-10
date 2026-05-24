@@ -36,7 +36,6 @@ model appointments_made {
   id                          Int                         @id @default(autoincrement())
   appointment_booking_slot_id Int?                        @unique
   patient_id                  String?                     @db.Uuid
-  active_appointment_made     Boolean?                    @default(true)
   appointment_is_complete     Boolean?                    @default(false)
   appointments_booking_slots  appointments_booking_slots? @relation(fields: [appointment_booking_slot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users                       users?                      @relation(fields: [patient_id], references: [id], onDelete: Cascade, onUpdate: NoAction)

@@ -110,7 +110,7 @@ class PatientAppointmentsService {
 
     return {
       id: appointment.id,
-      active: appointment.active_appointment_made !== false,
+      active: appointment.appointment_is_complete !== true,
       complete: appointment.appointment_is_complete === true,
       appointmentBookingSlotId: appointment.appointment_booking_slot_id,
       appointment: slot ? this.formatAppointment(slot) : null,
