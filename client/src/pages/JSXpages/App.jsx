@@ -4,7 +4,6 @@ import Sidebar from "../../components/layout/Sidebar.jsx";
 import Home from "./header-pages/Home.jsx";
 import About from "./header-pages/About.jsx";
 import Notifications from "./header-pages/Notifications.jsx";
-import Settings from "./header-pages/Settings.jsx";
 import Profile from "./header-pages/Profile.jsx";
 import LogOut from "./header-pages/LogOut.jsx";
 
@@ -75,7 +74,6 @@ export default function App() {
           <Route path="home" element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
           <Route path="logout" element={<LogOut />} />
           {/* ===================== SUPERUSER ===================== */}

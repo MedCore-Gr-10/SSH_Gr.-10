@@ -1,174 +1,334 @@
 .make-request-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 4% 60px 4%;
+  box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: #2d3748;
   background-color: #ffffff;
-  min-height: 100%;
-  width: 100%;
-  padding: 2rem 1rem;
-  box-sizing: border-box;
+}
+
+.make-request-container h1 {
+  margin: 0 0 8px;
+  color: #1a202c;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.make-request-container p {
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.request-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 30px;
+  margin-top: 24px;
+}
+
+.received-requests-section {
+  margin-top: 24px;
+  scroll-margin-top: 24px;
 }
 
 .make-request-card {
-  background-color: #ffffff;
-  border-radius: 20px;
+  background: #ffffff;
   border: 1px solid #edf2f7;
+  border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
-  padding: 2.5rem;
-  max-width: 760px;
-  width: 100%;
-  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
 }
 
-.make-request-title {
-  font-size: 36px;
-  font-weight: 800;
+.make-request-card h2 {
+  margin: 0 0 16px;
   color: #1a202c;
-  margin: 0 0 16px 0;
-  letter-spacing: -0.5px;
-  line-height: 1.1;
-  text-align: center;
-}
-
-.make-request-description {
-  color: #4a5568;
-  font-size: 1rem;
-  line-height: 1.75;
-  margin: 0 0 1.75rem 0;
-  text-align: center;
-}
-
-.make-request-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.form-label {
-  color: #5c5cd6;
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  line-height: 1.25;
 }
 
-.form-input,
-.request-textarea {
-  border: 1px solid #edf2f7;
-  border-radius: 14px;
-  padding: 1rem 1rem;
-  background-color: #ffffff;
+.request-history-card,
+.received-requests-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.request-history-card {
+  min-height: 620px;
+}
+
+.received-requests-card {
+  min-height: 700px;
+}
+
+.request-form label {
+  display: block;
+  margin: 16px 0 8px;
+  font-weight: 600;
   color: #2d3748;
-  font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 14px;
 }
 
-.form-input:hover:not(:disabled),
-.request-textarea:hover:not(:disabled) {
-  border-color: #c3d4fd;
-  box-shadow: 0 10px 25px rgba(92, 92, 214, 0.08);
-}
-
-.form-input:focus,
-.request-textarea:focus {
+.request-form select,
+.request-form input,
+.request-form textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #edf2f7;
+  padding: 12px;
+  box-sizing: border-box;
+  color: #2d3748;
+  font-size: 14px;
+  font-family: inherit;
   outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.request-form select:focus,
+.request-form input:focus,
+.request-form textarea:focus {
   border-color: #5c5cd6;
-  box-shadow: 0 0 20px rgba(92, 92, 214, 0.15);
 }
 
-.form-input:disabled,
-.request-textarea:disabled {
-  background-color: #f7fafc;
-  cursor: not-allowed;
-  color: #a0aec0;
-}
-
-.request-textarea {
-  min-height: 180px;
-  max-height: 320px;
-  line-height: 1.7;
+.request-form textarea {
+  min-height: 140px;
   resize: vertical;
 }
 
-.char-count {
-  font-size: 0.85rem;
-  color: #a0aec0;
-  text-align: right;
-  margin-top: 0.25rem;
+.recipient-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  background: #fafafa;
 }
 
-.error-message,
-.success-message {
-  padding: 1rem;
+.recipient-toggle button {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #4a5568;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 14px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.recipient-toggle button.active {
+  background: #5c5cd6;
+  color: #ffffff;
+}
+
+.patient-results {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.patient-result {
+  width: 100%;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2d3748;
+  cursor: pointer;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.patient-result:hover,
+.patient-result.selected {
+  border-color: #5c5cd6;
+  background: rgba(92, 92, 214, 0.02);
+}
+
+.selected-recipient,
+.empty-help {
+  margin-top: 12px;
+  color: #718096;
+  font-size: 13px;
+}
+
+.request-actions {
+  margin-top: 16px;
+}
+
+.btn-primary {
+  background: #5c5cd6;
+  color: #ffffff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background: #4b4bca;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.request-message {
+  margin-top: 16px;
+  padding: 14px 16px;
   border-radius: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 
-.error-message {
-  background-color: #fff5f5;
-  border: 1px solid #fed7d7;
-  color: #9b2c2c;
+.request-message.error {
+  background: rgba(239, 68, 68, 0.06);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.15);
 }
 
-.success-message {
-  background-color: #f0fff4;
-  border: 1px solid #c6f6d5;
-  color: #2f855a;
+.request-message.success {
+  background: rgba(16, 185, 129, 0.06);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.15);
 }
 
-.submit-button {
-  padding: 1rem 2rem;
-  background: #5c5cd6;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 1rem;
-  font-weight: 700;
+.request-list {
+  display: grid;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.request-list-paged {
+  align-content: start;
+}
+
+.request-list-paged.sent {
+  min-height: 460px;
+}
+
+.request-list-paged.received {
+  min-height: 540px;
+}
+
+.request-item {
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.request-item p {
+  margin-bottom: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.request-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #718096;
+  font-weight: 600;
+}
+
+.request-meta span {
+  flex: 0 0 auto;
+  font-size: 13px;
+}
+
+.request-recipient-line {
+  margin-top: 8px;
+  color: #4a5568;
+  font-size: 13px;
+}
+
+.request-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.request-pagination button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2d3748;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  letter-spacing: 0.5px;
-  margin-top: 0.5rem;
-  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
 }
 
-.submit-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(92, 92, 214, 0.18);
+.request-pagination button:hover:not(:disabled) {
+  background: #fafafa;
 }
 
-.submit-button:disabled {
-  background: #c3c8ff;
+.request-pagination button:disabled {
   cursor: not-allowed;
-  opacity: 0.8;
+  opacity: 0.45;
 }
 
-@media (max-width: 768px) {
-  .make-request-card {
-    padding: 2rem;
-  }
+.request-pagination span {
+  color: #4a5568;
+  font-size: 13px;
+  font-weight: 600;
+}
 
-  .make-request-title {
-    font-size: 30px;
+.reply-context {
+  margin-top: -6px;
+  color: #5c5cd6;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .request-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
+  .make-request-container {
+    padding: 20px;
+  }
+
   .make-request-card {
-    padding: 1.5rem;
+    padding: 16px;
   }
 
-  .make-request-title {
-    font-size: 26px;
-    margin-bottom: 1rem;
+  .request-meta {
+    display: grid;
   }
 
-  .submit-button {
+  .btn-primary,
+  .recipient-toggle {
     width: 100%;
-    padding: 0.95rem 1rem;
+  }
+
+  .recipient-toggle button {
+    flex: 1;
+    text-align: center;
   }
 }

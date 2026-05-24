@@ -27,6 +27,7 @@
 
 
 .nav-links a {
+  position: relative;
   display: flex;
   align-items: center; 
   text-decoration: none;
@@ -97,6 +98,20 @@
   filter: none !important;
 }
 
+.notification-badge {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0 6px;
+}
 .nav-links-logout {
   display: flex;
   align-items: center;
