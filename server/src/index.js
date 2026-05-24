@@ -38,13 +38,6 @@ app.use("/api/patient", patientRoutes);
 app.use("/api/doctor", doctorRoutes);
 app.use("/api/superuser", superuserRoutes);
 app.use("/api/requests", requestsRoutes);
-<<<<<<< HEAD
-app.use("/api/system-overview", systemOverviewRoutes);
-app.use("/api/system-logs", systemLogsRoutes);
-app.use("/api/appointments", appointmentsRoutes);
-app.use("/api/ai", aiRoutes);
-=======
->>>>>>> f694ddebf8503d54b71b1e4c96e9d90c99387f59
 
 // 404 handler MUST be last
 app.use("/api", (req, res) => {
