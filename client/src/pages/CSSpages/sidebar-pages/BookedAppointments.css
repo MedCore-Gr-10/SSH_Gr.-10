@@ -1,0 +1,261 @@
+.doctor-booked-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+  color: #1f2937;
+}
+
+.doctor-booked-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.doctor-booked-header h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 2rem;
+}
+
+.doctor-booked-header p {
+  margin: 8px 0 0;
+  color: #4b5563;
+}
+
+.doctor-booked-count {
+  min-width: 110px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 14px;
+  text-align: center;
+}
+
+.doctor-booked-count span {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.doctor-booked-count small {
+  color: #1e40af;
+  font-weight: 700;
+}
+
+.doctor-booked-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  padding: 20px;
+}
+
+.doctor-booked-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.doctor-booked-table th,
+.doctor-booked-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 14px 12px;
+  text-align: left;
+}
+
+.doctor-booked-table th {
+  color: #111827;
+  font-weight: 800;
+}
+
+.doctor-booked-table tbody tr {
+  cursor: pointer;
+}
+
+.doctor-booked-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.doctor-booked-table td {
+  color: #374151;
+}
+
+.doctor-booked-table button {
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 8px 12px;
+}
+
+.doctor-booked-message {
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.doctor-booked-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.doctor-booked-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.45);
+  padding: 24px;
+}
+
+.doctor-booked-modal {
+  width: min(760px, 100%);
+  max-height: min(86vh, 760px);
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24);
+  padding: 22px;
+}
+
+.doctor-booked-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 14px;
+}
+
+.doctor-booked-modal-header h2 {
+  margin: 0;
+  color: #111827;
+}
+
+.doctor-booked-modal-header p {
+  margin: 6px 0 0;
+  color: #4b5563;
+}
+
+.doctor-booked-modal-header button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.doctor-booked-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.doctor-booked-detail-grid div {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.doctor-booked-detail-grid span,
+.doctor-booked-detail-section li span {
+  display: block;
+  color: #6b7280;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.doctor-booked-detail-grid strong {
+  display: block;
+  margin-top: 6px;
+  color: #111827;
+}
+
+.doctor-booked-detail-section {
+  margin-top: 18px;
+}
+
+.doctor-booked-detail-section h3 {
+  margin: 0 0 10px;
+  color: #111827;
+}
+
+.doctor-booked-detail-section ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doctor-booked-detail-section li {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.doctor-booked-detail-section li strong {
+  display: block;
+  color: #111827;
+}
+
+.doctor-booked-detail-section p {
+  margin: 6px 0 0;
+  color: #4b5563;
+}
+
+@media (max-width: 720px) {
+  .doctor-booked-header,
+  .doctor-booked-detail-grid {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .doctor-booked-count {
+    width: 100%;
+  }
+
+  .doctor-booked-table,
+  .doctor-booked-table thead,
+  .doctor-booked-table tbody,
+  .doctor-booked-table th,
+  .doctor-booked-table td,
+  .doctor-booked-table tr {
+    display: block;
+  }
+
+  .doctor-booked-table thead {
+    display: none;
+  }
+
+  .doctor-booked-table tr {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+
+  .doctor-booked-table td {
+    border: 0;
+    display: grid;
+    gap: 4px;
+    padding: 8px 0;
+  }
+
+  .doctor-booked-table td::before {
+    content: attr(data-label);
+    color: #6b7280;
+    font-weight: 800;
+  }
+}
