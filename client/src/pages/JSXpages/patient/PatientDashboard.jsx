@@ -3,6 +3,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getPatientEmergencyContacts } from "../../../services/patientEmergencyContactsApi";
 import { getPatientHospitals, updatePatientHospitals } from "../../../services/patientHospitalsApi";
+import { sendPatientAiMessage } from "../../../services/patientAiApi";
 import "../../CSSpages/patient/PatientDashboard.css";
 
 const visibleHospitalCount = 3;
@@ -19,6 +20,15 @@ export default function PatientDashboard() {
   const [currentContactId, setCurrentContactId] = useState("");
   const [contactLoading, setContactLoading] = useState(false);
   const [contactError, setContactError] = useState("");
+  const [assistantMessages, setAssistantMessages] = useState([
+    {
+      role: "assistant",
+      content: "Hi, I can help you use MedCore. Ask me about appointments, records, hospitals, emergency contacts, insurance, or allergies.",
+    },
+  ]);
+  const [assistantInput, setAssistantInput] = useState("");
+  const [assistantLoading, setAssistantLoading] = useState(false);
+  const [assistantError, setAssistantError] = useState("");
 
   const latestRecord = {
     title: "Your latest record",
@@ -103,6 +113,36 @@ export default function PatientDashboard() {
     }
   };
 
+  const handleAssistantSubmit = async (event) => {
+    event.preventDefault();
+    const message = assistantInput.trim();
+    if (!message || assistantLoading) return;
+
+    const nextMessages = [...assistantMessages, { role: "user", content: message }];
+    setAssistantMessages(nextMessages);
+    setAssistantInput("");
+    setAssistantLoading(true);
+    setAssistantError("");
+
+    try {
+      const data = await sendPatientAiMessage({
+        message,
+        history: assistantMessages.slice(-8),
+      });
+      setAssistantMessages([
+        ...nextMessages,
+        {
+          role: "assistant",
+          content: data.answer || "I could not generate an answer. Please try again.",
+        },
+      ]);
+    } catch (err) {
+      setAssistantError(err.message || "Unable to reach the assistant.");
+    } finally {
+      setAssistantLoading(false);
+    }
+  };
+
   return (
     <div className="patient-dashboard-container">
       <div className="patient-dashboard-welcome">
@@ -165,6 +205,47 @@ export default function PatientDashboard() {
               </button>
             </div>
           )}
+        </div>
+
+        <div className="widget-card assistant-widget">
+          <div className="assistant-header">
+            <div>
+              <p className="widget-label">MedCore assistant</p>
+              <h2 className="widget-subheading">Ask for help using the app</h2>
+            </div>
+            <span className="assistant-badge">AI</span>
+          </div>
+
+          <div className="assistant-messages" aria-live="polite">
+            {assistantMessages.map((message, index) => (
+              <div
+                key={`${message.role}-${index}`}
+                className={`assistant-message ${message.role === "user" ? "user" : "assistant"}`}
+              >
+                {message.content}
+              </div>
+            ))}
+            {assistantLoading && (
+              <div className="assistant-message assistant">Thinking...</div>
+            )}
+          </div>
+
+          {assistantError && (
+            <p className="assistant-error">{assistantError}</p>
+          )}
+
+          <form className="assistant-form" onSubmit={handleAssistantSubmit}>
+            <input
+              type="text"
+              value={assistantInput}
+              onChange={(event) => setAssistantInput(event.target.value)}
+              placeholder="Ask how to book, cancel, or view records"
+              disabled={assistantLoading}
+            />
+            <button type="submit" disabled={assistantLoading || !assistantInput.trim()}>
+              Send
+            </button>
+          </form>
         </div>
 
         <div className="widget-card hospitals-widget">

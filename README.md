@@ -213,7 +213,12 @@ për profesionistët mjekësorë dhe komunitetet që ata shërbejnë.
 
 ### 🤖 Integrimi AI
 
-- Modul i integruar me **OpenAI API**
+- Modul i integruar me **Gemini API**
+- Ne `server/.env`, shto:
+  ```env
+  GEMINI_API_KEY=your-gemini-api-key
+  GEMINI_MODEL=gemini-2.5-flash
+  ```
 - Endpoint-e për:
   - chatbot
   - analiza teksti
