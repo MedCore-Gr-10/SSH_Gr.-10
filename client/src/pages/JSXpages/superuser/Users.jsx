@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "../../CSSpages/superuser/Users.css";
-import Button1 from "../../../components/JSXcomponents/Button1.jsx";
 import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
 import { superuserFetch } from "../../../services/superuserApi.js";
 
