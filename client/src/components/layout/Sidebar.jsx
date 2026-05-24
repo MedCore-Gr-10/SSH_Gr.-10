@@ -12,13 +12,12 @@ const Sidebar = () => {
 
   const sidebarConfig = {
     superuser: [
-      { label: "Dashboard", path: "/main/dashboard" },
+      { label: "System Overview", path: "/main/system-overview" },
       { label: "Hospitals", path: "/main/hospitals" },
       { label: "Users", path: "/main/users" },
-      { label: "Appointments", path: "/main/booked-appointments" },
+      { label: "Appointments Made", path: "/main/booked-appointments" },
       { label: "Manage Departments", path: "/main/manage-departments" },
       { label: "Manage Specialization", path: "/main/manage-specializations" },
-      { label: "System Overview", path: "/main/system-overview" },
       { label: "System Logs", path: "/main/system-logs" },
       { label: "Make a Request", path: "/main/make-request" }
     ],

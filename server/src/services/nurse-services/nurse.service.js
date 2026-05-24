@@ -340,11 +340,30 @@ class NurseService {
     await this.ensurePatientInHospital(patientId, hospitalId);
     const accessReason = this.requireReason(reason, "appointments view");
 
+    const hospital = await prisma.hospitals.findUnique({
+      where: { id: hospitalId },
+      select: { hospital_name: true },
+    });
+
     const appointments =
       await appointmentsMadeRepository.findPatientAppointmentsAtHospital(
         patientId,
         hospitalId,
       );
+
+    const items = appointments
+      .map((appointment) =>
+        this.mapVisitRecord(appointment, hospital?.hospital_name || null),
+      )
+      .sort((a, b) => {
+        const dateA = a.appointment_date
+          ? new Date(a.appointment_date).getTime()
+          : 0;
+        const dateB = b.appointment_date
+          ? new Date(b.appointment_date).getTime()
+          : 0;
+        return dateB - dateA;
+      });
 
     await this.logMyPatientsAccess(
       nurseId,
@@ -353,7 +372,7 @@ class NurseService {
       patientId,
     );
 
-    return appointments;
+    return items;
   }
 
   async getAccessLogs(nurseId) {

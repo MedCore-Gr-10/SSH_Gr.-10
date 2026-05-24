@@ -382,6 +382,54 @@
   font-size: 0.9rem;
 }
 
+.nurse-appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nurse-appointment-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: #fafafa;
+}
+
+.nurse-appointment-card--inactive {
+  opacity: 0.85;
+  background: #f3f4f6;
+}
+
+.nurse-appointment-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.nurse-appointment-date {
+  font-weight: 700;
+  color: #111827;
+}
+
+.nurse-appointment-time {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.nurse-appointment-meta {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.nurse-history-date-hint {
+  flex-basis: 100%;
+  margin: 0 0 4px;
+}
+
 .nurse-history-filters {
   display: flex;
   flex-wrap: wrap;

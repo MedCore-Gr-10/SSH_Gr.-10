@@ -6,6 +6,7 @@ import {
   DoctorAppointmentTemplatesController,
   DoctorAppointmentSlotsController
 } from "../controllers/doctor-controllers/appointments.controller.js";
+import DoctorPatientsController from "../controllers/doctor-controllers/patients.controller.js";
 
 const router = express.Router();
 const jwtService = new JwtService();
@@ -13,12 +14,67 @@ const authMiddleware = new AuthMiddleware(jwtService);
 const roleMiddleware = new RoleMiddleware("doctor", "DOCTOR");
 const templatesController = new DoctorAppointmentTemplatesController();
 const slotsController = new DoctorAppointmentSlotsController();
+const patientsController = new DoctorPatientsController();
 
 /**
  * All routes require doctor authentication
  */
 router.use((req, res, next) => authMiddleware.handle(req, res, next));
 router.use((req, res, next) => roleMiddleware.handle(req, res, next));
+
+/**
+ * GET /api/doctor/patients
+ * Fetch unique patients previously treated by the logged-in doctor
+ */
+router.get(
+  "/patients",
+  (req, res, next) => patientsController.getPatients(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/history
+ * Get patient history with access reason logging
+ */
+router.get(
+  "/patients/:id/history",
+  (req, res, next) => patientsController.getPatientHistory(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/allergies
+ * Get patient allergies with access reason logging
+ */
+router.get(
+  "/patients/:id/allergies",
+  (req, res, next) => patientsController.getPatientAllergies(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/insurance
+ * Get patient insurance with access reason logging
+ */
+router.get(
+  "/patients/:id/insurance",
+  (req, res, next) => patientsController.getPatientInsurance(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/emergency-contacts
+ * Get patient emergency contacts with access reason logging
+ */
+router.get(
+  "/patients/:id/emergency-contacts",
+  (req, res, next) => patientsController.getPatientEmergencyContacts(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/appointments
+ * Get patient appointments with access reason logging
+ */
+router.get(
+  "/patients/:id/appointments",
+  (req, res, next) => patientsController.getPatientAppointments(req, res, next)
+);
 
 /**
  * ===================================

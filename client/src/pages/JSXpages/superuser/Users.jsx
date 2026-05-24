@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import "./../CSSpages/superuser/Users.css";
-import Button1 from "../../components/JSXcomponents/Button1.jsx";
-import GenericTable from "../../components/JSXcomponents/GenericTable.jsx";
+import "../../CSSpages/superuser/Users.css";
+import Button1 from "../../../components/JSXcomponents/Button1.jsx";
+import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -157,7 +157,7 @@ export default function Users() {
           val === 1 ||
           String(val).toLowerCase() === "true";
 
-        return active ? "✅ Active" : "❌ Inactive";
+        return active ? "✅ Enabled" : "❌ Disabled";
       }
     },
   ];
@@ -492,8 +492,8 @@ export default function Users() {
         <div className="menu-bubble-information-buttons">
           <div className="menu-information">
             <p>Total Users: {users.length}</p>
-            <p>Active: {users.filter((u) => u && (u.is_active === true || u.is_active === 1 || String(u.is_active).toLowerCase() === "true")).length}</p>
-            <p>Inactive: {users.filter((u) => u && !(u.is_active === true || u.is_active === 1 || String(u.is_active).toLowerCase() === "true")).length}</p>
+            <p>Enabled: {users.filter((u) => u && (u.is_active === true || u.is_active === 1 || String(u.is_active).toLowerCase() === "true")).length}</p>
+            <p>Disabled: {users.filter((u) => u && !(u.is_active === true || u.is_active === 1 || String(u.is_active).toLowerCase() === "true")).length}</p>
           </div>
           <div className="menu-search-button">
             <input 
@@ -570,8 +570,8 @@ export default function Users() {
                     style={{ padding: "6px 12px", borderRadius: "6px", border: "1px solid #ccc", cursor: "pointer" }}
                   >
                     <option value="ALL">All Statuses</option>
-                    <option value="ACTIVE">✅ Active Only</option>
-                    <option value="INACTIVE">❌ Inactive Only</option>
+                    <option value="ACTIVE">✅ Enabled Only</option>
+                    <option value="INACTIVE">❌ Disabled Only</option>
                   </select>
                 </div>
               </div>
@@ -756,7 +756,7 @@ export default function Users() {
 
             {isUserEditMode && (
               <div className="danger-zone-password-reset">
-                <h3>Administrative Credential Override</h3>
+                <h4>Administrative Credential Override</h4>
                 {!showPasswordForm ? (
                   <button type="button" className="trigger-reset-btn" onClick={() => setShowPasswordForm(true)}>Modify User Security Password</button>
                 ) : (

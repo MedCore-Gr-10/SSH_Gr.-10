@@ -12,6 +12,15 @@ import {
   IconArrowRight,
 } from "./AuthIcons.jsx";
 import "./auth.css";
+import {
+  sanitizePersonalNoInput,
+  sanitizePhoneInput,
+  todayDateString,
+  validateBirthDate,
+  validatePersonalNo,
+  validatePhoneNumber,
+  validateRegistrationProfile,
+} from "../../utils/registerValidation.js";
 
 function passwordRulesMet(password) {
   return {
@@ -58,6 +67,21 @@ export default function Register() {
   const passwordsMatch =
     form.password.length > 0 && form.password === form.confirmPassword;
 
+  const birthMaxDate = todayDateString();
+  const profileValid = useMemo(
+    () =>
+      !validateBirthDate(form.birth) &&
+      !validatePersonalNo(form.personal_no) &&
+      !validatePhoneNumber(form.phone_number),
+    [form.birth, form.personal_no, form.phone_number],
+  );
+
+  const handleBirthChange = (value) => {
+    let next = value;
+    if (next > birthMaxDate) next = birthMaxDate;
+    setForm((current) => ({ ...current, birth: next }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -68,6 +92,12 @@ export default function Register() {
     }
     if (!passwordsMatch) {
       setError("Passwords do not match.");
+      return;
+    }
+
+    const profileError = validateRegistrationProfile(form);
+    if (profileError) {
+      setError(profileError);
       return;
     }
 
@@ -98,7 +128,8 @@ export default function Register() {
     form.personal_no &&
     form.phone_number &&
     allRulesMet(rules) &&
-    passwordsMatch;
+    passwordsMatch &&
+    profileValid;
 
   return (
     <div className="mc-auth-page">
@@ -302,10 +333,13 @@ export default function Register() {
                   id="reg-birth"
                   name="birth"
                   type="date"
+                  required
+                  max={birthMaxDate}
                   value={form.birth}
-                  onChange={(e) => setForm({ ...form, birth: e.target.value })}
+                  onChange={(e) => handleBirthChange(e.target.value)}
                 />
               </div>
+              <p className="mc-field-hint">Cannot be a future date.</p>
             </div>
 
             <div className="mc-field">
@@ -337,13 +371,21 @@ export default function Register() {
                   id="reg-personal"
                   name="personal_no"
                   autoComplete="off"
-                  placeholder="National ID or personal number"
+                  placeholder="e.g. PAT-123456"
+                  minLength={6}
+                  maxLength={20}
                   value={form.personal_no}
                   onChange={(e) =>
-                    setForm({ ...form, personal_no: e.target.value.trim() })
+                    setForm({
+                      ...form,
+                      personal_no: sanitizePersonalNoInput(e.target.value),
+                    })
                   }
                 />
               </div>
+              <p className="mc-field-hint">
+                6–20 characters: letters, numbers, and hyphens only.
+              </p>
             </div>
 
             <div className="mc-field">
@@ -356,13 +398,20 @@ export default function Register() {
                   name="phone_number"
                   type="tel"
                   autoComplete="tel"
-                  placeholder="+1 234 567 8900"
+                  inputMode="tel"
+                  placeholder="e.g. +383 44 123 456"
                   value={form.phone_number}
                   onChange={(e) =>
-                    setForm({ ...form, phone_number: e.target.value.trim() })
+                    setForm({
+                      ...form,
+                      phone_number: sanitizePhoneInput(e.target.value),
+                    })
                   }
                 />
               </div>
+              <p className="mc-field-hint">
+                Digits only (8–15 digits). +, spaces, and hyphens are allowed.
+              </p>
             </div>
           </div>
 

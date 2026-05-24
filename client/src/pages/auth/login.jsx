@@ -22,9 +22,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(() => {
-    if (location.state?.passwordReset) {
-      return "Password updated. You can sign in with your new password.";
-    }
     if (location.state?.registered) {
       return "Account created. You can sign in now.";
     }
@@ -39,10 +36,20 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSuccess("");
     setError("");
+
+    const username = form.username.trim();
+    const password = form.password;
+
+    if (!username || !password) {
+      setError("Username and password are required.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await loginUser(form);
+      const res = await loginUser({ username, password });
       if (res.error) {
         setError(res.error);
         return;
@@ -53,6 +60,8 @@ export default function Login() {
       } else {
         setError("Could not sign you in. Please try again.");
       }
+    } catch {
+      setError("Could not sign you in. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -90,9 +99,10 @@ export default function Login() {
                 name="username"
                 autoComplete="username"
                 placeholder="Your username"
+                required
                 value={form.username}
                 onChange={(e) =>
-                  setForm({ ...form, username: e.target.value.trim() })
+                  setForm({ ...form, username: e.target.value })
                 }
               />
             </div>
@@ -112,6 +122,7 @@ export default function Login() {
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 placeholder="Enter your password"
+                required
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
@@ -136,11 +147,6 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="mc-link-row">
-          <Link to="/forgot-password" className="mc-link-muted">
-            Forgot password?
-          </Link>
-        </div>
         <p className="mc-footer-link">
           Don&apos;t have an account? <Link to="/register">Sign Up</Link>
         </p>

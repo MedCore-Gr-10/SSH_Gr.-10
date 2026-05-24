@@ -13,7 +13,8 @@ export class AuthController {
       const result = await this.authService.login(username, password);
       res.json(result);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      const isInactiveAccount = String(err.message || "").includes("not active");
+      res.status(isInactiveAccount ? 403 : 400).json({ error: err.message });
     }
   };
 
@@ -26,26 +27,4 @@ export class AuthController {
     }
   };
 
-  forgotPassword = async (req, res) => {
-    try {
-      const { email } = req.body;
-      const result = await this.authService.requestPasswordReset(email);
-      res.json(result);
-    } catch (err) {
-      console.error("forgotPassword error:", err);
-      res
-        .status(400)
-        .json({ error: err.message || "Password reset request failed" });
-    }
-  };
-
-  resetPassword = async (req, res) => {
-    try {
-      const { token, password } = req.body;
-      const result = await this.authService.resetPassword(token, password);
-      res.json(result);
-    } catch (err) {
-      res.status(400).json({ error: err.message });
-    }
-  };
 }
