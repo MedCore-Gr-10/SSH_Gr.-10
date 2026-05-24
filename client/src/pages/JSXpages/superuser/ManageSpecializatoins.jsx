@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
 import "../../CSSpages/superuser/ManageSpecializatoins.css"; 
+import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function ManageSpecialization() {
   // Data and structural states
@@ -30,7 +31,7 @@ export default function ManageSpecialization() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/specializations");
+      const response = await superuserFetch("/specializations");
       const result = await response.json();
       if (result.success) {
         setSpecializations(result.data);
@@ -53,11 +54,11 @@ export default function ManageSpecialization() {
     if (!inputValue.trim()) return;
 
     setError("");
-    const url = isEditing ? `/api/specializations/${selectedItem.id}` : "/api/specializations";
+    const url = isEditing ? `/specializations/${selectedItem.id}` : "/specializations";
     const method = isEditing ? "PUT" : "POST";
 
     try {
-      const response = await fetch(url, {
+      const response = await superuserFetch(url, {
         method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ specialization_name: inputValue }),
@@ -85,7 +86,7 @@ export default function ManageSpecialization() {
 
     setError("");
     try {
-      const response = await fetch(`/api/specializations/${selectedItem.id}`, {
+      const response = await superuserFetch(`/specializations/${selectedItem.id}`, {
         method: "DELETE",
       });
       const result = await response.json();

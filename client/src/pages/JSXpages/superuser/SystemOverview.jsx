@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "../../CSSpages/superuser/SystemOverview.css"; 
+import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function SystemOverview() {
   const [stats, setStats] = useState({
@@ -34,7 +35,7 @@ export default function SystemOverview() {
         setError(null);
         
         // Thirrja e rrugës së re të dedikuar në backend
-        const response = await fetch('/api/system-overview'); 
+        const response = await superuserFetch('/system-overview'); 
         const result = await response.json();
 
         if (result.success) {

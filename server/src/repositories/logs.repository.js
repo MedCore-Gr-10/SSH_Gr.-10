@@ -1,21 +1,14 @@
 import prisma from "../prisma.js";
 
 class LogsRepository {
-
   async create(data) {
-    return prisma.logs.create({
-      data
-    });
+    return prisma.logs.create({ data });
   }
 
   async findUserLogs(userId, limit = 100) {
     return prisma.logs.findMany({
-      where: {
-        user_id: userId
-      },
-      orderBy: {
-        timestamp: "desc"
-      },
+      where: { user_id: userId },
+      orderBy: { timestamp: "desc" },
       take: limit,
     });
   }
@@ -24,14 +17,11 @@ class LogsRepository {
     return prisma.logs.count({
       where: {
         user_id: userId,
-        timestamp: {
-          gte: since,
-        },
+        timestamp: { gte: since },
       },
     });
   }
 
-  /** My Patients page actions only (prefix match). */
   static MY_PATIENTS_ACTION_PREFIXES = [
     "Search patients",
     "View allergies",
@@ -70,25 +60,17 @@ class LogsRepository {
     });
   }
 
+  // Optimized to eagerly load user details for the layout transformer
   async findAll() {
     return prisma.logs.findMany({
       include: {
-        user: {
-          include: {
-            users_profiles: {
-              include: {
-                profiles: true,
-              },
-            },
-          },
-        },
+        user: true,
       },
       orderBy: {
         timestamp: "desc",
       },
     });
   }
-
 }
 
 export default new LogsRepository();
