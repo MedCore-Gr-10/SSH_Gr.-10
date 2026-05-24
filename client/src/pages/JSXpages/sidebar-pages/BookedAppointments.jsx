@@ -17,13 +17,15 @@ const formatDate = (value) => {
 
 const formatTime = (value) => {
   if (!value) return "";
-  if (value.includes?.("T")) {
-    return new Date(value).toLocaleTimeString(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(value)) {
+    const [hour, minute] = value.split(":");
+    return `${hour.padStart(2, "0")}:${minute}`;
   }
-  return value.length === 8 ? value.slice(0, 5) : value;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
 };
 
 const getPatientProfileLink = (appointment) => appointment?.users?.users_profiles?.[0] || null;
