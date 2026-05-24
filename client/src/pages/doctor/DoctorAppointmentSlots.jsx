@@ -40,24 +40,25 @@ const formatDate = (value) => {
 const formatTime = (value) => {
   if (!value) return "-";
 
-  let date;
   if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(value)) {
-    date = new Date(`1970-01-01T${value}`);
-  } else {
-    date = new Date(value);
+    const [hour, minute] = value.split(":");
+    return `${hour.padStart(2, "0")}:${minute}`;
   }
 
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
 
-  return new Intl.DateTimeFormat("en", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
+  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
 };
 
 const getTemplateSummary = (template) => {
   const day = template.day_of_week || "Scheduled day";
   return `${day}, ${formatTime(template.start_time)} - ${formatTime(template.end_time)}`;
+};
+
+const getTemplateOptionLabel = (template) => {
+  const day = template.day_of_week || "Scheduled day";
+  return `${day} ${formatTime(template.start_time)} - ${formatTime(template.end_time)}`;
 };
 
 const getDepartmentLabel = (template) => {
@@ -359,7 +360,7 @@ export default function DoctorAppointmentSlots() {
           <p>Available on {checkedAvailableDate}</p>
         </div>
         <div className="doctor-slots-stat-card">
-          <strong>{generationStatus?.latest_slot_date || "-"}</strong>
+          <strong>{generationStatus?.latest_slot_date ? formatDate(generationStatus.latest_slot_date) : "-"}</strong>
           <p>Latest generated slot</p>
         </div>
       </div>
@@ -465,7 +466,7 @@ export default function DoctorAppointmentSlots() {
               <option value="">Select a template</option>
               {templates.map((template) => (
                 <option key={template.id} value={template.id}>
-                  {`${template.day_of_week} ${template.start_time || ""}-${template.end_time || ""}`}
+                  {getTemplateOptionLabel(template)}
                 </option>
               ))}
             </select>

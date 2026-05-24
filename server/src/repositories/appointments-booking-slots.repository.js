@@ -69,7 +69,24 @@ class AppointmentsBookingSlotsRepository {
       },
       include: {
         appointments_templates: true,
-        appointments_made: true
+        appointments_made: {
+          include: {
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: {
+                      include: {
+                        allergies: true,
+                        insurance: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       orderBy: [
         { appointment_date: "asc" },

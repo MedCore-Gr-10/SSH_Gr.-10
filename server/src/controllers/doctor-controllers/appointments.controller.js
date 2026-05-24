@@ -187,6 +187,24 @@ class DoctorAppointmentTemplatesController {
  * Handles REST API endpoints for booking slots
  */
 class DoctorAppointmentSlotsController {
+  patientDisplayName(patient) {
+    if (!patient) return null;
+
+    const profile = patient.users_profiles?.[0]?.profiles;
+    const fullName = `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim();
+
+    return fullName || patient.username || null;
+  }
+
+  withPatientDisplayNames(slots) {
+    return slots.map((slot) => ({
+      ...slot,
+      appointments_made: (slot.appointments_made || []).map((appointment) => ({
+        ...appointment,
+        patient_name: this.patientDisplayName(appointment.users),
+      })),
+    }));
+  }
 
   /**
    * GET /api/doctor/appointments/slots
@@ -202,6 +220,7 @@ class DoctorAppointmentSlotsController {
         doctorId,
         date ? new Date(date) : null
       );
+      const slotsWithPatientNames = this.withPatientDisplayNames(slots);
 
       await logsRepository.create({
         user_id: doctorId,
@@ -211,7 +230,7 @@ class DoctorAppointmentSlotsController {
           : "Doctor viewed appointment slots",
       });
 
-      res.status(200).json({ success: true, data: slots });
+      res.status(200).json({ success: true, data: slotsWithPatientNames });
     } catch (err) {
       next(err);
     }
