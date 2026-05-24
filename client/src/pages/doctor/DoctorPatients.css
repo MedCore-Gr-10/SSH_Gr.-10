@@ -1,0 +1,215 @@
+.doctor-patients-page {
+  padding: 40px 4% 60px 4%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #2d3748;
+  background-color: #ffffff;
+  max-height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.doctor-patients-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.doctor-patients-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a202c;
+  letter-spacing: -0.5px;
+}
+
+.doctor-patients-header p {
+  margin: 8px 0 0;
+  color: #4a5568;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.doctor-patients-header button,
+.doctor-patients-toolbar input {
+  font: inherit;
+}
+
+.doctor-patients-header button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  background: #5c5cd6;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.doctor-patients-header button:hover {
+  background: #4b4bca;
+  transform: translateY(-1px);
+}
+
+.doctor-patients-header button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.doctor-patients-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.doctor-patients-toolbar label {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 260px;
+  color: #2d3748;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.doctor-patients-toolbar input {
+  width: 100%;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 12px 14px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+
+.doctor-patients-toolbar input:focus {
+  border-color: #5c5cd6;
+}
+
+.doctor-patients-count {
+  min-width: 140px;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  padding: 14px 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
+}
+
+.doctor-patients-count strong,
+.doctor-patients-count span {
+  display: block;
+}
+
+.doctor-patients-count strong {
+  font-size: 26px;
+  font-weight: 700;
+  color: #5c5cd6;
+}
+
+.doctor-patients-count span {
+  color: #718096;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.doctor-patients-alert {
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.doctor-patients-alert--error {
+  background: rgba(239, 68, 68, 0.06);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.doctor-patients-card {
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+.doctor-patients-table-wrapper {
+  overflow-x: auto;
+}
+
+.doctor-patients-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+}
+
+.doctor-patients-table th,
+.doctor-patients-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #edf2f7;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.doctor-patients-table th {
+  color: #1a202c;
+  background: #fafafa;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.doctor-patients-table tr:last-child td {
+  border-bottom: none;
+}
+
+.doctor-patients-table td {
+  color: #2d3748;
+}
+
+.doctor-patients-table td strong,
+.doctor-patients-table td span {
+  display: block;
+}
+
+.doctor-patients-table td strong {
+  color: #1a202c;
+  font-weight: 600;
+}
+
+.doctor-patients-table td span {
+  margin-top: 4px;
+  color: #718096;
+  font-size: 13px;
+}
+
+.doctor-patients-empty {
+  margin: 0;
+  padding: 40px;
+  color: #718096;
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .doctor-patients-page {
+    padding: 20px;
+  }
+
+  .doctor-patients-header button,
+  .doctor-patients-count {
+    width: 100%;
+  }
+}
