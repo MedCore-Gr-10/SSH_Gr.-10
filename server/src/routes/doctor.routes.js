@@ -32,6 +32,51 @@ router.get(
 );
 
 /**
+ * GET /api/doctor/patients/:id/history
+ * Get patient history with access reason logging
+ */
+router.get(
+  "/patients/:id/history",
+  (req, res, next) => patientsController.getPatientHistory(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/allergies
+ * Get patient allergies with access reason logging
+ */
+router.get(
+  "/patients/:id/allergies",
+  (req, res, next) => patientsController.getPatientAllergies(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/insurance
+ * Get patient insurance with access reason logging
+ */
+router.get(
+  "/patients/:id/insurance",
+  (req, res, next) => patientsController.getPatientInsurance(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/emergency-contacts
+ * Get patient emergency contacts with access reason logging
+ */
+router.get(
+  "/patients/:id/emergency-contacts",
+  (req, res, next) => patientsController.getPatientEmergencyContacts(req, res, next)
+);
+
+/**
+ * GET /api/doctor/patients/:id/appointments
+ * Get patient appointments with access reason logging
+ */
+router.get(
+  "/patients/:id/appointments",
+  (req, res, next) => patientsController.getPatientAppointments(req, res, next)
+);
+
+/**
  * ===================================
  * APPOINTMENT TEMPLATES ENDPOINTS
  * ===================================

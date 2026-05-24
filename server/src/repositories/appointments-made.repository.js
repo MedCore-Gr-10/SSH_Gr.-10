@@ -1,15 +1,38 @@
 import prisma from "../prisma.js";
+import cacheService from "../services/cache.service.js";
 
 class AppointmentsMadeRepository {
+  doctorIdsForAppointment(appointment) {
+    return [
+      appointment?.appointments_booking_slots?.doctor_id,
+      appointment?.appointments_booking_slots?.appointments_templates?.staff_id,
+    ].filter(Boolean);
+  }
+
+  async invalidateDoctorPatientsCacheForAppointment(appointment) {
+    const doctorIds = [...new Set(this.doctorIdsForAppointment(appointment))];
+    await Promise.all(
+      doctorIds.map((doctorId) => cacheService.invalidateDoctorPatients(doctorId)),
+    );
+  }
 
   async create(data) {
-    return prisma.appointments_made.create({
-      data
+    const appointment = await prisma.appointments_made.create({
+      data,
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: true,
+          },
+        },
+      },
     });
+    await this.invalidateDoctorPatientsCacheForAppointment(appointment);
+    return appointment;
   }
 
   async bookSlot(patientId, slotId) {
-    return prisma.appointments_made.create({
+    const appointment = await prisma.appointments_made.create({
       data: {
         patient_id: patientId,
         appointment_booking_slot_id: slotId,
@@ -50,6 +73,8 @@ class AppointmentsMadeRepository {
         }
       }
     });
+    await this.invalidateDoctorPatientsCacheForAppointment(appointment);
+    return appointment;
   }
 
   async findById(id) {
@@ -73,6 +98,233 @@ class AppointmentsMadeRepository {
       where: {
         patient_id: patientId
       }
+    });
+  }
+
+  doctorAppointmentWhere(doctorId) {
+    return {
+      OR: [
+        { doctor_id: doctorId },
+        {
+          appointments_templates: {
+            staff_id: doctorId,
+          },
+        },
+      ],
+    };
+  }
+
+  async findDoctorPatients(doctorId) {
+    const appointments = await prisma.appointments_made.findMany({
+      where: {
+        appointments_booking_slots: this.doctorAppointmentWhere(doctorId),
+      },
+      include: {
+        users: {
+          include: {
+            roles: true,
+            users_profiles: {
+              include: {
+                profiles: true,
+              },
+            },
+            patients_hospitals: {
+              include: {
+                hospitals: true,
+              },
+            },
+          },
+        },
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true,
+                        hospitals: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    const patientMap = new Map();
+
+    appointments.forEach((appointment) => {
+      const patient = appointment.users;
+      if (!patient?.id) return;
+
+      const slot = appointment.appointments_booking_slots;
+      const department =
+        slot?.appointments_templates?.staff_hospitals_departments
+          ?.hospitals_departments?.departments?.department_name;
+      const previous = patientMap.get(patient.id);
+
+      if (!previous) {
+        patientMap.set(patient.id, {
+          ...patient,
+          appointment_count: 1,
+          last_appointment_date: slot?.appointment_date || null,
+          departments: department ? [department] : [],
+        });
+        return;
+      }
+
+      previous.appointment_count += 1;
+      if (department && !previous.departments.includes(department)) {
+        previous.departments.push(department);
+      }
+      if (
+        slot?.appointment_date &&
+        (!previous.last_appointment_date ||
+          new Date(slot.appointment_date) > new Date(previous.last_appointment_date))
+      ) {
+        previous.last_appointment_date = slot.appointment_date;
+      }
+    });
+
+    return Array.from(patientMap.values()).sort((a, b) =>
+      (a.username || "").localeCompare(b.username || ""),
+    );
+  }
+
+  async hasDoctorPatient(doctorId, patientId) {
+    const appointment = await prisma.appointments_made.findFirst({
+      where: {
+        patient_id: patientId,
+        appointments_booking_slots: this.doctorAppointmentWhere(doctorId),
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return Boolean(appointment);
+  }
+
+  async findPatientHistoryForDoctor(patientId, doctorId, filters = {}) {
+    const slotWhere = this.doctorAppointmentWhere(doctorId);
+
+    if (filters.dateFrom || filters.dateTo) {
+      slotWhere.appointment_date = {};
+      if (filters.dateFrom) {
+        slotWhere.appointment_date.gte = new Date(filters.dateFrom);
+      }
+      if (filters.dateTo) {
+        slotWhere.appointment_date.lte = new Date(filters.dateTo);
+      }
+    }
+
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        appointments_booking_slots: slotWhere,
+      },
+      include: {
+        diagnoses: {
+          orderBy: { created_at: "desc" },
+        },
+        prescriptions: {
+          orderBy: { created_at: "desc" },
+        },
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true,
+                        hospitals: true,
+                      },
+                    },
+                    users: {
+                      include: {
+                        users_profiles: {
+                          include: {
+                            profiles: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async findPatientAppointmentsForDoctor(patientId, doctorId) {
+    return prisma.appointments_made.findMany({
+      where: {
+        patient_id: patientId,
+        appointments_booking_slots: this.doctorAppointmentWhere(doctorId),
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: {
+              include: {
+                staff_hospitals_departments: {
+                  include: {
+                    hospitals_departments: {
+                      include: {
+                        departments: true,
+                        hospitals: true,
+                      },
+                    },
+                    users: {
+                      include: {
+                        users_profiles: {
+                          include: {
+                            profiles: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            users: {
+              include: {
+                users_profiles: {
+                  include: {
+                    profiles: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
+      },
     });
   }
 
@@ -286,25 +538,54 @@ class AppointmentsMadeRepository {
   }
 
   async update(id, data) {
-    return prisma.appointments_made.update({
+    const previous = await this.findById(id);
+    const updated = await prisma.appointments_made.update({
       where: { id },
-      data
+      data,
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: true,
+          },
+        },
+      },
     });
+    await this.invalidateDoctorPatientsCacheForAppointment(previous);
+    await this.invalidateDoctorPatientsCacheForAppointment(updated);
+    return updated;
   }
 
   async cancel(id) {
-    return prisma.appointments_made.update({
+    const appointment = await prisma.appointments_made.update({
       where: { id },
       data: {
         active_appointment_made: false
-      }
+      },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: true,
+          },
+        },
+      },
     });
+    await this.invalidateDoctorPatientsCacheForAppointment(appointment);
+    return appointment;
   }
 
   async delete(id) {
-    return prisma.appointments_made.delete({
-      where: { id }
+    const appointment = await prisma.appointments_made.delete({
+      where: { id },
+      include: {
+        appointments_booking_slots: {
+          include: {
+            appointments_templates: true,
+          },
+        },
+      },
     });
+    await this.invalidateDoctorPatientsCacheForAppointment(appointment);
+    return appointment;
   }
 
  async getAllBookedAppointments() {
