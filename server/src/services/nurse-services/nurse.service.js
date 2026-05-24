@@ -1,6 +1,7 @@
 import prisma from "../../prisma.js";
 import userRepository from "../../repositories/user.repository.js";
 import staffScheduleRepository from "../../repositories/staff-working-schedules.repository.js";
+import profileRepository from "../../repositories/profile.repository.js";
 import allergiesRepository from "../../repositories/allergies.repository.js";
 import insuranceRepository from "../../repositories/insurance.repository.js";
 import emergencyContactsRepository from "../../repositories/emergency-contacts.repository.js";
@@ -43,6 +44,14 @@ class NurseService {
     }
 
     return nurse;
+  }
+
+  async resolvePatientProfileId(patientId) {
+    const profileLink = await profileRepository.findUserProfile(patientId);
+    if (!profileLink?.profiles?.id) {
+      throw new Error("Patient profile not found");
+    }
+    return profileLink.profiles.id;
   }
 
   async ensurePatientInHospital(patientId, hospitalId) {
@@ -168,7 +177,8 @@ class NurseService {
     await this.ensurePatientInHospital(patientId, hospitalId);
     const accessReason = this.requireReason(reason, "allergies view");
 
-    const allergies = await allergiesRepository.findByPatientId(patientId);
+    const profileId = await this.resolvePatientProfileId(patientId);
+    const allergies = await allergiesRepository.findByProfileId(profileId);
 
     await this.logMyPatientsAccess(
       nurseId,
@@ -185,7 +195,8 @@ class NurseService {
     await this.ensurePatientInHospital(patientId, hospitalId);
     const accessReason = this.requireReason(reason, "insurance view");
 
-    const insurance = await insuranceRepository.findPatientInsurance(patientId);
+    const profileId = await this.resolvePatientProfileId(patientId);
+    const insurance = await insuranceRepository.findProfileInsurance(profileId);
 
     await this.logMyPatientsAccess(
       nurseId,
@@ -202,8 +213,9 @@ class NurseService {
     await this.ensurePatientInHospital(patientId, hospitalId);
     const accessReason = this.requireReason(reason, "emergency contacts view");
 
+    const profileId = await this.resolvePatientProfileId(patientId);
     const contacts =
-      await emergencyContactsRepository.findPatientContacts(patientId);
+      await emergencyContactsRepository.findProfileContacts(profileId);
 
     await this.logMyPatientsAccess(
       nurseId,

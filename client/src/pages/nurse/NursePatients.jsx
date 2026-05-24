@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   getNursePatients,
-  searchNursePatients,
   getNursePatientAllergies,
   getNursePatientInsurance,
   getNursePatientEmergencyContacts,
   getNursePatientAppointments,
   getNursePatientHistory,
 } from "../../services/nurseApi.js";
+import {
+  matchesPatientSearch,
+  patientLabel,
+  patientPersonalNo,
+} from "./nursePatientUtils.js";
+import "../doctor/DoctorStaffSchedule.css";
 import "./Nurse.css";
-
-const patientLabel = (p) => {
-  const profile = p.users_profiles?.[0]?.profiles;
-  const name = `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim();
-  return name || p.username || p.id;
-};
 
 const emptyDetail = () => ({
   allergies: null,
@@ -42,10 +41,10 @@ const formatTimeRange = (start, end) => {
 
 export default function NursePatients() {
   const [allPatients, setAllPatients] = useState([]);
-  const [displayPatients, setDisplayPatients] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pendingPatientId, setPendingPatientId] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [recordsUnlocked, setRecordsUnlocked] = useState(false);
   const [reason, setReason] = useState("");
   const [historyFrom, setHistoryFrom] = useState("");
   const [historyTo, setHistoryTo] = useState("");
@@ -55,16 +54,15 @@ export default function NursePatients() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const accessPromptRef = useRef(null);
+  const detailPanelRef = useRef(null);
+
   const loadPatients = async () => {
     setLoading(true);
     setError("");
     try {
       const data = await getNursePatients();
-      const list = data || [];
-      setAllPatients(list);
-      if (!isSearchMode) {
-        setDisplayPatients(list);
-      }
+      setAllPatients(data || []);
     } catch (err) {
       setError(err.message || "Unable to load patients.");
     } finally {
@@ -76,75 +74,94 @@ export default function NursePatients() {
     loadPatients();
   }, []);
 
-  const selectPatient = async (id) => {
-    setSelectedId(id);
+  const filteredPatients = useMemo(
+    () =>
+      allPatients.filter((patient) => matchesPatientSearch(patient, searchTerm)),
+    [allPatients, searchTerm],
+  );
+
+  const hasActiveSearch = Boolean(searchTerm.trim());
+
+  const pendingPatient = allPatients.find((p) => p.id === pendingPatientId);
+  const selectedPatient = allPatients.find((p) => p.id === selectedId);
+
+  const scrollToRef = (ref) => {
+    requestAnimationFrame(() => {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  useEffect(() => {
+    if (pendingPatientId && !recordsUnlocked) {
+      const timer = setTimeout(() => scrollToRef(accessPromptRef), 80);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingPatientId, recordsUnlocked]);
+
+  useEffect(() => {
+    if (recordsUnlocked && selectedId) {
+      const timer = setTimeout(() => scrollToRef(detailPanelRef), 80);
+      return () => clearTimeout(timer);
+    }
+  }, [recordsUnlocked, selectedId]);
+
+  const handleViewRecords = (id) => {
+    setError("");
+    setMessage("");
+
+    if (selectedId === id && recordsUnlocked) {
+      scrollToRef(detailPanelRef);
+      return;
+    }
+
+    setPendingPatientId(id);
+    setSelectedId(null);
+    setRecordsUnlocked(false);
+    setReason("");
     setDetail(emptyDetail());
     setActiveTab("history");
     setHistoryFrom("");
     setHistoryTo("");
-    setMessage("");
-    setError("");
-
-    if (reason.trim().length >= 3) {
-      setLoading(true);
-      try {
-        const data = await getNursePatientHistory(id, reason, {});
-        setDetail((d) => ({ ...d, history: data }));
-        setMessage("Patient history loaded. Access was recorded in the audit log.");
-      } catch (err) {
-        setError(err.message || "Unable to load patient history.");
-      } finally {
-        setLoading(false);
-      }
-    }
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    const q = searchQuery.trim();
-    if (!q) {
-      setDisplayPatients(allPatients);
-      setIsSearchMode(false);
-      setError("");
-      return;
-    }
-    if (!reason.trim() || reason.trim().length < 3) {
-      setError("Enter an access reason before searching (min. 3 characters).");
+  const cancelAccessRequest = () => {
+    setPendingPatientId(null);
+    setReason("");
+    setError("");
+    setMessage("");
+  };
+
+  const confirmAccess = async (event) => {
+    event.preventDefault();
+    if (!pendingPatientId) return;
+
+    const accessReason = reason.trim();
+    if (accessReason.length < 3) {
+      setError("Enter an access reason (min. 3 characters).");
       return;
     }
 
-    setLoading(true);
     setError("");
     setMessage("");
+    setLoading(true);
+
+    const patientId = pendingPatientId;
+
     try {
-      const data = await searchNursePatients(q, reason.trim());
-      setDisplayPatients(data || []);
-      setIsSearchMode(true);
-      setSelectedId(null);
-      setDetail(emptyDetail());
-      if ((data || []).length === 0) {
-        setMessage("No patients matched your search.");
-      } else {
-        setMessage(
-          `Found ${data.length} patient(s). Select one and open a tab to view records.`,
-        );
-      }
+      const data = await getNursePatientHistory(patientId, accessReason, {});
+      setSelectedId(patientId);
+      setRecordsUnlocked(true);
+      setPendingPatientId(null);
+      setDetail((d) => ({ ...d, history: data }));
+      setActiveTab("history");
+      setMessage("Access granted. Patient history loaded and recorded in the audit log.");
     } catch (err) {
-      setError(err.message || "Search failed.");
-      setDisplayPatients([]);
+      setError(err.message || "Unable to load patient records.");
+      setRecordsUnlocked(false);
+      setSelectedId(null);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery("");
-    setIsSearchMode(false);
-    setDisplayPatients(allPatients);
-    setSelectedId(null);
-    setDetail(emptyDetail());
-    setMessage("");
-    setError("");
   };
 
   const loadDetail = async (tab) => {
@@ -184,10 +201,6 @@ export default function NursePatients() {
     }
   };
 
-  const selectedPatient =
-    displayPatients.find((p) => p.id === selectedId) ||
-    allPatients.find((p) => p.id === selectedId);
-
   const visits = detail.history?.visits || [];
 
   return (
@@ -198,9 +211,9 @@ export default function NursePatients() {
           <span className="nurse-readonly-badge">Read only</span>
         </h1>
         <p>
-          Search by name, username, or personal number — then select a
-          patient to view history (visits, diagnoses, prescriptions),
-          allergies, insurance, and more. All access is logged.
+          Filter by full name or personal number, then click View records. You
+          will be asked for an access reason before records are shown. All access
+          is logged.
         </p>
       </div>
 
@@ -208,50 +221,41 @@ export default function NursePatients() {
       {message && <div className="nurse-message success">{message}</div>}
 
       <div className="nurse-patients-toolbar">
-        <div className="nurse-reason-row nurse-reason-row--toolbar">
-          <label htmlFor="access-reason">
-            Reason for access (required for search and viewing records):
+        <div className="doctor-staff-filter-row nurse-patients-filter-row">
+          <label className="doctor-staff-search">
+            Search by name
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Full name or personal number"
+            />
           </label>
-          <input
-            id="access-reason"
-            type="text"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="e.g. pre-medication allergy check"
-          />
         </div>
 
-        <form className="nurse-search-bar" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Search name, username, or personal no..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button type="submit" className="nurse-btn" disabled={loading}>
-            {loading ? "Searching..." : "Search"}
-          </button>
-          {(isSearchMode || searchQuery) && (
-            <button
-              type="button"
-              className="nurse-btn nurse-btn--secondary"
-              onClick={handleClearSearch}
-              disabled={loading}
-            >
-              Show all
-            </button>
+        <div className="doctor-staff-role-counts" aria-live="polite">
+          {hasActiveSearch ? (
+            <span>
+              Showing {filteredPatients.length} of {allPatients.length} patient
+              {allPatients.length === 1 ? "" : "s"}
+            </span>
+          ) : (
+            <span>
+              {allPatients.length} patient{allPatients.length === 1 ? "" : "s"} in
+              your hospital
+            </span>
           )}
-        </form>
+        </div>
       </div>
 
-      {loading && !displayPatients.length && !allPatients.length ? (
+      {loading && !allPatients.length ? (
         <p className="nurse-loading">Loading patients...</p>
       ) : (
         <div className="nurse-table-wrap">
           <p className="nurse-table-caption">
-            {isSearchMode
-              ? `Search results (${displayPatients.length})`
-              : `All patients (${displayPatients.length})`}
+            {hasActiveSearch
+              ? `Matching patients (${filteredPatients.length})`
+              : `All patients (${filteredPatients.length})`}
           </p>
           <table className="nurse-table">
             <thead>
@@ -263,34 +267,36 @@ export default function NursePatients() {
               </tr>
             </thead>
             <tbody>
-              {displayPatients.length === 0 ? (
+              {filteredPatients.length === 0 ? (
                 <tr>
                   <td colSpan={4}>
-                    {isSearchMode
+                    {hasActiveSearch
                       ? "No patients matched your search."
                       : "No patients in your hospital tenant."}
                   </td>
                 </tr>
               ) : (
-                displayPatients.map((p) => (
+                filteredPatients.map((p) => (
                   <tr
                     key={p.id}
                     className={
-                      selectedId === p.id ? "nurse-table-row--selected" : ""
+                      selectedId === p.id || pendingPatientId === p.id
+                        ? "nurse-table-row--selected"
+                        : ""
                     }
                   >
                     <td>{patientLabel(p)}</td>
                     <td>{p.username}</td>
-                    <td>
-                      {p.users_profiles?.[0]?.profiles?.personal_no || "—"}
-                    </td>
+                    <td>{patientPersonalNo(p) || "—"}</td>
                     <td>
                       <button
                         type="button"
                         className="nurse-btn"
-                        onClick={() => selectPatient(p.id)}
+                        onClick={() => handleViewRecords(p.id)}
                       >
-                        {selectedId === p.id ? "Selected" : "View records"}
+                        {selectedId === p.id && recordsUnlocked
+                          ? "Viewing records"
+                          : "View records"}
                       </button>
                     </td>
                   </tr>
@@ -301,12 +307,55 @@ export default function NursePatients() {
         </div>
       )}
 
-      {selectedPatient && (
-        <div className="nurse-detail-panel">
+      {pendingPatient && !recordsUnlocked && (
+        <section
+          ref={accessPromptRef}
+          className="nurse-access-prompt"
+          aria-labelledby="nurse-access-prompt-title"
+        >
+          <h2 id="nurse-access-prompt-title">Reason for access</h2>
+          <p className="nurse-access-prompt-lead">
+            You are requesting read-only records for{" "}
+            <strong>{patientLabel(pendingPatient)}</strong>
+            {patientPersonalNo(pendingPatient)
+              ? ` (${patientPersonalNo(pendingPatient)})`
+              : ""}
+            . Please state why you need access.
+          </p>
+
+          <form className="nurse-access-prompt-form" onSubmit={confirmAccess}>
+            <label htmlFor="access-reason">Access reason</label>
+            <textarea
+              id="access-reason"
+              rows={3}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="e.g. pre-medication allergy check before morning rounds"
+              disabled={loading}
+            />
+            <div className="nurse-access-prompt-actions">
+              <button type="submit" className="nurse-btn" disabled={loading}>
+                {loading ? "Loading records..." : "Continue to records"}
+              </button>
+              <button
+                type="button"
+                className="nurse-btn nurse-btn--secondary"
+                onClick={cancelAccessRequest}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {recordsUnlocked && selectedPatient && (
+        <div ref={detailPanelRef} className="nurse-detail-panel">
           <h2>{patientLabel(selectedPatient)}</h2>
           <p className="nurse-detail-hint">
-            Open a tab below to load read-only data (uses the access reason
-            above).
+            Access reason: <em>{reason}</em>. Open a tab below to load more
+            read-only data (each view is logged).
           </p>
 
           <div className="nurse-tabs">
@@ -489,12 +538,17 @@ export default function NursePatients() {
                 <p>No emergency contacts on record.</p>
               ) : (
                 <ul className="nurse-list">
-                  {detail.contacts.map((c) => (
-                    <li key={c.id}>
-                      {c.contact_name} ({c.relationship || "—"}) —{" "}
-                      {c.phone_number || "—"}
-                    </li>
-                  ))}
+                  {detail.contacts.map((c) => {
+                    const name =
+                      `${c.first_name || ""} ${c.last_name || ""}`.trim() ||
+                      c.contact_name ||
+                      "—";
+                    return (
+                      <li key={c.id}>
+                        {name} ({c.relationship || "—"}) — {c.phone_number || "—"}
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
