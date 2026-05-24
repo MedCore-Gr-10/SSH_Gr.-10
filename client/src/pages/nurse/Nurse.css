@@ -232,6 +232,7 @@
   border-radius: 16px;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
   padding: 24px;
+  scroll-margin-top: 16px;
 }
 
 .nurse-detail-panel h2 {
@@ -285,6 +286,75 @@
 
 .nurse-patients-toolbar {
   margin-bottom: 20px;
+}
+
+.nurse-patients-filter-row {
+  grid-template-columns: minmax(280px, 420px);
+  margin-bottom: 12px;
+}
+
+.nurse-patients-toolbar .doctor-staff-role-counts {
+  margin-bottom: 4px;
+}
+
+.nurse-access-prompt {
+  margin-top: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #c7d2fe;
+  background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
+  box-shadow: 0 12px 32px rgba(92, 92, 214, 0.08);
+  scroll-margin-top: 16px;
+}
+
+.nurse-access-prompt h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.nurse-access-prompt-lead {
+  margin: 0 0 16px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.nurse-access-prompt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nurse-access-prompt-form label {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.9rem;
+}
+
+.nurse-access-prompt-form textarea {
+  width: 100%;
+  max-width: 640px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 88px;
+  box-sizing: border-box;
+}
+
+.nurse-access-prompt-form textarea:focus {
+  outline: none;
+  border-color: #5c5cd6;
+  box-shadow: 0 0 0 3px rgba(92, 92, 214, 0.15);
+}
+
+.nurse-access-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .nurse-reason-row--toolbar {
