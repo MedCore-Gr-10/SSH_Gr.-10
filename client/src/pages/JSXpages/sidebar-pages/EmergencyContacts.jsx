@@ -1,24 +1,11 @@
 import React, { useEffect, useState } from "react";
+import {
+  createPatientEmergencyContact,
+  deletePatientEmergencyContact,
+  getPatientEmergencyContacts,
+  setPatientCurrentEmergencyContact,
+} from "../../../services/patientEmergencyContactsApi";
 import "../../CSSpages/sidebar-pages/EmergencyContacts.css";
-
-const getHeaders = () => {
-  const token = localStorage.getItem("token");
-
-  return {
-    "Content-Type": "application/json",
-    Authorization: token ? `Bearer ${token}` : "",
-  };
-};
-
-const readResponse = async (response) => {
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(payload.error || payload.message || `Request failed (${response.status})`);
-  }
-
-  return payload.data ?? payload;
-};
 
 export default function EmergencyContacts() {
   const [contacts, setContacts] = useState([]);
@@ -39,10 +26,7 @@ export default function EmergencyContacts() {
   const fetchContacts = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/patient/emergency-contacts", {
-        headers: getHeaders(),
-      });
-      const data = await readResponse(response);
+      const data = await getPatientEmergencyContacts();
 
       setContacts(data.contacts || []);
       setCurrentContactId(data.currentContactId || "");
@@ -84,20 +68,14 @@ export default function EmergencyContacts() {
 
     try {
       setSaving(true);
-      const response = await fetch("/api/patient/emergency-contacts", {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          email: email.trim(),
-          relationship: relationship.trim(),
-          phoneNumber: phoneNumber.trim(),
-          idNumber: idNumber.trim(),
-        }),
+      await createPatientEmergencyContact({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        relationship: relationship.trim(),
+        phoneNumber: phoneNumber.trim(),
+        idNumber: idNumber.trim(),
       });
-
-      await readResponse(response);
       await fetchContacts();
       setSuccess("Emergency contact added successfully!");
       closeModal();
@@ -122,12 +100,7 @@ export default function EmergencyContacts() {
     if (!pendingRemoval) return;
     try {
       setSaving(true);
-      const response = await fetch(`/api/patient/emergency-contacts/${pendingRemoval.id}`, {
-        method: "DELETE",
-        headers: getHeaders(),
-      });
-
-      await readResponse(response);
+      await deletePatientEmergencyContact(pendingRemoval.id);
       await fetchContacts();
       setSuccess("Emergency contact removed successfully.");
       setPendingRemoval(null);
@@ -141,12 +114,7 @@ export default function EmergencyContacts() {
   const selectCurrentContact = async (contact) => {
     try {
       setSaving(true);
-      const response = await fetch(`/api/patient/emergency-contacts/${contact.id}/current`, {
-        method: "PATCH",
-        headers: getHeaders(),
-      });
-
-      const data = await readResponse(response);
+      const data = await setPatientCurrentEmergencyContact(contact.id);
       setCurrentContactId(data.currentContactId);
       setSuccess(`${contact.firstName} ${contact.lastName} is now your current emergency contact.`);
     } catch (err) {

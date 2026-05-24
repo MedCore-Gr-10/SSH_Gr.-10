@@ -1,88 +1,14 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  bookPatientAppointment,
+  getPatientAppointmentFilters,
+  searchPatientAppointments,
+} from "../../../services/patientAppointmentsApi";
 import "../../CSSpages/sidebar-pages/Appointments.css";
 
-const timeSlots = [
-  "08:00-08:30",
-  "09:00-09:30",
-  "10:00-10:30",
-  "11:00-11:30",
-  "12:00-12:30",
-  "13:00-13:30",
-  "14:00-14:30",
-  "15:00-15:30",
-  "16:00-16:30",
-  "17:00-17:30",
-  "18:00-18:30",
-  "19:00-19:30",
-  "19:30-20:00",
-];
-
-const specializations = [
-  "All specializations",
-  "Cardiology",
-  "Dermatology",
-  "Pediatrics",
-  "Neurology",
-  "Orthopedics",
-];
-
-const placeholderAppointments = [
-  {
-    id: "appt-1",
-    doctor: "Dr. John Smith",
-    time: "08:00-08:30",
-    date: "2026-02-20",
-    specialization: "Cardiology",
-    rating: 4.2,
-    reviews: 120,
-    location: "Main Street Clinic",
-    notes: "Experienced with patient follow-up and treatment planning.",
-  },
-  {
-    id: "appt-2",
-    doctor: "Dr. John Smith",
-    time: "10:30-11:00",
-    date: "2026-02-20",
-    specialization: "Cardiology",
-    rating: 4.2,
-    reviews: 120,
-    location: "Main Street Clinic",
-    notes: "Accepts new patients and has availability in the morning.",
-  },
-  {
-    id: "appt-3",
-    doctor: "Dr. John Smith",
-    time: "14:00-14:30",
-    date: "2026-02-24",
-    specialization: "Cardiology",
-    rating: 4.2,
-    reviews: 120,
-    location: "Main Street Clinic",
-    notes: "Focus on personalized care and clear communication.",
-  },
-  {
-    id: "appt-4",
-    doctor: "Dr. Emma Johnson",
-    time: "09:00-09:30",
-    date: "2026-02-22",
-    specialization: "Dermatology",
-    rating: 3.8,
-    reviews: 95,
-    location: "Northside Health Center",
-    notes: "Specializes in skin wellness and chronic condition management.",
-  },
-  {
-    id: "appt-5",
-    doctor: "Dr. Noah Brown",
-    time: "11:00-11:30",
-    date: "2026-02-25",
-    specialization: "Pediatrics",
-    rating: 4.5,
-    reviews: 180,
-    location: "Westside Pediatrics",
-    notes: "Friendly pediatric specialist with strong family focus.",
-  },
-];
+const visibleHospitalCount = 3;
+const allSpecializationsLabel = "All specializations";
 
 const formatDateDisplay = (value) => {
   if (!value) return "";
@@ -91,28 +17,179 @@ const formatDateDisplay = (value) => {
 };
 
 export default function Appointments() {
+  const [hospitalStartIndex, setHospitalStartIndex] = useState(0);
+  const [hospitals, setHospitals] = useState([]);
+  const [selectedHospitalId, setSelectedHospitalId] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedSpecialization, setSelectedSpecialization] = useState(specializations[0]);
+  const [specializations, setSpecializations] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [selectedSpecialization, setSelectedSpecialization] = useState(allSpecializationsLabel);
+  const [appointments, setAppointments] = useState([]);
   const [activeAppointment, setActiveAppointment] = useState(null);
+  const [loadingHospitals, setLoadingHospitals] = useState(false);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
+  const [bookingAppointmentId, setBookingAppointmentId] = useState(null);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const filteredAppointments = placeholderAppointments.filter((appointment) => {
-    const matchesDoctor = appointment.doctor.toLowerCase().includes(doctorSearch.toLowerCase());
-    const matchesTime = selectedTime ? appointment.time === selectedTime : true;
-    const matchesDate = selectedDate ? appointment.date === selectedDate : true;
-    const matchesSpecialty =
-      selectedSpecialization === specializations[0] ? true : appointment.specialization === selectedSpecialization;
-    return matchesDoctor && matchesTime && matchesDate && matchesSpecialty;
-  });
+  const selectedHospital = hospitals.find((hospital) => hospital.id === Number(selectedHospitalId));
+  const visibleHospitals = hospitals.slice(hospitalStartIndex, hospitalStartIndex + visibleHospitalCount);
+  const canMoveHospitalsLeft = hospitalStartIndex > 0;
+  const canMoveHospitalsRight = hospitalStartIndex + visibleHospitalCount < hospitals.length;
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        setLoadingHospitals(true);
+        const data = await getPatientAppointmentFilters();
+        const availableHospitals = data.hospitals || [];
+
+        setHospitals(availableHospitals);
+        setSpecializations(data.specializations || []);
+        setTimeSlots(data.timeSlots || []);
+        setSelectedHospitalId(availableHospitals[0]?.id ? String(availableHospitals[0].id) : "");
+        setHospitalStartIndex(0);
+        setError("");
+      } catch (err) {
+        setError("Failed to load appointment filters: " + err.message);
+      } finally {
+        setLoadingHospitals(false);
+      }
+    };
+
+    loadFilters();
+  }, []);
+
+  const loadAppointments = useCallback(async () => {
+    if (!selectedHospitalId) {
+      setAppointments([]);
+      return;
+    }
+
+    try {
+      setLoadingAppointments(true);
+      const data = await searchPatientAppointments({
+        hospitalId: selectedHospitalId,
+        doctorName: doctorSearch.trim(),
+        specialization: selectedSpecialization === allSpecializationsLabel ? "" : selectedSpecialization,
+        date: selectedDate,
+        time: selectedTime,
+      });
+
+      setAppointments(data || []);
+      setError("");
+    } catch (err) {
+      setError("Failed to load appointments: " + err.message);
+    } finally {
+      setLoadingAppointments(false);
+    }
+  }, [doctorSearch, selectedDate, selectedHospitalId, selectedSpecialization, selectedTime]);
+
+  useEffect(() => {
+    loadAppointments();
+  }, [loadAppointments]);
+
+  const handlePreviousHospitals = () => {
+    setHospitalStartIndex((current) => Math.max(current - 1, 0));
+  };
+
+  const handleNextHospitals = () => {
+    setHospitalStartIndex((current) =>
+      Math.min(current + 1, Math.max(hospitals.length - visibleHospitalCount, 0))
+    );
+  };
+
+  const handleBookAppointment = async () => {
+    if (!activeAppointment) return;
+
+    try {
+      setBookingAppointmentId(activeAppointment.id);
+      setSuccessMessage("");
+      await bookPatientAppointment(activeAppointment.id);
+      setAppointments((current) =>
+        current.filter((appointment) => appointment.id !== activeAppointment.id)
+      );
+      setSuccessMessage("Appointment booked successfully.");
+      setActiveAppointment(null);
+      await loadAppointments();
+    } catch (err) {
+      setError("Failed to book appointment: " + err.message);
+    } finally {
+      setBookingAppointmentId(null);
+    }
+  };
 
   return (
     <div className="appointments-container">
       <div className="appointments-card">
         <h1 className="appointments-title">Appointments</h1>
         <p className="appointments-description">
-          Search available appointments by doctor, specialization, date, or time slot. Click a row to view more details.
+          Search available appointments by doctor, specialization, date, time slot, and selected hospital.
         </p>
+
+        {error && <div className="appointments-error">{error}</div>}
+        {successMessage && <div className="appointments-success">{successMessage}</div>}
+
+        <section className="hospital-picker">
+          <div className="section-heading">
+            <div>
+              <h2>Select hospital</h2>
+              <p>
+                {selectedHospital
+                  ? `${selectedHospital.name} is currently selected.`
+                  : "Select a hospital before searching appointments."}
+              </p>
+            </div>
+            {hospitals.length > visibleHospitalCount && (
+              <div className="hospital-controls">
+                <button
+                  type="button"
+                  className="carousel-button"
+                  onClick={handlePreviousHospitals}
+                  disabled={!canMoveHospitalsLeft}
+                  aria-label="Show previous hospitals"
+                >
+                  <FaChevronLeft />
+                </button>
+                <button
+                  type="button"
+                  className="carousel-button"
+                  onClick={handleNextHospitals}
+                  disabled={!canMoveHospitalsRight}
+                  aria-label="Show next hospitals"
+                >
+                  <FaChevronRight />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="hospital-grid">
+            {loadingHospitals && <div className="appointments-empty-state">Loading hospitals...</div>}
+
+            {!loadingHospitals && !hospitals.length && (
+              <div className="appointments-empty-state">
+                No hospitals are available yet.
+              </div>
+            )}
+
+            {!loadingHospitals && visibleHospitals.map((hospital) => (
+              <button
+                key={hospital.id}
+                type="button"
+                className={`hospital-card ${selectedHospitalId === String(hospital.id) ? "selected" : ""}`}
+                onClick={() => setSelectedHospitalId(String(hospital.id))}
+              >
+                <span className="hospital-type">Hospital</span>
+                <strong>{hospital.name}</strong>
+                <span>{hospital.address || hospital.email}</span>
+                <small>{hospital.email}</small>
+              </button>
+            ))}
+          </div>
+        </section>
 
         <div className="appointments-filters">
           <div className="filter-group">
@@ -139,9 +216,10 @@ export default function Appointments() {
               value={selectedSpecialization}
               onChange={(e) => setSelectedSpecialization(e.target.value)}
             >
+              <option value={allSpecializationsLabel}>{allSpecializationsLabel}</option>
               {specializations.map((specialty) => (
-                <option key={specialty} value={specialty}>
-                  {specialty}
+                <option key={specialty.id} value={specialty.name}>
+                  {specialty.name}
                 </option>
               ))}
             </select>
@@ -172,8 +250,8 @@ export default function Appointments() {
             >
               <option value="">All time slots</option>
               {timeSlots.map((slot) => (
-                <option key={slot} value={slot}>
-                  {slot}
+                <option key={slot.value} value={slot.value}>
+                  {slot.label}
                 </option>
               ))}
             </select>
@@ -185,6 +263,7 @@ export default function Appointments() {
             <thead>
               <tr>
                 <th>Doctor</th>
+                <th>Hospital</th>
                 <th>Specialization</th>
                 <th>Time Slot</th>
                 <th>Date</th>
@@ -192,8 +271,16 @@ export default function Appointments() {
               </tr>
             </thead>
             <tbody>
-              {filteredAppointments.length ? (
-                filteredAppointments.map((appointment) => (
+              {loadingAppointments && (
+                <tr>
+                  <td colSpan={6} className="no-results">
+                    Loading appointments...
+                  </td>
+                </tr>
+              )}
+
+              {!loadingAppointments && appointments.length ? (
+                appointments.map((appointment) => (
                   <tr
                     key={appointment.id}
                     className="appointments-row"
@@ -202,16 +289,19 @@ export default function Appointments() {
                     onKeyDown={(event) => event.key === "Enter" && setActiveAppointment(appointment)}
                   >
                     <td>{appointment.doctor}</td>
+                    <td>{appointment.hospitalName}</td>
                     <td>{appointment.specialization}</td>
                     <td>{appointment.time}</td>
                     <td>{formatDateDisplay(appointment.date)}</td>
-                    <td className="row-arrow">→</td>
+                    <td className="row-arrow">-&gt;</td>
                   </tr>
                 ))
-              ) : (
+              ) : null}
+
+              {!loadingAppointments && !appointments.length && (
                 <tr>
-                  <td colSpan={5} className="no-results">
-                    No results match your filters.
+                  <td colSpan={6} className="no-results">
+                    No available appointments match your filters.
                   </td>
                 </tr>
               )}
@@ -251,8 +341,8 @@ export default function Appointments() {
                   <p>{activeAppointment.location}</p>
                 </div>
                 <div>
-                  <h3>Rating</h3>
-                  <p>{activeAppointment.rating} / 5 · {activeAppointment.reviews} reviews</p>
+                  <h3>Hospital</h3>
+                  <p>{activeAppointment.hospitalName}</p>
                 </div>
               </div>
 
@@ -266,8 +356,13 @@ export default function Appointments() {
               <button type="button" className="modal-secondary" onClick={() => setActiveAppointment(null)}>
                 Close
               </button>
-              <button type="button" className="modal-primary">
-                Book appointment
+              <button
+                type="button"
+                className="modal-primary"
+                onClick={handleBookAppointment}
+                disabled={bookingAppointmentId === activeAppointment.id}
+              >
+                {bookingAppointmentId === activeAppointment.id ? "Booking..." : "Book appointment"}
               </button>
             </div>
           </div>

@@ -8,6 +8,8 @@
     "dev": "nodemon src/index.js",
     "create-superuser": "node scripts/create_superuser.js",
     "create-director": "node scripts/create_test_director.js",
+    "create-nurse": "node scripts/create_test_nurse.js",
+    "seed:nurse-test": "node scripts/seed_nurse_test_data.js",
     "create-staff": "node scripts/create_test_staff.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

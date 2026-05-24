@@ -26,8 +26,6 @@ export default function DirectorDashboard() {
   }, []);
 
   const stats = overview?.statistics ?? {};
-  const metrics = overview?.metrics ?? {};
-  const logs = overview?.logs ?? [];
 
   const formatNumber = (value) => (typeof value === "number" ? value : 0);
 
@@ -73,26 +71,6 @@ export default function DirectorDashboard() {
               <p className="dd-value">{formatNumber(stats.staffCount)}</p>
             </div>
           </div>
-
-          <section className="dd-section">
-            <h2>Recent Activities</h2>
-            {logs.length > 0 ? (
-              <ul className="dd-activities">
-                {logs.map((log) => (
-                  <li key={log.id}>
-                    <strong>{log.user?.name || log.user?.username || "Unknown"}</strong>
-                    <span> {log.action}</span>
-                    <div className="dd-activity-meta">
-                      <span>{new Date(log.timestamp).toLocaleString()}</span>
-                      <span>{log.reason}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="dd-empty">No recent activity yet.</div>
-            )}
-          </section>
         </>
       )}
     </div>

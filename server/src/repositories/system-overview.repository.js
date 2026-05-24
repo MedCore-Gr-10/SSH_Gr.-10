@@ -67,9 +67,18 @@ class SystemOverviewRepository {
     return prisma.logs.findMany({
       where: {
         user: {
-          staff_hospitals_departments: {
-            some: { hospital_id: hospitalId },
-          },
+          OR: [
+            {
+              staff_hospitals_departments: {
+                some: { hospital_id: hospitalId },
+              },
+            },
+            {
+              patients_hospitals: {
+                some: { hospital_id: hospitalId },
+              },
+            },
+          ],
         },
       },
       include: {
