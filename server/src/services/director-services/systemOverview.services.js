@@ -3,12 +3,12 @@ import logsRepository from "../../repositories/logs.repository.js";
 
 class DirectorSystemOverviewService {
   async getOverview(hospitalId, currentUserId) {
-    const [patientCount, staffCount, appointmentCount, activeAppointments, cancelledAppointments, activeSchedules, logs] = await Promise.all([
+    const [patientCount, staffCount, appointmentCount, activeAppointments, completedAppointments, activeSchedules, logs] = await Promise.all([
       systemOverviewRepository.countPatients(hospitalId),
       systemOverviewRepository.countStaff(hospitalId),
       systemOverviewRepository.countAppointments(hospitalId),
       systemOverviewRepository.countActiveAppointments(hospitalId),
-      systemOverviewRepository.countCancelledAppointments(hospitalId),
+      systemOverviewRepository.countCompletedAppointments(hospitalId),
       systemOverviewRepository.countActiveSchedules(hospitalId),
       systemOverviewRepository.findHospitalLogs(hospitalId, 10),
     ]);
@@ -19,7 +19,7 @@ class DirectorSystemOverviewService {
       reason: "Director viewed system overview metrics",
     });
 
-    const completionRate = appointmentCount > 0 ? Math.round((activeAppointments / appointmentCount) * 100) : 0;
+    const completionRate = appointmentCount > 0 ? Math.round((completedAppointments / appointmentCount) * 100) : 0;
     const utilization = activeSchedules > 0 ? Math.round((appointmentCount / activeSchedules) * 10) / 10 : 0;
 
     return {
@@ -28,7 +28,7 @@ class DirectorSystemOverviewService {
         staffCount,
         appointmentCount,
         activeAppointments,
-        cancelledAppointments,
+        completedAppointments,
         activeSchedules,
       },
       metrics: {

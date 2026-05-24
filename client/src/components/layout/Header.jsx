@@ -5,7 +5,6 @@ import {
   IoHomeOutline,
   IoInformationCircleOutline,
   IoNotificationsOutline,
-  IoSettingsOutline,
   IoPersonOutline,
   IoLogOutOutline,
 } from "react-icons/io5";
@@ -130,11 +129,6 @@ function Header() {
                 {receivedCount}
               </span>
             )}
-          </NavLink>
-
-          <NavLink to="/main/settings" className="header-button">
-            <IoSettingsOutline className="nav-icon" />
-            Settings
           </NavLink>
 
           <NavLink to="/main/Profile" className="header-button">

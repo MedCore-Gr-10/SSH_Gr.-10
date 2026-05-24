@@ -1,6 +1,8 @@
 import appointmentsBookingSlotsRepository from "../../repositories/appointments-booking-slots.repository.js";
 import appointmentsMadeRepository from "../../repositories/appointments-made.repository.js";
+import allergiesRepository from "../../repositories/allergies.repository.js";
 import patientHospitalsRepository from "../../repositories/patient-hospitals.repository.js";
+import profileRepository from "../../repositories/profile.repository.js";
 import specializationsRepository from "../../repositories/specializations.repository.js";
 import staffWorkingSchedulesRepository from "../../repositories/staff-working-schedules.repository.js";
 
@@ -108,15 +110,82 @@ class PatientAppointmentsService {
 
     return {
       id: appointment.id,
-      active: appointment.active_appointment_made !== false,
+      active: appointment.appointment_is_complete !== true,
+      complete: appointment.appointment_is_complete === true,
       appointmentBookingSlotId: appointment.appointment_booking_slot_id,
       appointment: slot ? this.formatAppointment(slot) : null,
+    };
+  }
+
+  formatCreatedAt(value) {
+    if (!value) return "";
+    return value.toISOString();
+  }
+
+  formatAllergy(allergy) {
+    return {
+      id: allergy.id,
+      name: allergy.allergy_name,
+      type: allergy.allergy_type,
+      reaction: allergy.reaction_symptoms,
+      severity: allergy.severity,
+    };
+  }
+
+  formatPatientRecord(appointment, patientAllergies = []) {
+    const slot = appointment.appointments_booking_slots;
+    const formattedAppointment = slot ? this.formatAppointment(slot) : {};
+    const prescriptions = (appointment.prescriptions || []).map((prescription) => ({
+      id: prescription.id,
+      medicationName: prescription.medication_name,
+      dosage: prescription.dosage || "",
+      instructions: prescription.instructions || "",
+      createdAt: this.formatCreatedAt(prescription.created_at),
+    }));
+    const diagnoses = (appointment.diagnoses || []).map((diagnosis) => ({
+      id: diagnosis.id,
+      diagnosis: diagnosis.diagnosis,
+      createdAt: this.formatCreatedAt(diagnosis.created_at),
+    }));
+    const createdAt =
+      prescriptions[0]?.createdAt ||
+      diagnoses[0]?.createdAt ||
+      "";
+
+    return {
+      id: appointment.id,
+      appointmentBookingSlotId: appointment.appointment_booking_slot_id,
+      doctorName: formattedAppointment.doctor || "Doctor",
+      hospitalName: formattedAppointment.hospitalName || "Hospital",
+      specialization: formattedAppointment.specialization || "General Medicine",
+      date: formattedAppointment.date || "",
+      timeSlot: formattedAppointment.time || "",
+      prescriptions,
+      diagnoses,
+      allergies: patientAllergies,
+      createdAt,
     };
   }
 
   async getBookedAppointments(patientId) {
     const appointments = await appointmentsMadeRepository.findActivePatientAppointments(patientId);
     return appointments.map((appointment) => this.formatBookedAppointment(appointment));
+  }
+
+  async getPatientRecords(patientId) {
+    const [appointments, profileLink] = await Promise.all([
+      appointmentsMadeRepository.findCompletedPatientRecords(patientId),
+      profileRepository.findUserProfile(patientId),
+    ]);
+
+    const patientAllergies = profileLink?.profiles
+      ? await allergiesRepository.findByProfileId(profileLink.profiles.id)
+      : [];
+    const formattedAllergies = patientAllergies.map((allergy) => this.formatAllergy(allergy));
+
+    return appointments.map((appointment) =>
+      this.formatPatientRecord(appointment, formattedAllergies)
+    );
   }
 
   async getPatientStaffSchedules(patientId) {

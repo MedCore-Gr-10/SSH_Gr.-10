@@ -41,7 +41,7 @@ export default function AppointmentsList() {
     { header: "End Time", key: "endTime", render: formatTime },
     { 
       header: "Completed", 
-      key: "active_appointment_made",
+      key: "appointment_is_complete",
       render: (val) => (val ? "True" : "False")
     }
   ];
@@ -78,7 +78,7 @@ export default function AppointmentsList() {
             <p><strong>Hospital:</strong> {selectedAppointment.hospital}</p>
             <p><strong>Date:</strong> {new Date(selectedAppointment.date).toLocaleDateString()}</p>
             <p><strong>Time Slot:</strong> {formatTime(selectedAppointment.time)} - {formatTime(selectedAppointment.endTime)}</p>
-            <p><strong>Status:</strong> {selectedAppointment.active_appointment_made ? "True" : "False"}</p>
+            <p><strong>Completed:</strong> {selectedAppointment.appointment_is_complete ? "True" : "False"}</p>
             <button onClick={() => setIsModalOpen(false)}>Close</button>
           </div>
         </div>

@@ -445,6 +445,8 @@ router.get("/appointments/search", (req, res, next) => appointmentsController.se
  */
 router.get("/appointments/booked", (req, res, next) => appointmentsController.getBookedAppointments(req, res, next));
 
+router.get("/records", (req, res, next) => appointmentsController.getPatientRecords(req, res, next));
+
 /**
  * @swagger
  * /api/patient/appointments/staff-schedules:

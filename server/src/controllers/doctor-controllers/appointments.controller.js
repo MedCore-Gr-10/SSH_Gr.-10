@@ -1,6 +1,9 @@
 import appointmentTemplatesService from "../../services/doctor-services/appointmentTemplates.service.js";
 import slotGeneratorService from "../../services/doctor-services/slotGenerator.service.js";
 import appointmentsBookingSlotsRepository from "../../repositories/appointments-booking-slots.repository.js";
+import appointmentsMadeRepository from "../../repositories/appointments-made.repository.js";
+import diagnosesRepository from "../../repositories/diagnoses.repository.js";
+import prescriptionsRepository from "../../repositories/prescriptions.repository.js";
 import logsRepository from "../../repositories/logs.repository.js";
 
 /**
@@ -187,6 +190,30 @@ class DoctorAppointmentTemplatesController {
  * Handles REST API endpoints for booking slots
  */
 class DoctorAppointmentSlotsController {
+  doctorOwnsAppointment(appointment, doctorId) {
+    const slot = appointment?.appointments_booking_slots;
+    const template = slot?.appointments_templates;
+    return slot?.doctor_id === doctorId || template?.staff_id === doctorId;
+  }
+
+  patientDisplayName(patient) {
+    if (!patient) return null;
+
+    const profile = patient.users_profiles?.[0]?.profiles;
+    const fullName = `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim();
+
+    return fullName || patient.username || null;
+  }
+
+  withPatientDisplayNames(slots) {
+    return slots.map((slot) => ({
+      ...slot,
+      appointments_made: (slot.appointments_made || []).map((appointment) => ({
+        ...appointment,
+        patient_name: this.patientDisplayName(appointment.users),
+      })),
+    }));
+  }
 
   /**
    * GET /api/doctor/appointments/slots
@@ -202,6 +229,7 @@ class DoctorAppointmentSlotsController {
         doctorId,
         date ? new Date(date) : null
       );
+      const slotsWithPatientNames = this.withPatientDisplayNames(slots);
 
       await logsRepository.create({
         user_id: doctorId,
@@ -211,7 +239,7 @@ class DoctorAppointmentSlotsController {
           : "Doctor viewed appointment slots",
       });
 
-      res.status(200).json({ success: true, data: slots });
+      res.status(200).json({ success: true, data: slotsWithPatientNames });
     } catch (err) {
       next(err);
     }
@@ -400,6 +428,112 @@ class DoctorAppointmentSlotsController {
 
       const deactivated = await appointmentsBookingSlotsRepository.deactivate(Number(id));
       res.status(200).json({ success: true, data: deactivated });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async markAppointmentComplete(req, res, next) {
+    try {
+      const appointmentId = Number(req.params.appointmentId);
+      if (!Number.isInteger(appointmentId)) {
+        return res.status(400).json({ error: "Invalid appointment" });
+      }
+
+      const appointment = await appointmentsMadeRepository.findById(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ error: "Appointment not found" });
+      }
+
+      if (!this.doctorOwnsAppointment(appointment, req.user.user_id)) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+
+      if (appointment.appointment_is_complete === true) {
+        return res.status(400).json({ error: "Appointment is already complete" });
+      }
+
+      const updated = await appointmentsMadeRepository.update(appointmentId, {
+        appointment_is_complete: true,
+      });
+
+      await logsRepository.create({
+        user_id: req.user.user_id,
+        action: "complete appointment",
+        reason: `Doctor marked appointment ${appointmentId} as complete`,
+      });
+
+      res.status(200).json({ success: true, data: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async saveAppointmentRecord(req, res, next) {
+    try {
+      const appointmentId = Number(req.params.appointmentId);
+      if (!Number.isInteger(appointmentId)) {
+        return res.status(400).json({ error: "Invalid appointment" });
+      }
+
+      const appointment = await appointmentsMadeRepository.findById(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ error: "Appointment not found" });
+      }
+
+      if (!this.doctorOwnsAppointment(appointment, req.user.user_id)) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+
+      if (appointment.appointment_is_complete === true) {
+        return res.status(400).json({ error: "Appointment is already complete" });
+      }
+
+      const description = String(req.body.description || "").trim();
+      const medicationName = String(req.body.medicationName || "").trim();
+      const dosage = String(req.body.dosage || "").trim();
+      const instructions = String(req.body.prescription || "").trim();
+
+      if (!description) {
+        return res.status(400).json({ error: "Description is required" });
+      }
+
+      if ((dosage || instructions) && !medicationName) {
+        return res.status(400).json({ error: "Medication name is required for a prescription" });
+      }
+
+      const diagnosis = await diagnosesRepository.create({
+        appointment_made_id: appointmentId,
+        diagnosis: description,
+      });
+
+      const prescription = medicationName
+        ? await prescriptionsRepository.create({
+            appointment_made_id: appointmentId,
+            medication_name: medicationName,
+            dosage: dosage || null,
+            instructions: instructions || null,
+          })
+        : null;
+
+      const updated = await appointmentsMadeRepository.update(appointmentId, {
+        appointment_is_complete: true,
+      });
+
+      await logsRepository.create({
+        user_id: req.user.user_id,
+        action: "save appointment record",
+        reason: `Doctor saved record for appointment ${appointmentId}`,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: {
+          appointment: updated,
+          diagnosis,
+          prescription,
+        },
+      });
     } catch (err) {
       next(err);
     }
