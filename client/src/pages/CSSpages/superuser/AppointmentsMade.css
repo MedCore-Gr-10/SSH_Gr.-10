@@ -1,0 +1,53 @@
+/* Container for the page */
+.appointments-container {
+  padding: 20px;
+}
+
+/* Modal Background Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* The White Box - Updated for larger size */
+.modal-content {
+  background: white;
+  padding: 30px; /* Increased padding for better internal spacing */
+  border-radius: 12px; /* Slightly softer corners */
+  width: 90%;          /* Occupies 90% of screen width on small devices */
+  max-width: 600px;    /* Max size set to 600px instead of 400px */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;           /* Increased spacing between elements */
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.modal-content button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modal-content button:hover {
+  background-color: #0056b3;
+}

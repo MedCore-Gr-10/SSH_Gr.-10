@@ -1,0 +1,711 @@
+.director-dashboard,
+.director-staff-page,
+.director-staff-schedule-page,
+.director-patients-page,
+.director-appointments-page,
+.director-departments-page,
+.director-page-wrapper {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 4% 60px;
+  color: #2d3748;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.director-dashboard,
+.director-staff-page,
+.director-patients-page {
+  max-height: none;
+  overflow: visible;
+}
+
+.dd-header,
+.director-staff-header,
+.director-staff-schedule-header,
+.director-patients-header,
+.director-appointments-header,
+.director-departments-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.dd-header h1,
+.director-staff-header h1,
+.director-staff-schedule-header h1,
+.director-patients-header h1,
+.director-appointments-header h1,
+.director-page-wrapper h1,
+.director-departments-header h2 {
+  margin: 0;
+  color: #1a202c;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.dd-sub,
+.director-staff-header p,
+.director-staff-schedule-header p,
+.director-patients-header p,
+.director-appointments-header p,
+.director-departments-header p,
+.director-page-wrapper > p {
+  margin: 8px 0 0;
+  color: #4a5568;
+  max-width: 720px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dd-cards,
+.overview-cards,
+.overview-grid,
+.director-grid-overview {
+  display: grid;
+  gap: 24px;
+  margin: 0 0 30px;
+}
+
+.dd-cards,
+.overview-cards {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.overview-grid {
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+}
+
+.director-grid-overview {
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+}
+
+.dd-card,
+.overview-card,
+.director-card,
+.director-section,
+.director-staff-section,
+.director-staff-schedule-table-section,
+.director-staff-schedule-form-section,
+.director-appointments-section,
+.director-departments-page .content-scroll {
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+
+.dd-card,
+.overview-card {
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dd-card h3,
+.overview-card h3,
+.director-card h2,
+.director-section h2,
+.director-staff-section h2,
+.director-staff-schedule-table-section h2,
+.director-staff-schedule-form-section h2,
+.director-appointments-section h2,
+.director-schedule-overview h2 {
+  margin: 0 0 18px;
+  color: #1a202c;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dd-card h3,
+.overview-card h3 {
+  margin-bottom: 8px;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dd-value,
+.overview-card p,
+.overview-card strong {
+  margin: 0;
+  color: #1a202c;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.overview-card span {
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.director-staff-grid,
+.director-staff-schedule-grid,
+.director-patients-grid,
+.director-appointments-grid,
+.request-grid {
+  display: grid;
+  gap: 30px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.director-staff-grid,
+.director-patients-grid,
+.director-staff-schedule-grid {
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr);
+}
+
+.director-appointments-grid {
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.85fr);
+}
+
+.director-appointments-grid > .director-appointments-section:last-child {
+  grid-column: 1 / -1;
+}
+
+.director-patients-grid--single {
+  grid-template-columns: 1fr;
+}
+
+.request-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+}
+
+.content-scroll {
+  overflow: auto;
+}
+
+.director-section,
+.director-staff-section,
+.director-staff-schedule-table-section,
+.director-staff-schedule-form-section,
+.director-appointments-section {
+  display: flex;
+  flex-direction: column;
+  max-height: none;
+}
+
+.director-staff-table,
+.director-staff-schedule-table,
+.director-patient-table,
+.director-appointments-table,
+.departments-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.director-section .content-scroll,
+.director-staff-section.content-scroll,
+.director-staff-schedule-table-section.content-scroll,
+.director-appointments-section.content-scroll,
+.director-departments-page .content-scroll {
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+}
+
+.director-section .content-scroll .director-patient-table,
+.director-staff-section.content-scroll .director-staff-table,
+.director-staff-schedule-table-section.content-scroll .director-staff-schedule-table,
+.director-appointments-section.content-scroll .director-appointments-table,
+.director-departments-page .content-scroll .departments-table {
+  min-width: 720px;
+}
+
+.director-staff-table th,
+.director-staff-table td,
+.director-staff-schedule-table th,
+.director-staff-schedule-table td,
+.director-patient-table th,
+.director-patient-table td,
+.director-appointments-table th,
+.director-appointments-table td,
+.departments-table th,
+.departments-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  vertical-align: middle;
+  color: #2d3748;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.director-staff-table th,
+.director-staff-schedule-table th,
+.director-patient-table th,
+.director-appointments-table th,
+.departments-table th {
+  background: #fafafa;
+  color: #1a202c;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.director-staff-table tr:last-child td,
+.director-staff-schedule-table tr:last-child td,
+.director-patient-table tr:last-child td,
+.director-appointments-table tr:last-child td,
+.departments-table tr:last-child td {
+  border-bottom: none;
+}
+
+.director-staff-table td button,
+.director-staff-schedule-table td button,
+.director-patient-table td button,
+.director-appointments-table td button,
+.departments-table button,
+.director-form-actions button,
+.director-staff-actions button,
+.director-staff-schedule-actions button,
+.director-appointments-actions button,
+.request-actions button,
+.btn-primary,
+.btn-secondary {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.2s, background-color 0.2s, opacity 0.2s;
+}
+
+.director-staff-table td button:hover,
+.director-staff-schedule-table td button:hover,
+.director-patient-table td button:hover,
+.director-appointments-table td button:hover,
+.departments-table button:hover,
+.director-form-actions button:hover,
+.director-staff-actions button:hover,
+.director-staff-schedule-actions button:hover,
+.director-appointments-actions button:hover,
+.request-actions button:hover {
+  transform: translateY(-1px);
+}
+
+button.edit-button,
+.btn-primary,
+.director-form-actions button.primary,
+.director-staff-actions button.primary,
+.director-staff-schedule-actions button.primary,
+.director-appointments-actions button.primary,
+.request-actions .btn-primary {
+  background: #5c5cd6;
+}
+
+button.edit-button:hover,
+.btn-primary:hover,
+.director-form-actions button.primary:hover,
+.director-staff-actions button.primary:hover,
+.director-staff-schedule-actions button.primary:hover,
+.director-appointments-actions button.primary:hover,
+.request-actions .btn-primary:hover {
+  background: #4b4bca;
+}
+
+button.delete-button,
+button.cancel-button {
+  background: #ef4444;
+}
+
+button.delete-button:hover,
+button.cancel-button:hover {
+  background: #dc2626;
+}
+
+.btn-secondary,
+.director-form-actions button.secondary,
+.director-staff-actions button.secondary,
+.director-staff-schedule-actions button.secondary,
+.director-appointments-actions button.secondary {
+  background: #1a202c;
+}
+
+.btn-secondary:hover,
+.director-form-actions button.secondary:hover,
+.director-staff-actions button.secondary:hover,
+.director-staff-schedule-actions button.secondary:hover,
+.director-appointments-actions button.secondary:hover {
+  background: #2d3748;
+}
+
+button:disabled,
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.director-form,
+.director-staff-form,
+.director-staff-schedule-form,
+.director-appointments-form,
+.request-form {
+  display: grid;
+  gap: 16px;
+}
+
+.director-form label,
+.director-staff-form label,
+.director-staff-schedule-form label,
+.director-appointments-form label,
+.request-form label {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  color: #2d3748;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.director-form input,
+.director-form select,
+.director-form textarea,
+.director-staff-form input,
+.director-staff-form select,
+.director-staff-form textarea,
+.director-staff-schedule-form input,
+.director-staff-schedule-form select,
+.director-appointments-form input,
+.director-appointments-form select,
+.request-form select,
+.request-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: #2d3748;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.director-form input:focus,
+.director-form select:focus,
+.director-form textarea:focus,
+.director-staff-form input:focus,
+.director-staff-form select:focus,
+.director-staff-form textarea:focus,
+.director-staff-schedule-form input:focus,
+.director-staff-schedule-form select:focus,
+.director-appointments-form input:focus,
+.director-appointments-form select:focus,
+.request-form select:focus,
+.request-form textarea:focus {
+  border-color: #5c5cd6;
+}
+
+.director-appointments-form input[readonly] {
+  background: #fafafa;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.director-form textarea,
+.director-staff-form textarea,
+.request-form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.director-form-actions,
+.director-staff-actions,
+.director-staff-schedule-actions,
+.director-appointments-actions,
+.request-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.checkbox-label {
+  display: flex !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-label input {
+  width: auto;
+  margin: 0;
+}
+
+.director-message,
+.dd-loading,
+.dd-error,
+.departments-error {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #edf2f7;
+  background: #ffffff;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.director-message.success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.director-message.error,
+.dd-error,
+.departments-error {
+  background: #fff5f5;
+  border-color: #fed7d7;
+  color: #c53030;
+}
+
+.status-active,
+.status-inactive,
+.slot-available,
+.slot-booked,
+.departments-count,
+.section-heading-row span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-active,
+.slot-available {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.status-inactive {
+  background: #f7fafc;
+  color: #4a5568;
+}
+
+.slot-booked {
+  background: #fff5f5;
+  color: #c53030;
+}
+
+.departments-count,
+.section-heading-row span {
+  background: #eef2ff;
+  color: #4b4bca;
+}
+
+@media screen and (max-width: 1050px) {
+  .director-staff-grid,
+  .director-staff-schedule-grid,
+  .director-patients-grid,
+  .director-appointments-grid,
+  .request-grid,
+  .director-grid-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .director-dashboard,
+  .director-staff-page,
+  .director-staff-schedule-page,
+  .director-patients-page,
+  .director-appointments-page,
+  .director-departments-page,
+  .director-page-wrapper {
+    padding: 28px 0 40px;
+  }
+
+  .dd-header h1,
+  .director-staff-header h1,
+  .director-staff-schedule-header h1,
+  .director-patients-header h1,
+  .director-appointments-header h1,
+  .director-page-wrapper h1,
+  .director-departments-header h2 {
+    font-size: 24px;
+  }
+
+  .dd-cards,
+  .overview-cards,
+  .overview-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .director-card,
+  .director-section,
+  .director-staff-section,
+  .director-staff-schedule-table-section,
+  .director-staff-schedule-form-section,
+  .director-appointments-section,
+  .director-departments-page .content-scroll,
+  .dd-card,
+  .overview-card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .director-section .content-scroll,
+  .director-staff-section.content-scroll,
+  .director-staff-schedule-table-section.content-scroll,
+  .director-appointments-section.content-scroll,
+  .director-departments-page .content-scroll {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .director-staff-table,
+  .director-staff-schedule-table,
+  .director-patient-table,
+  .director-appointments-table,
+  .departments-table,
+  .director-staff-table thead,
+  .director-staff-schedule-table thead,
+  .director-patient-table thead,
+  .director-appointments-table thead,
+  .departments-table thead,
+  .director-staff-table tbody,
+  .director-staff-schedule-table tbody,
+  .director-patient-table tbody,
+  .director-appointments-table tbody,
+  .departments-table tbody,
+  .director-staff-table th,
+  .director-staff-schedule-table th,
+  .director-patient-table th,
+  .director-appointments-table th,
+  .departments-table th,
+  .director-staff-table td,
+  .director-staff-schedule-table td,
+  .director-patient-table td,
+  .director-appointments-table td,
+  .departments-table td,
+  .director-staff-table tr,
+  .director-staff-schedule-table tr,
+  .director-patient-table tr,
+  .director-appointments-table tr,
+  .departments-table tr {
+    display: block;
+    min-width: 0;
+  }
+
+  .director-staff-table,
+  .director-staff-schedule-table,
+  .director-patient-table,
+  .director-appointments-table,
+  .departments-table {
+    min-width: 0;
+  }
+
+  .director-section .content-scroll .director-patient-table,
+  .director-staff-section.content-scroll .director-staff-table,
+  .director-staff-schedule-table-section.content-scroll .director-staff-schedule-table,
+  .director-appointments-section.content-scroll .director-appointments-table,
+  .director-departments-page .content-scroll .departments-table {
+    min-width: 0;
+  }
+
+  .director-staff-table thead,
+  .director-staff-schedule-table thead,
+  .director-patient-table thead,
+  .director-appointments-table thead,
+  .departments-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .director-staff-table tr,
+  .director-staff-schedule-table tr,
+  .director-patient-table tr,
+  .director-appointments-table tr,
+  .departments-table tr {
+    margin-bottom: 14px;
+    border: 1px solid #edf2f7;
+    border-radius: 12px;
+    padding: 12px;
+    background: #ffffff;
+  }
+
+  .director-staff-table td,
+  .director-staff-schedule-table td,
+  .director-patient-table td,
+  .director-appointments-table td,
+  .departments-table td {
+    position: relative;
+    min-height: 24px;
+    padding: 10px 0 10px 46%;
+    border: none;
+    word-break: break-word;
+  }
+
+  .director-staff-table td::before,
+  .director-staff-schedule-table td::before,
+  .director-patient-table td::before,
+  .director-appointments-table td::before,
+  .departments-table td::before {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 40%;
+    color: #1a202c;
+    font-weight: 700;
+    content: attr(data-label);
+  }
+
+  .departments-table td:nth-child(1)::before {
+    content: "Department";
+  }
+
+  .departments-table td:nth-child(2)::before {
+    content: "Status";
+  }
+
+  .departments-table td:nth-child(3)::before {
+    content: "Staff";
+  }
+
+  .departments-table td:nth-child(4)::before {
+    content: "Actions";
+  }
+
+  .director-form-actions,
+  .director-staff-actions,
+  .director-staff-schedule-actions,
+  .director-appointments-actions,
+  .request-actions {
+    flex-direction: column;
+  }
+
+  .director-form-actions button,
+  .director-staff-actions button,
+  .director-staff-schedule-actions button,
+  .director-appointments-actions button,
+  .request-actions button {
+    width: 100%;
+  }
+}

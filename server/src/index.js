@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
-
+import { JwtService } from "./utils/jwt.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/user.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
@@ -16,7 +16,12 @@ import manageDepartmentsRouter from "./routes/manageDepartments.routes.js";
 import hospitalsRoutes from "./routes/hospital.routes.js";
 import doctorRoutes from "./routes/doctor.routes.js";
 import requestsRoutes from "./routes/requests.routes.js";
-import { initializeCronJobs, stopCronJobs } from "./services/cronJobs.service.js";
+import appointmentsRoutes from './routes/appointmentsMade.routes.js';
+
+import {
+  initializeCronJobs,
+  stopCronJobs,
+} from "./services/cronJobs.service.js";
 
 import systemOverviewRoutes from "./routes/systemOverview.routes.js";
 import systemLogsRoutes from "./routes/systemLogs.routes.js";
@@ -46,6 +51,7 @@ app.use("/api/doctor", doctorRoutes);
 app.use("/api/requests", requestsRoutes);
 app.use("/api/system-overview", systemOverviewRoutes);
 app.use("/api/system-logs", systemLogsRoutes);
+app.use("/api/appointments", appointmentsRoutes);
 
 // 404 handler MUST be last
 app.use("/api", (req, res) => {

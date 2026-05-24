@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import GenericTable from "../../components/JSXcomponents/GenericTable.jsx";
-import "./../CSSpages/superuser/Hospitals.css";
+import GenericTable from "../../../components/JSXcomponents/GenericTable.jsx";
+import "../../CSSpages/superuser/Hospitals.css";
 
 export default function ManageHospitals() {
   const [hospitals, setHospitals] = useState([]);

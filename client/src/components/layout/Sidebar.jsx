@@ -12,13 +12,12 @@ const Sidebar = () => {
 
   const sidebarConfig = {
     superuser: [
-      { label: "Dashboard", path: "/main/dashboard" },
+      { label: "System Overview", path: "/main/system-overview" },
       { label: "Hospitals", path: "/main/hospitals" },
       { label: "Users", path: "/main/users" },
-      { label: "Appointments", path: "/main/booked-appointments" },
+      { label: "Appointments Made", path: "/main/booked-appointments" },
       { label: "Manage Departments", path: "/main/manage-departments" },
       { label: "Manage Specialization", path: "/main/manage-specializations" },
-      { label: "System Overview", path: "/main/system-overview" },
       { label: "System Logs", path: "/main/system-logs" },
       { label: "Make a Request", path: "/main/make-request" }
     ],
@@ -34,12 +33,12 @@ const Sidebar = () => {
     ],
     patient: [
       { label: "Dashboard", path: "/main/dashboard" },
-      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
+      { label: "Book an Appointment", path: "/main/appointments" },
+      { label: "My Appointments", path: "/main/my-appointments" },
       { label: "My Records", path: "/main/records" },
-      { label: "Appointments", path: "/main/appointments" },
+      { label: "Emergency Contacts", path: "/main/emergency-contacts" },
       { label: "My Insurance", path: "/main/insurance" },
       { label: "My Allergies", path: "/main/allergies" },
-      { label: "Leave a Review", path: "/main/leave-review" },
       { label: "Make a Request", path: "/main/make-request" }
     ],
     doctor: [

@@ -9,8 +9,6 @@ import LogOut from "./header-pages/LogOut.jsx";
 
 import Login from "../auth/login.jsx";
 import Register from "../auth/register.jsx";
-import ForgotPassword from "../auth/ForgotPassword.jsx";
-import ResetPassword from "../auth/ResetPassword.jsx";
 import ProtectedRoute from "../../components/auth/ProtectedRoute.jsx";
 import "../CSSpages/App.css";
 
@@ -30,9 +28,9 @@ import MakeRequest from "./sidebar-pages/MakeRequest";
 
 import Records from "./sidebar-pages/Records";
 import Appointments from "./sidebar-pages/Appointments";
+import MyAppointments from "./sidebar-pages/MyAppointments";
 import Insurance from "./sidebar-pages/Insurance";
 import Allergies from "./sidebar-pages/Allergies";
-import LeaveReview from "./sidebar-pages/LeaveReview";
 import EmergencyContacts from "./sidebar-pages/EmergencyContacts";
 
 import AppointmentsSchedule from "./sidebar-pages/AppointmentsSchedule";
@@ -65,8 +63,6 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/main" element={<MainLayout />}>
           <Route index element={<Home />} />
@@ -102,9 +98,9 @@ export default function App() {
           {/* <Route path="dashboard" element={<Dashboard />} /> */}
           <Route path="records" element={<Records />} />
           <Route path="appointments" element={<Appointments />} />
+          <Route path="my-appointments" element={<MyAppointments />} />
           <Route path="insurance" element={<Insurance />} />
           <Route path="allergies" element={<Allergies />} />
-          <Route path="leave-review" element={<LeaveReview />} />
           <Route path="emergency-contacts" element={<EmergencyContacts />} />
           {/* <Route path="staff-schedule" element={<StaffSchedule />} /> */}
           {/* <Route path="make-request" element={<MakeRequest />} /> */}

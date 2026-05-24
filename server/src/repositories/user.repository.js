@@ -283,6 +283,7 @@ class UsersRepository {
     if (!trimmed) {
       return [];
     }
+    const terms = trimmed.split(/\s+/).filter(Boolean);
 
     const uuidPattern =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -332,6 +333,40 @@ class UsersRepository {
                     },
                   },
                 ],
+              },
+            },
+          },
+          {
+            users_profiles: {
+              some: {
+                AND: terms.map((term) => ({
+                  OR: [
+                    {
+                      profiles: {
+                        first_name: {
+                          contains: term,
+                          mode: "insensitive",
+                        },
+                      },
+                    },
+                    {
+                      profiles: {
+                        last_name: {
+                          contains: term,
+                          mode: "insensitive",
+                        },
+                      },
+                    },
+                    {
+                      profiles: {
+                        personal_no: {
+                          contains: term,
+                          mode: "insensitive",
+                        },
+                      },
+                    },
+                  ],
+                })),
               },
             },
           },

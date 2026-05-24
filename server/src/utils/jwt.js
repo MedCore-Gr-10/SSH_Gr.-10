@@ -14,22 +14,7 @@ export class JwtService {
     return jwt.sign(payload, this.secret, { expiresIn });
   }
 
-  generatePasswordResetToken(userId) {
-    return this.generateToken(
-      { user_id: userId, purpose: "password_reset" },
-      "1h",
-    );
-  }
-
   verifyToken(token) {
     return jwt.verify(token, this.secret);
-  }
-
-  verifyPasswordResetToken(token) {
-    const payload = this.verifyToken(token);
-    if (payload?.purpose !== "password_reset" || !payload?.user_id) {
-      throw new Error("Invalid or expired reset link");
-    }
-    return payload;
   }
 }

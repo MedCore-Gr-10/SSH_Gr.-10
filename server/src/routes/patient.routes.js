@@ -431,6 +431,38 @@ router.get("/appointments/search", (req, res, next) => appointmentsController.se
 
 /**
  * @swagger
+ * /api/patient/appointments/booked:
+ *   get:
+ *     summary: Get booked appointments for the logged-in patient
+ *     description: Returns the patient's currently booked appointments with doctor, hospital, date, time, and specialization details.
+ *     tags:
+ *       - Patient Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Patient booked appointments returned successfully.
+ */
+router.get("/appointments/booked", (req, res, next) => appointmentsController.getBookedAppointments(req, res, next));
+
+/**
+ * @swagger
+ * /api/patient/appointments/staff-schedules:
+ *   get:
+ *     summary: Get staff schedules for patient hospitals
+ *     description: Returns active doctor and nurse schedules for hospitals selected by the logged-in patient.
+ *     tags:
+ *       - Patient Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Staff schedules returned successfully.
+ */
+router.get("/appointments/staff-schedules", (req, res, next) => appointmentsController.getStaffSchedules(req, res, next));
+
+/**
+ * @swagger
  * /api/patient/appointments/{slotId}/book:
  *   post:
  *     summary: Book an available appointment slot
@@ -453,5 +485,30 @@ router.get("/appointments/search", (req, res, next) => appointmentsController.se
  *         description: Slot is invalid, inactive, or already booked.
  */
 router.post("/appointments/:slotId/book", (req, res, next) => appointmentsController.bookAppointment(req, res, next));
+
+/**
+ * @swagger
+ * /api/patient/appointments/{appointmentId}:
+ *   delete:
+ *     summary: Cancel a booked appointment
+ *     description: Deletes the logged-in patient's booked appointment record so the slot can become available again.
+ *     tags:
+ *       - Patient Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: appointmentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Booked appointment ID.
+ *     responses:
+ *       200:
+ *         description: Appointment canceled successfully.
+ *       400:
+ *         description: Appointment is invalid or does not belong to the patient.
+ */
+router.delete("/appointments/:appointmentId", (req, res, next) => appointmentsController.cancelAppointment(req, res, next));
 
 export default router;
