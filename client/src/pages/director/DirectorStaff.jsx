@@ -179,7 +179,7 @@ export default function DirectorStaff() {
 
       <div className="director-staff-grid">
         <section className="director-staff-section content-scroll">
-          <h2>Staff roster</h2>
+          <h2>Staff list</h2>
           <table className="director-staff-table">
             <thead>
               <tr>
