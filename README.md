@@ -44,15 +44,6 @@ Shiko per nje file .env ( nese nuk eshte gjeneruar , shtoje) FileName = .env
    Username: dev_nurse
    Password: devpassword
 
-**Full nurse test data** (patients, allergies, insurance, contacts, visits, schedules):
-
-```bash
-cd server
-npm run seed:nurse-test
-```
-
-Login: `dev_nurse` / `devpassword` — search patients: Anna, Ben, Clara (or personal numbers PAT-ANNA-1001, etc.)
-
 ### Infermier/e (nurse) — API `/api/nurse`
 
 - Qasje vetëm në tenancën e spitalit (`staff_hospitals_departments` + `patients_hospitals`)
@@ -143,8 +134,7 @@ për profesionistët mjekësorë dhe komunitetet që ata shërbejnë.
 ### 🔐 Siguria
 
 - Sistem i plotë **autentikimi (login/register)** përmes `POST /api/auth/login` dhe `POST /api/auth/register` (regjistrim vetëm për pacientë)
-- Frontend: `/` (login), `/register`, `/forgot-password`, `/reset-password?token=...`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
-- Rivendosja e fjalëkalimit: `POST /api/auth/forgot-password` (email), `POST /api/auth/reset-password` (token + password). Në dev, linku kthehet në përgjigje dhe shfaqet në UI.
+- Frontend: `/` (login), `/register`, pas hyrjes `/main/dashboard` me sidebar sipas rolit
 - **Role-based authorization** (p.sh. pacient, superuser, doctor, nurse, director)
 - Middleware për:
   - autentikim

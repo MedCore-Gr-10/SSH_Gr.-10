@@ -22,9 +22,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(() => {
-    if (location.state?.passwordReset) {
-      return "Password updated. You can sign in with your new password.";
-    }
     if (location.state?.registered) {
       return "Account created. You can sign in now.";
     }
@@ -150,11 +147,6 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="mc-link-row">
-          <Link to="/forgot-password" className="mc-link-muted">
-            Forgot password?
-          </Link>
-        </div>
         <p className="mc-footer-link">
           Don&apos;t have an account? <Link to="/register">Sign Up</Link>
         </p>
