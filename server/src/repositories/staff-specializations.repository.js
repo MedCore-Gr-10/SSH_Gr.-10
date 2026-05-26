@@ -1,9 +1,7 @@
 import prisma from "../prisma.js";
 
-// 1. Ndryshohet nga objekt në klasë të vërtetë
 export class StaffSpecializationsRepository {
   
-  // I cakton një specializim një mjeku në një spital dhe departament specifik
   async addSpecializationToStaff(data) {
     return await prisma.staff_specializations.create({
       data: {
@@ -18,7 +16,7 @@ export class StaffSpecializationsRepository {
     });
   }
 
-  // Gjen të gjitha specializimet e një mjeku për një vend të caktuar pune
+
   async replaceStaffSpecialization(data) {
     const staffId = data.staff_id;
     const hospitalId = Number(data.hospital_id);
@@ -61,7 +59,6 @@ export class StaffSpecializationsRepository {
     });
   }
 
-  // Heq një specializim specifik nga mjeku (përdor çelësin e përbërë me 4 fusha)
   async removeSpecializationFromStaff(staffId, hospitalId, departmentId, specializationId) {
     return await prisma.staff_specializations.delete({
       where: {
@@ -74,6 +71,6 @@ export class StaffSpecializationsRepository {
       },
     });
   }
-} // Mbyllja e klasës
+}
 
 export default new StaffSpecializationsRepository();

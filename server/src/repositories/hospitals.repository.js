@@ -2,7 +2,6 @@ import prisma from "../prisma.js";
 
 class HospitalsRepository {
 
-  // 1. Krijon spitalin e ri
   async create(data) {
     const { director_personal_no, ...hospitalData } = data;
 
@@ -17,7 +16,6 @@ class HospitalsRepository {
     return newHospital;
   }
 
-  // 2. RREGULLUAR: Merr të gjithë spitalet duke ndjekur skemën e saktë të marrëdhënieve
   async findAll() {
     const hospitals = await prisma.hospitals.findMany({
       include: {
@@ -45,7 +43,6 @@ class HospitalsRepository {
     return hospitals.map(hosp => this.mapHospitalDirector(hosp));
   }
 
-  // 3. RREGULLUAR: Gjen spitalin sipas ID me të njëjtën strukturë korrekte
   async findById(id) {
     const hospital = await prisma.hospitals.findUnique({
       where: { id: Number(id) },
@@ -75,7 +72,6 @@ class HospitalsRepository {
     return this.mapHospitalDirector(hospital);
   }
 
-  // 4. Përditëson spitalin
   async update(id, data) {
     const { director_personal_no, ...pureHospitalData } = data;
 
@@ -91,16 +87,13 @@ class HospitalsRepository {
     return this.findById(updatedHospital.id);
   }
 
-  // 5. Fshin spitalin
   async delete(id) {
     return prisma.hospitals.delete({
       where: { id: Number(id) }
     });
   }
 
-  // Lidh Drejtorin e ri përmes tabelave ndërmjetëse
   async linkDirectorToHospital(hospitalId, personalNo) {
-  // 1. Gjejmë profilin e drejtorit sipas numrit personal
   const profile = await prisma.profiles.findUnique({
     where: { personal_no: String(personalNo) },
     include: {
@@ -118,15 +111,12 @@ class HospitalsRepository {
 
   const userId = profile.users_profiles[0].user_id;
 
-  // 2. AUTOMATIZIMI: Gjejmë ose krijojmë një departament të përgjithshëm "General"
-  // Kjo bën që të mos na interesojë se çfarë ID-je ka, Prisma e menaxhon vetë
   const defaultDepartment = await prisma.departments.upsert({
     where: { department_name: "General" },
     update: {},
     create: { department_name: "General" }
   });
 
-  // 3. Sigurohemi që ky spital është i lidhur me këtë departament të përgjithshëm
   await prisma.hospitals_departments.upsert({
     where: {
       hospital_id_department_id: { 
@@ -141,7 +131,6 @@ class HospitalsRepository {
     }
   });
 
-  // 4. Pastrojmë drejtorin e vjetër nga ky departament i këtë spitali (nëse ka pasur)
   await prisma.staff_hospitals_departments.deleteMany({
     where: { 
       hospital_id: hospitalId, 
@@ -149,7 +138,7 @@ class HospitalsRepository {
     }
   });
 
-  // 5. Regjistrojmë drejtorin e ri në këtë departament të spitalit
+
   return prisma.staff_hospitals_departments.create({
     data: {
       staff_id: userId,
@@ -159,19 +148,16 @@ class HospitalsRepository {
   });
 }
 
-  // RREGULLUAR: Mapimi i të dhënave që të nxjerrë drejtorin nga struktura e re e nested array-ve
   mapHospitalDirector(hospital) {
     let directorData = null;
 
-    // Shëtitim nëpër departamente për të gjetur stafin
     if (hospital.hospitals_departments && hospital.hospitals_departments.length > 0) {
       for (const hospDept of hospital.hospitals_departments) {
         if (hospDept.staff_hospitals_departments && hospDept.staff_hospitals_departments.length > 0) {
           
-          // Gjejmë anëtarin e parë të stafit që ka rolin 'director'
           const staffRecord = hospDept.staff_hospitals_departments.find(shd => 
             shd.users?.roles?.role_name === "director"
-          ) || hospDept.staff_hospitals_departments[0]; // Nëse s'gjen dot me rol, merr të parin
+          ) || hospDept.staff_hospitals_departments[0]; 
 
           if (staffRecord && staffRecord.users) {
             const user = staffRecord.users;
@@ -185,7 +171,7 @@ class HospitalsRepository {
               personal_no: profile?.personal_no || 'N/A',
               phone_number: profile?.phone_number || 'N/A'
             };
-            break; // Kemi gjetur drejtorin, ndalojmë ciklin
+            break; 
           }
         }
       }
@@ -227,12 +213,11 @@ class HospitalsRepository {
   }
 
   async findHospitalByDirectorId(userId) {
-    // 🚀 RREGULLIMI: Hoqëm Number(userId) sepse ID-të tuaja janë UUID (String)
     if (!userId) return null;
 
     const assignment = await prisma.staff_hospitals_departments.findFirst({
       where: {
-        staff_id: String(userId), // Sigurohemi që shkon si String/UUID e pastër
+        staff_id: String(userId), 
         hospitals_departments: {
           departments: {
             department_name: "General"

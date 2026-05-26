@@ -1,5 +1,4 @@
 import "../../CSSpages/header-pages/About.css";
-// Import the professional icons
 import { LuUsers, LuBuilding2, LuEye } from "react-icons/lu";
 import { FaLaptopCode } from "react-icons/fa6";
 

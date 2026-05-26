@@ -4,7 +4,6 @@ import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function SystemOverview() {
   const [stats, setStats] = useState({
-    // Widgeti i parë i madh (Llogaritë dhe Rolet - Dinamike)
     totalUsers: 0,
     activeUsers: 0,
     inactiveUsers: 0,
@@ -27,14 +26,12 @@ export default function SystemOverview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Hook-u për të tërhequr të dhënat live nga kontrolluesi i ri i System Overview
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Thirrja e rrugës së re të dedikuar në backend
         const response = await superuserFetch('/system-overview'); 
         const result = await response.json();
 
@@ -53,7 +50,6 @@ export default function SystemOverview() {
             departments: result.data.departments,          
             specializations: result.data.specializations,
             appointments: result.data.totalAppointments,
-            //totalRequests: result.data.totalRequests
           }));
         } else {
           setError(result.error || "Nuk u mundësua ngarkimi i të dhënave.");
@@ -189,7 +185,7 @@ export default function SystemOverview() {
                 <div className="role-subcard infra-card-spec">
                   <span className="role-icon">📚</span>
                   <span className="role-label">Existing Specialties</span>
-                  <h3 className="role-value">{stats.specializations}</h3> {/* 🌟 Ndryshuar këtu në stats.specializations */}
+                  <h3 className="role-value">{stats.specializations}</h3> 
                 </div>
 
                 <div className="role-subcard infra-card-appointments">

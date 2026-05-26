@@ -1,9 +1,5 @@
 import prisma from "../prisma.js";
 
-/**
- * Repository for managing appointment booking slots (actual dated slots)
- * These are generated from appointment templates
- */
 class AppointmentsBookingSlotsRepository {
 
   /**

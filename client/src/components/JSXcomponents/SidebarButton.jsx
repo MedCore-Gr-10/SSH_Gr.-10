@@ -1,4 +1,3 @@
-// src/components/JSXcomponents/SidebarButton.jsx
 import React from 'react';
 import '../CSScomponents/SidebarButton.css';
 

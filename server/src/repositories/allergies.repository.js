@@ -2,11 +2,6 @@ import prisma from "../prisma.js";
 
 class AllergiesRepository {
 
-  /*
-  |--------------------------------------------------------------------------
-  | CREATE
-  |--------------------------------------------------------------------------
-  */
 
   async create(data) {
     return prisma.allergies.create({
@@ -21,11 +16,6 @@ class AllergiesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | FIND UNIQUE
-  |--------------------------------------------------------------------------
-  */
 
   async findById(id) {
     return prisma.allergies.findUnique({
@@ -53,11 +43,6 @@ class AllergiesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | FIND MANY
-  |--------------------------------------------------------------------------
-  */
 
   async findAll() {
     return prisma.allergies.findMany({
@@ -98,12 +83,6 @@ class AllergiesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | UPDATE
-  |--------------------------------------------------------------------------
-  */
-
   async update(id, data) {
     return prisma.allergies.update({
       where: { id },
@@ -120,11 +99,6 @@ class AllergiesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | DELETE
-  |--------------------------------------------------------------------------
-  */
 
   async delete(id) {
     return prisma.allergies.delete({
@@ -132,11 +106,6 @@ class AllergiesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | EXISTS / COUNT
-  |--------------------------------------------------------------------------
-  */
 
   async exists(profileId, allergyName) {
     const allergy = await prisma.allergies.findFirst({

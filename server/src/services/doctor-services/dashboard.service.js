@@ -28,7 +28,6 @@ class DoctorDashboardService {
         today
       ),
 
-      // reuse your existing service via repository dependency if needed
       Promise.resolve(null),
 
       appointmentsBookingSlotsRepository.findDoctorSlots(doctorId, null),
@@ -77,7 +76,7 @@ class DoctorDashboardService {
       }),
     };
 
-    await cacheService.setJson(cacheKey, dashboard, 60); // 1 min cache
+    await cacheService.setJson(cacheKey, dashboard, 60); 
 
     return dashboard;
   }

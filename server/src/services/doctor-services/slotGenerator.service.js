@@ -2,15 +2,6 @@ import appointmentsTemplatesRepository from "../../repositories/appointments-tem
 import appointmentsBookingSlotsRepository from "../../repositories/appointments-booking-slots.repository.js";
 import logsRepository from "../../repositories/logs.repository.js";
 
-/**
- * Appointment Slot Generator Service
- * Automatically generates booking slots from recurring templates
- * 
- * This service handles:
- * - Converting weekly recurring templates to actual dated booking slots
- * - Preventing duplicate slot generation
- * - Handling weekly auto-generation
- */
 class AppointmentSlotGeneratorService {
 
   /**
@@ -76,10 +67,8 @@ class AppointmentSlotGeneratorService {
     const start = startDate ? new Date(startDate) : new Date();
     start.setHours(0, 0, 0, 0);
 
-    // Get next 7 days
     const next7Days = this.#getNext7Days(start);
 
-    // Get all active templates for this doctor
     const templates = await appointmentsTemplatesRepository.findByStaffId(doctorId);
 
     if (templates.length === 0) {
@@ -89,16 +78,12 @@ class AppointmentSlotGeneratorService {
     const slotsToCreate = [];
     let totalToCreate = 0;
 
-    // For each day in the next 7 days
     for (const date of next7Days) {
       const dayOfWeek = this.#getDayOfWeek(date);
 
-      // Find templates for this day
       const dayTemplates = templates.filter(t => t.day_of_week === dayOfWeek);
 
-      // For each template on this day, create a slot
       for (const template of dayTemplates) {
-        // Check for duplicate
         const duplicate = await appointmentsBookingSlotsRepository.findDuplicate(
           doctorId,
           this.#toDateOnly(date),
@@ -120,7 +105,6 @@ class AppointmentSlotGeneratorService {
       }
     }
 
-    // Bulk create slots
     if (slotsToCreate.length > 0) {
       const result = await appointmentsBookingSlotsRepository.createBulk(slotsToCreate);
 
@@ -156,7 +140,6 @@ class AppointmentSlotGeneratorService {
       throw new Error("From date must be before to date");
     }
 
-    // Get templates
     const templates = await appointmentsTemplatesRepository.findByStaffId(doctorId);
     if (templates.length === 0) {
       throw new Error("Doctor has no recurring appointment templates");
@@ -166,13 +149,11 @@ class AppointmentSlotGeneratorService {
     const currentDate = new Date(fromDate);
     currentDate.setHours(0, 0, 0, 0);
 
-    // Iterate through date range
     while (currentDate <= toDate) {
       const dayOfWeek = this.#getDayOfWeek(currentDate);
       const dayTemplates = templates.filter(t => t.day_of_week === dayOfWeek);
 
       for (const template of dayTemplates) {
-        // Check for duplicate
         const duplicate = await appointmentsBookingSlotsRepository.findDuplicate(
           doctorId,
           this.#toDateOnly(currentDate),
@@ -192,11 +173,9 @@ class AppointmentSlotGeneratorService {
         }
       }
 
-      // Move to next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    // Bulk create
     if (slotsToCreate.length > 0) {
       const result = await appointmentsBookingSlotsRepository.createBulk(slotsToCreate);
 
@@ -239,12 +218,10 @@ class AppointmentSlotGeneratorService {
     const currentDate = new Date(startDate);
     currentDate.setHours(0, 0, 0, 0);
 
-    // Only create slots for dates that match the template's day of week
     while (currentDate <= endDate) {
       const dayOfWeek = this.#getDayOfWeek(currentDate);
 
       if (dayOfWeek === template.day_of_week) {
-        // Check for duplicate
         const duplicate = await appointmentsBookingSlotsRepository.findDuplicate(
           template.staff_id,
           this.#toDateOnly(currentDate),
@@ -267,7 +244,6 @@ class AppointmentSlotGeneratorService {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    // Bulk create
     if (slotsToCreate.length > 0) {
       const result = await appointmentsBookingSlotsRepository.createBulk(slotsToCreate);
 
@@ -341,7 +317,6 @@ class AppointmentSlotGeneratorService {
     const lastDate = new Date(latestSlotDate);
     lastDate.setHours(0, 0, 0, 0);
 
-    // If latest slot is less than 3 days away, generation is needed
     const daysUntilLastSlot = Math.ceil((lastDate - today) / (1000 * 60 * 60 * 24));
     return daysUntilLastSlot <= 3;
   }
@@ -351,11 +326,8 @@ class AppointmentSlotGeneratorService {
    * @returns {Promise<Array>} Array of doctor IDs
    */
   async findDoctorsNeedingGeneration() {
-    // Get all doctors with templates
     const templates = await appointmentsTemplatesRepository.findByStaffId("*"); // This won't work, need different approach
     
-    // For now, return empty - this would be implemented with a query
-    // to find doctors whose latest slots are expiring soon
     return [];
   }
 }

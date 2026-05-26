@@ -5,19 +5,14 @@ class ManageSpecializationsController {
     this.manageSpecializationsService = new ManageSpecializationsService();
   }
 
-  /**
-   * GET /specializations
-   * Lists all specializations
-   */
  async getAll(req, res) {
     try {
       const specializations = await this.manageSpecializationsService.listSpecializations();
       
-      // Map the array to cleanly display the doctor count field if structured via Prisma aggregates
       const formattedData = specializations.map(spec => ({
         id: spec.id,
         specialization_name: spec.specialization_name,
-        total_doctors: spec._count?.staff_specializations ?? 0 // Safely extracts the count number
+        total_doctors: spec._count?.staff_specializations ?? 0 
       }));
 
       return res.status(200).json({
@@ -33,10 +28,6 @@ class ManageSpecializationsController {
     }
   }
 
-  /**
-   * POST /specializations
-   * Creates a new specialization
-   */
   async create(req, res) {
     try {
       const { specialization_name } = req.body;
@@ -51,7 +42,6 @@ class ManageSpecializationsController {
         data: newSpecialization,
       });
     } catch (error) {
-      // Differentiate between user input errors vs server errors
       const statusCode = error.message.includes("required") || error.message.includes("exists") ? 400 : 500;
       
       return res.status(statusCode).json({
@@ -61,10 +51,6 @@ class ManageSpecializationsController {
     }
   }
 
-  /**
-   * PUT /specializations/:id
-   * Modifies an existing specialization
-   */
   async update(req, res) {
     try {
       const { id } = req.params;
@@ -111,7 +97,7 @@ class ManageSpecializationsController {
       if (error.message.includes("not found")) {
         statusCode = 404;
       } else if (error.message.includes("Cannot delete")) {
-        statusCode = 400; // Business rule validation failure (Doctors assigned)
+        statusCode = 400; 
       }
 
       return res.status(statusCode).json({

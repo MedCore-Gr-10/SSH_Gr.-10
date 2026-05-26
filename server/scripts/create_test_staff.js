@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import prisma from "../src/prisma.js";
 import bcrypt from "bcrypt";
 import { JwtService } from "../src/utils/jwt.js";
@@ -162,9 +161,6 @@ async function main() {
     console.log("Staff already linked to hospital and department");
   }
 
-  // -------------------------------
-  // JWT TOKEN GENERATION (NEW)
-  // -------------------------------
   const jwtService = new JwtService(process.env.JWT_SECRET || "devsecret");
 
   const token = jwtService.generateToken({

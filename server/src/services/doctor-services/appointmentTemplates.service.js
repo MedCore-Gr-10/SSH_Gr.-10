@@ -4,10 +4,6 @@ import staffWorkingSchedulesRepository from "../../repositories/staff-working-sc
 import logsRepository from "../../repositories/logs.repository.js";
 import prisma from "../../prisma.js";
 
-/**
- * Doctor Appointment Templates Service
- * Handles recurring template management with validation against staff schedules
- */
 class DoctorAppointmentTemplatesService {
   
   /**
@@ -159,7 +155,6 @@ class DoctorAppointmentTemplatesService {
   async createTemplate(data, doctorId, hospitalId, departmentId, currentUserId) {
     const { day_of_week, start_time, end_time } = data;
 
-    // Validate input
     if (!day_of_week || !start_time || !end_time) {
       throw new Error("day_of_week, start_time, and end_time are required");
     }
@@ -175,7 +170,6 @@ class DoctorAppointmentTemplatesService {
       departmentId
     );
 
-    // Validate doctor is assigned to hospital/department
     const assignment = await prisma.staff_hospitals_departments.findUnique({
       where: {
         staff_id_hospital_id_department_id: {
@@ -190,16 +184,14 @@ class DoctorAppointmentTemplatesService {
       throw new Error("Doctor not assigned to this hospital/department");
     }
 
-    // Normalize times
     const normalizedStart = this.#normalizeTime(start_time);
     const normalizedEnd = this.#normalizeTime(end_time);
 
-    // Validate start < end
     if (this.#compareTime(normalizedStart, normalizedEnd) >= 0) {
       throw new Error("Start time must be before end time");
     }
 
-    // Fetch doctor's working schedule for the day
+
     const workingSchedules = await staffWorkingSchedulesRepository.findByHospital(hospitalId);
     const daySchedules = workingSchedules.filter(
       s => s.staff_id === doctorId && s.day_of_week === day_of_week
@@ -211,17 +203,14 @@ class DoctorAppointmentTemplatesService {
 
     const daySchedule = daySchedules[0];
 
-    // Validate template is within working hours
     this.#validateTimeWithinWorkingSchedule(daySchedule, normalizedStart, normalizedEnd);
 
-    // Check for overlaps with existing templates
     const existingTemplates = await appointmentsTemplatesRepository.findByStaffAndDay(
       doctorId,
       day_of_week
     );
     this.#validateNoOverlap(existingTemplates, normalizedStart, normalizedEnd);
 
-    // Create template
     const template = await appointmentsTemplatesRepository.create({
       staff_id: doctorId,
       hospital_id: hospitalId,
@@ -232,7 +221,6 @@ class DoctorAppointmentTemplatesService {
       active_appointment_template: true
     });
 
-    // Log action
     await logsRepository.create({
       user_id: currentUserId,
       action: "create appointment template",
@@ -252,11 +240,8 @@ class DoctorAppointmentTemplatesService {
     return appointmentsTemplatesRepository.findByStaffAssignment(
       doctorId,
       hospitalId,
-      // We need to fetch the department from context, so let's get all for now
-      // and filter on the service level
     );
     
-    // Alternative: Get all and return
     return appointmentsTemplatesRepository.findByStaffId(doctorId);
   }
 
@@ -287,33 +272,27 @@ class DoctorAppointmentTemplatesService {
       throw new Error("Template not found");
     }
 
-    // Authorization check
     if (template.staff_id !== doctorId || template.hospital_id !== hospitalId) {
       throw new Error("Unauthorized: Cannot update other doctor's template");
     }
 
     const updateData = {};
 
-    // If times are being updated, validate
     if (data.start_time || data.end_time) {
       const newStart = data.start_time ? this.#normalizeTime(data.start_time) : template.start_time;
       const newEnd = data.end_time ? this.#normalizeTime(data.end_time) : template.end_time;
 
-      // Validate start < end
       if (this.#compareTime(newStart, newEnd) >= 0) {
         throw new Error("Start time must be before end time");
       }
 
-      // Get working schedule for validation
       const workingSchedules = await staffWorkingSchedulesRepository.findByHospital(hospitalId);
       const daySchedule = workingSchedules.find(
         s => s.staff_id === doctorId && s.day_of_week === template.day_of_week
       );
 
-      // Validate within working hours
       this.#validateTimeWithinWorkingSchedule(daySchedule, newStart, newEnd);
 
-      // Check overlaps (excluding this template)
       const existingTemplates = await appointmentsTemplatesRepository.findByStaffAndDay(
         doctorId,
         template.day_of_week
@@ -352,19 +331,17 @@ class DoctorAppointmentTemplatesService {
       throw new Error("Template not found");
     }
 
-    // Authorization check
+
     if (template.staff_id !== doctorId || template.hospital_id !== hospitalId) {
       throw new Error("Unauthorized: Cannot delete other doctor's template");
     }
 
-    // Deactivate all related booking slots instead of deleting
     const slots = await appointmentsBookingSlotsRepository.findByTemplateId(templateId);
     if (slots.length > 0) {
       const slotIds = slots.map(s => s.id);
       await appointmentsBookingSlotsRepository.deactivateBulk(slotIds);
     }
 
-    // Soft delete the template
     await appointmentsTemplatesRepository.update(templateId, {
       active_appointment_template: false
     });

@@ -1,15 +1,3 @@
-/**
- * Cron Job Service for Appointment Slot Generation
- * 
- * This service sets up automatic weekly slot generation
- * Default: Every Monday at 00:00 UTC
- * 
- * Usage in main server file (index.js):
- * import { initializeCronJobs } from './services/cronJobs.service.js';
- * 
- * initializeCronJobs(); // Call this after server starts
- */
-
 import cron from 'node-cron';
 import slotGeneratorService from './doctor-services/slotGenerator.service.js';
 import prisma from '../prisma.js';
@@ -57,12 +45,10 @@ async function generateSlotsForAllDoctors() {
 
     console.log(`[CronJob] Starting slot generation for ${doctorIds.length} doctors`);
 
-    // Generate for each doctor
     const results = await Promise.allSettled(
       doctorIds.map(doctorId => generateSlotsForDoctor(doctorId))
     );
 
-    // Process results
     const summary = {
       success: true,
       total_doctors: doctorIds.length,
@@ -103,15 +89,9 @@ async function generateSlotsForAllDoctors() {
   }
 }
 
-/**
- * Initialize all cron jobs
- * Should be called once when the server starts
- */
 async function initializeCronJobs() {
   console.log('[CronJob] Initializing scheduled tasks...');
 
-  // Schedule: Every Monday at 00:00 UTC
-  // Format: "0 0 * * 1" = minute hour day-of-month month day-of-week
   const weeklySlotGenerationJob = cron.schedule('0 0 * * 1', async () => {
     console.log('[CronJob] Running weekly slot generation...');
     const startTime = Date.now();
@@ -129,24 +109,10 @@ async function initializeCronJobs() {
 
   console.log('[CronJob] ✓ Scheduled: Weekly slot generation (Every Monday 00:00 UTC)');
 
-  // Optional: Daily slot refresh (for testing/demo)
-  // Uncomment to enable daily generation
-  /*
-  const dailyRefreshJob = cron.schedule('0 0 * * *', async () => {
-    console.log('[CronJob] Running daily slot generation...');
-    const result = await generateSlotsForAllDoctors();
-  });
-  cronJobInstances.push(dailyRefreshJob);
-  console.log('[CronJob] ✓ Scheduled: Daily slot generation (Every day 00:00 UTC)');
-  */
 
   console.log('[CronJob] All scheduled tasks initialized');
 }
 
-/**
- * Stop all cron jobs
- * Call this when shutting down the server
- */
 function stopCronJobs() {
   console.log('[CronJob] Stopping all scheduled tasks...');
   cronJobInstances.forEach(job => {
@@ -156,10 +122,6 @@ function stopCronJobs() {
   console.log('[CronJob] All scheduled tasks stopped');
 }
 
-/**
- * Manual trigger for testing
- * POST /api/admin/cron/generate-slots-now
- */
 async function manualTriggerSlotGeneration(hospitalId = null) {
   console.log('[CronJob] Manual trigger: Starting slot generation...');
   

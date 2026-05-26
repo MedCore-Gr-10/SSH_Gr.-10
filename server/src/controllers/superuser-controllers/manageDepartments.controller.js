@@ -14,7 +14,6 @@ class ManageDepartmentsController {
 
   getAll = async (req, res, next) => {
     try {
-      // ✅ Thërret Service-in i cili do të merret me llogaritjen e mjekëve
       const data = await departmentsService.listDepartments();
       res.status(200).json({ success: true, data });
     } catch (error) {
@@ -68,7 +67,6 @@ class ManageDepartmentsController {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-// *Sigurohu që e ke regjistruar këtë rrugë te router-i yt: router.get("/:id/hospitals", controller.getHospitals)*
 }
 
 export default ManageDepartmentsController;

@@ -1,15 +1,13 @@
 .system-overview-content{
   display: flex;
   flex-direction: column;
-  gap: 36px; /* ⬅️ Change this from 24px to 36px or 40px to increase the space */
+  gap: 36px; 
 }
 
-/* ==========================================================================
-   MAIN DASHBOARD WIDGETS (CORNER TO CORNER) - FIXED HEIGHTS FOR COMPACT VIEW
-   ========================================================================== */
+
 .main-dashboard-widget {
   width: 100%;
-  height: auto; /* Ndryshuar nga 300px në auto që të mos ketë overflow të kartelave */
+  height: auto;
   background-color: #ffffff;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
@@ -19,14 +17,13 @@
   flex-direction: column;
 }
 
-/* Row 1: Overview Panel */
 .widget-row.row-overview {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  height: auto; /* Ndryshuar nga 100px në auto për t'u bërë më i hollë */
-  padding: 12px 20px; /* Reduktuar padding-u për kompaktësi */
+  height: auto; 
+  padding: 12px 20px; 
   border-bottom: 1px solid #edf2f7;
   background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
 }
@@ -38,9 +35,9 @@
 }
 
 .big-icon {
-  font-size: 22px; /* Zvogëluar pak madhësia e ikonës */
-  width: 44px;    /* Bërë më e vogël */
-  height: 44px;   /* Bërë më e vogël */
+  font-size: 22px;
+  width: 44px;  
+  height: 44px;  
   background-color: #ebf8ff;
   color: #2b6cb0;
   display: flex;
@@ -60,7 +57,7 @@
 }
 
 .widget-label {
-  font-size: 11px; /* Zvogëluar tekstet */
+  font-size: 11px;
   font-weight: 600;
   color: #718096;
   text-transform: uppercase;
@@ -68,20 +65,19 @@
 }
 
 .widget-big-value {
-  font-size: 26px; /* Zvogëluar numri i madh kryesor */
+  font-size: 26px; 
   font-weight: 800;
   color: #1a202c;
   margin: 2px 0 0 0;
 }
 
-/* Top Right Subcount Badges */
 .status-subcounts {
   display: flex;
   gap: 10px;
 }
 
 .subcount-box {
-  padding: 6px 12px; /* Më pak hapësirë e brendshme */
+  padding: 6px 12px;
   border-radius: 8px;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
@@ -115,9 +111,8 @@
   margin: 2px 0 0 0;
 }
 
-/* Row 2: Roles & Inner Grid Distribution */
 .widget-row.row-roles {
-  padding: 14px 20px 18px 20px; /* Reduktuar padding i jashtëm i zonës së kartelave */
+  padding: 14px 20px 18px 20px; 
 }
 
 .roles-section-title {
@@ -130,21 +125,18 @@
 .roles-inner-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 12px; /* Reduktuar hapësira mes kartelave */
+  gap: 12px; 
 }
 
-/* ==========================================================================
-   ROLE SUBCARDS & INNER SPECIFIC BORDERS (COMPACT VERSION)
-   ========================================================================== */
 .role-subcard {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  height: 95px; /* NDRYSHUAR: Nga 150px në 95px për t'i bërë dukshëm më të shkurtra */
-  padding: 10px 12px; /* Përshtatur padding për lartësinë e re */
+  height: 95px; 
+  padding: 10px 12px; 
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Shpërndan ikonën sipër dhe vlerën poshtë */
+  justify-content: space-between; 
   box-sizing: border-box;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -155,7 +147,7 @@
 }
 
 .role-icon {
-  font-size: 16px; /* Zvogëluar ikona brenda kartelës */
+  font-size: 16px;
   margin-bottom: 2px;
   line-height: 1;
 }
@@ -166,25 +158,24 @@
   color: #718096;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Nëse teksti është i gjatë nuk e thyen rreshtin keq */
+  text-overflow: ellipsis; 
 }
 
 .role-value {
-  font-size: 18px; /* Zvogëluar font-size i vlerave (p.sh. 145 Doctors) */
+  font-size: 18px;
   font-weight: 700;
   color: #1a202c;
   margin: 0;
   line-height: 1.2;
 }
 
-/* Specific left borders for User Roles */
 .role-superuser { border-left: 3px solid #ecc94b; }
 .role-director { border-left: 3px solid #4299e1; }
 .role-doctor { border-left: 3px solid #319795; }
 .role-nurse { border-left: 3px solid #ed64a6; }
 .role-patient { border-left: 3px solid #ed8936; }
 
-/* Specific left borders for Infrastructure */
+
 .infra-card-dept { border-left: 3px solid #4a5568 !important; }
 .infra-card-spec { border-left: 3px solid #00b5d8 !important; }
 .infra-card-rating { border-left: 3px solid #dd6b20 !important; }
@@ -197,27 +188,25 @@
   font-weight: normal;
 }
 
-/* ==========================================================================
-   EXTENDED PATIENT CARD WITH DETAILS (COMPACT ADAPTATION)
-   ========================================================================== */
+
 .patient-extended-card {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Ndryshuar për kompaktësi */
+  justify-content: flex-start; 
   gap: 4px !important;
   padding: 8px 10px !important;
 }
 
 .patient-main-info {
   display: flex;
-  flex-direction: row; /* Kthyer në rresht që të zërë më pak lartësi */
+  flex-direction: row; 
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
 
 .patient-main-info .role-value {
-  font-size: 16px; /* Pak më i vogël që të përshtatet në rresht horizontal */
+  font-size: 16px; 
 }
 
 .patient-insurance-split {
@@ -231,7 +220,7 @@
 }
 
 .insurance-badge {
-  font-size: 10px; /* Zvogëluar font-i i sigurimeve */
+  font-size: 10px; 
   color: #4a5568;
   display: flex;
   align-items: center;
@@ -256,9 +245,6 @@
 .insured::before { background-color: #3182ce; }
 .uninsured::before { background-color: #a0aec0; }
 
-/* ==========================================================================
-   BOTTOM OPERATIONAL CARDS GRID
-   ========================================================================== */
 .infrastructure-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -269,7 +255,7 @@
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 16px; /* Zvogëluar pak padding */
+  padding: 16px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -307,15 +293,12 @@
 .border-requests { border-left: 4px solid #805ad5; }
 .icon-bg-requests { background-color: #faf5ff; color: #805ad5; }
 
-/* ==========================================================================
-   RESPONSIVE MEDIA QUERIES
-   ========================================================================== */
 @media (max-width: 1024px) {
   .roles-inner-grid {
     grid-template-columns: repeat(3, 1fr);
   }
   .role-subcard {
-    height: auto; /* Lejon zgjatjen nëse thyhet teksti në ekrane më të vogla */
+    height: auto; 
   }
 }
 

@@ -12,7 +12,6 @@ class ManageDepartmentsService {
       throw new Error("Department name is required.");
     }
 
-    // Kontrollon nëse departamenti ekziston (pasi është @unique në skemë)
     const existing = await departmentsRepository.findByName(data.department_name.trim());
     if (existing) {
       throw new Error("A department with this name already exists.");
@@ -46,7 +45,6 @@ class ManageDepartmentsService {
         throw new Error("Department name cannot be empty.");
       }
 
-      // Kontrollon nëse një rekord tjetër e përdor këtë emër
       const nameCheck = await departmentsRepository.findByName(trimmedName);
       if (nameCheck && nameCheck.id !== Number(id)) {
         throw new Error("Another department already uses this name.");
@@ -76,7 +74,6 @@ class ManageDepartmentsService {
       throw new Error(`Department with ID ${id} not found.`);
     }
 
-    // Marrim numrin e doktorëve të lidhur me këtë departament
     const doctorCount = await departmentsRepository.countDoctors(id);
 
     if (doctorCount > 0) {
@@ -123,14 +120,12 @@ class ManageDepartmentsService {
   }
 
   async listDepartments() {
-    // 1. Marrim të dhënat e plota nga Repository
     const departments = await departmentsRepository.findAll();
 
     if (!departments || !Array.isArray(departments)) {
       return [];
     }
 
-    // 2. Formatimi i strukturuar ekzaktësisht siç e pret Frontend-i
     return departments.map((dept) => {
       const hdList = dept.hospitals_departments || [];
       
@@ -141,7 +136,7 @@ class ManageDepartmentsService {
       return {
         id: dept.id,
         department_name: dept.department_name,
-        total_doctors: totalDoctors, // 👈 Përputhet 100% me kolonën e tabelës në React
+        total_doctors: totalDoctors, 
       };
     });
   }
@@ -156,10 +151,8 @@ class ManageDepartmentsService {
   return departments.map((dept) => {
     const hdList = dept.hospitals_departments || [];
     
-    // 1. Numri i spitaleve është thjesht sa elemente ka në këtë listë lidhjeje
     const totalHospitals = hdList.length;
 
-    // 2. Numri i mjekëve (Kodi ekzistues)
     const totalDoctors = hdList.reduce((sum, hd) => {
       return sum + (hd._count?.staff_hospitals_departments || 0);
     }, 0);
@@ -168,7 +161,7 @@ class ManageDepartmentsService {
       id: dept.id,
       department_name: dept.department_name,
       total_doctors: totalDoctors,
-      total_hospitals: totalHospitals, // 👈 Kjo fushë e re i dërgohet frontend-it
+      total_hospitals: totalHospitals, 
     };
   });
 }

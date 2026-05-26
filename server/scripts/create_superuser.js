@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import prisma from "../src/prisma.js";
 import bcrypt from "bcrypt";
 

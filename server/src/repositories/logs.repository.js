@@ -60,7 +60,6 @@ class LogsRepository {
     });
   }
 
-  // Optimized to eagerly load user details for the layout transformer
   async findAll() {
     return prisma.logs.findMany({
       include: {
