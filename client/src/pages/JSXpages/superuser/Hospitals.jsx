@@ -11,17 +11,14 @@ export default function ManageHospitals() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // State për modale e detajeve dhe editimit
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
-  // State për verifikimin e profilit të drejtorit
   const [searchPersonalNo, setSearchPersonalNo] = useState('');
   const [linkedProfile, setLinkedProfile] = useState(null);
   const [profileSearchError, setProfileSearchError] = useState('');
   
-  // State për formën e spitalit të ri
   const [formData, setFormData] = useState({
     hospital_name: '',
     hospital_address: '',
@@ -30,7 +27,6 @@ export default function ManageHospitals() {
     departments: [] 
   });
 
-  // State për formën e editimit të spitalit ekzistues
   const [editFormData, setEditFormData] = useState({
     hospital_name: '',
     hospital_address: '',
@@ -42,7 +38,6 @@ export default function ManageHospitals() {
   const API_URL = '/hospitals'; 
   const DEPARTMENTS_API_URL = '/departments';
 
-  // 1. Merr spitalet nga Backend-i
   const fetchHospitals = async () => {
     setLoading(true);
     try {
@@ -60,7 +55,6 @@ export default function ManageHospitals() {
     }
   };
 
-  // Funksioni për të marrë departamentet nga Backend-i
   const fetchDepartments = async () => {
     try {
       const response = await superuserFetch(DEPARTMENTS_API_URL);
@@ -90,17 +84,14 @@ export default function ManageHospitals() {
     setEditFormData({ ...editFormData, [name]: value });
   };
 
-  // Logjika e re për ndryshimin e Checkbox-eve (Krijim)
   const handleCheckboxChange = (deptId) => {
     const currentDepartments = [...formData.departments];
     if (currentDepartments.includes(deptId)) {
-      // Nëse është i selektuar, e heqim
       setFormData({
         ...formData,
         departments: currentDepartments.filter(id => id !== deptId)
       });
     } else {
-      // Nëse nuk është i selektuar, e shtojmë
       setFormData({
         ...formData,
         departments: [...currentDepartments, deptId]
@@ -108,7 +99,6 @@ export default function ManageHospitals() {
     }
   };
 
-  // Logjika e re për ndryshimin e Checkbox-eve (Editim)
   const handleEditCheckboxChange = (deptId) => {
     const currentDepartments = [...editFormData.departments];
     if (currentDepartments.includes(deptId)) {
@@ -124,7 +114,6 @@ export default function ManageHospitals() {
     }
   };
 
-  // Verifikimi i Profilit nga API
   const handleVerifyProfile = async (isForEdit = false) => {
     setProfileSearchError("");
     setLinkedProfile(null);
@@ -168,7 +157,6 @@ export default function ManageHospitals() {
     }
   };
 
-  // 2. Krijimi i një Spitali të Ri
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -201,7 +189,6 @@ export default function ManageHospitals() {
     }
   };
 
-  // 3. Përditësimi i Spitalit
   const handleEditFormSubmit = async (e) => {
     e.preventDefault();
     setError('');

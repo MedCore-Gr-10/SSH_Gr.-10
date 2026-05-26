@@ -4,19 +4,15 @@ import "../../CSSpages/superuser/ManageSpecializatoins.css";
 import { superuserFetch } from "../../../services/superuserApi.js";
 
 export default function ManageSpecialization() {
-  // Data and structural states
   const [specializations, setSpecializations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Form states (handles Create, Edit, Delete)
   const [inputValue, setInputValue] = useState("");
   const [selectedItem, setSelectedItem] = useState(null); 
   const [isEditing, setIsEditing] = useState(false);
-
-  // States për Modalin e Doktorëve 🩺
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [doctorsList, setDoctorsList] = useState([]);
   const [loadingDoctors, setLoadingDoctors] = useState(false);

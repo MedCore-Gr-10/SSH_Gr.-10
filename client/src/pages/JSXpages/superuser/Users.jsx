@@ -13,24 +13,19 @@ export default function Users() {
   const [departments, setDepartments] = useState([]);
   const [specializations, setSpecializations] = useState([]);
 
-  // States for Search inputs 🔍
   const [userSearch, setUserSearch] = useState("");
   const [profileSearch, setProfileSearch] = useState("");
 
-  // States for Dropdown Filtering 🎛️
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [genderFilter, setGenderFilter] = useState("ALL");
   
-  // viewMode determines current grid view: 'none', 'users', or 'profiles'
   const [viewMode, setViewMode] = useState('none'); 
 
-  // States for Searching and Linking a Unique Profile 🆔
   const [searchPersonalNo, setSearchPersonalNo] = useState("");
   const [linkedProfile, setLinkedProfile] = useState(null);
   const [profileSearchError, setProfileSearchError] = useState("");
 
-  // States for Profiles Modal 📑
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isProfileEditMode, setIsProfileEditMode] = useState(false);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
@@ -43,12 +38,10 @@ export default function Users() {
     phone_number: ""
   });
 
-  // States for Users Modal 👤
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isUserEditMode, setIsUserEditMode] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   
-  // 🚀 SHTUAR: Ruajmë rolin origjinal të përdoruesit kur hapet modal-i për editim
   const [originalRole, setOriginalRole] = useState(""); 
 
   const [newUser, setNewUser] = useState({
@@ -62,11 +55,9 @@ export default function Users() {
     specialization_id: ""   
   });
 
-  // States for Password Reset Utility 🔐
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPasswordValue, setNewPasswordValue] = useState("");
 
-  // Function to fetch Users 🔄
   const fetchUsers = async () => {
     try {
       const res = await superuserFetch("/users");
@@ -77,7 +68,6 @@ export default function Users() {
     }
   };
 
-  // Function to fetch Profiles
   const fetchProfiles = async () => {
     try {
       const res = await superuserFetch("/profiles");
@@ -90,7 +80,6 @@ export default function Users() {
     }
   };
 
-  // Function to fetch Hospitals, Departments & Specializations
   const fetchInfrastructureData = async () => {
     try {
       const [hospRes, deptRes, specRes] = await Promise.all([
@@ -110,14 +99,12 @@ export default function Users() {
     }
   };
 
-  // Initial data loading
   useEffect(() => {
     fetchUsers();
     fetchProfiles();
     fetchInfrastructureData();
   }, []);
 
-  // Function to verify unique personal number and return First/Last Name 🔍
   const handleVerifyProfile = async () => {
     setProfileSearchError("");
     setLinkedProfile(null);
@@ -142,7 +129,6 @@ export default function Users() {
     }
   };
 
-  // Columns for Users Table
   const userColumns = [
     { header: "UUID", key: "id" },
     { header: "Username", key: "username" },
@@ -162,7 +148,6 @@ export default function Users() {
     },
   ];
 
-  // Columns for Profiles Table
   const profileColumns = [
     { header: "ID", key: "id" },
     { header: "First Name", key: "first_name" },
@@ -172,7 +157,7 @@ export default function Users() {
     { header: "Personal No.", key: "personal_no" },
   ];
 
-  // Management of Handle More Function 🛠️
+
   const handleMore = (item) => {
     if (viewMode === 'profiles') {
       setIsProfileEditMode(true);
@@ -227,7 +212,6 @@ export default function Users() {
       else if (normalizedRole === "doctor") mappedRoleId = "4";
       else if (normalizedRole === "nurse") mappedRoleId = "5";
 
-      // 🚀 RREGULLIMI: Ruajmë rolin origjinal të llogarisë
       setOriginalRole(mappedRoleId);
 
       setNewUser({
@@ -252,7 +236,7 @@ export default function Users() {
     setProfileSearchError("");
     setShowPasswordForm(false);
     setNewPasswordValue("");
-    setOriginalRole(""); // Reset rolin origjinal
+    setOriginalRole("");
     setNewUser({
       username: "",
       email: "",
@@ -294,7 +278,6 @@ export default function Users() {
         [name]: type === "checkbox" ? checked : value
       };
 
-      // Reset nested values if hospital changes to prevent stale data
       if (name === "hospital_id") {
         updatedFields.department_id = "";
         updatedFields.specialization_id = "";
@@ -419,7 +402,6 @@ export default function Users() {
     }
   };
 
-  // Multi-criteria User Filter Chain
   const filteredUsers = users.filter((user) => {
     if (!user.username) return false;
 
