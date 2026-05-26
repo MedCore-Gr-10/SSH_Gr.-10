@@ -6,15 +6,7 @@ import diagnosesRepository from "../../repositories/diagnoses.repository.js";
 import prescriptionsRepository from "../../repositories/prescriptions.repository.js";
 import logsRepository from "../../repositories/logs.repository.js";
 
-/**
- * Doctor Appointment Templates Controller
- * Handles REST API endpoints for template and slot management
- */
 class DoctorAppointmentTemplatesController {
-  /**
-   * GET /api/doctor/appointments/assignments
-   * Fetch hospital/department assignments for the logged-in doctor
-   */
   async getAssignments(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -41,10 +33,6 @@ class DoctorAppointmentTemplatesController {
     }
   }
 
-  /**
-   * GET /api/doctor/appointments/templates
-   * Fetch all recurring templates for the doctor
-   */
   async getTemplates(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -66,10 +54,6 @@ class DoctorAppointmentTemplatesController {
     }
   }
 
-  /**
-   * GET /api/doctor/appointments/templates/by-day/:day
-   * Fetch templates for a specific day
-   */
   async getTemplatesByDay(req, res, next) {
     try {
       const { day } = req.params;
@@ -87,10 +71,6 @@ class DoctorAppointmentTemplatesController {
     }
   }
 
-  /**
-   * GET /api/doctor/appointments/templates/summary
-   * Get summary of templates with counts by day
-   */
   async getTemplateSummary(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -107,12 +87,7 @@ class DoctorAppointmentTemplatesController {
     }
   }
 
-  /**
-   * POST /api/doctor/appointments/templates
-   * Create a new recurring appointment template
-   * 
-   * Body: { day_of_week, start_time, end_time }
-   */
+
   async createTemplate(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -137,10 +112,7 @@ class DoctorAppointmentTemplatesController {
     }
   }
 
-  /**
-   * PUT /api/doctor/appointments/templates/:id
-   * Update a recurring template
-   */
+  
   async updateTemplate(req, res, next) {
     try {
       const { id } = req.params;
@@ -161,10 +133,7 @@ class DoctorAppointmentTemplatesController {
     }
   }
 
-  /**
-   * DELETE /api/doctor/appointments/templates/:id
-   * Delete a template and deactivate its slots
-   */
+  
   async deleteTemplate(req, res, next) {
     try {
       const { id } = req.params;
@@ -185,10 +154,7 @@ class DoctorAppointmentTemplatesController {
   }
 }
 
-/**
- * Doctor Appointment Slots Controller
- * Handles REST API endpoints for booking slots
- */
+
 class DoctorAppointmentSlotsController {
   doctorOwnsAppointment(appointment, doctorId) {
     const slot = appointment?.appointments_booking_slots;
@@ -215,11 +181,7 @@ class DoctorAppointmentSlotsController {
     }));
   }
 
-  /**
-   * GET /api/doctor/appointments/slots
-   * Fetch doctor's booking slots (optionally filtered by date)
-   * Query: ?date=2026-06-01 (optional)
-   */
+
   async getSlots(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -245,11 +207,7 @@ class DoctorAppointmentSlotsController {
     }
   }
 
-  /**
-   * GET /api/doctor/appointments/slots/available
-   * Fetch only available (unbooked) slots
-   * Query: ?date=2026-06-01 (optional)
-   */
+ 
   async getAvailableSlots(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -276,10 +234,6 @@ class DoctorAppointmentSlotsController {
     }
   }
 
-  /**
-   * GET /api/doctor/appointments/slots/:id
-   * Fetch a specific slot
-   */
   async getSlot(req, res, next) {
     try {
       const { id } = req.params;
@@ -289,7 +243,6 @@ class DoctorAppointmentSlotsController {
         return res.status(404).json({ error: "Slot not found" });
       }
 
-      // Check authorization
       if (slot.doctor_id !== req.user.user_id) {
         return res.status(403).json({ error: "Unauthorized" });
       }
@@ -306,10 +259,6 @@ class DoctorAppointmentSlotsController {
     }
   }
 
-  /**
-   * GET /api/doctor/appointments/slots/generation/status
-   * Get current generation status
-   */
   async getGenerationStatus(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -327,11 +276,6 @@ class DoctorAppointmentSlotsController {
     }
   }
 
-  /**
-   * POST /api/doctor/appointments/slots/generate/week
-   * Generate slots for next 7 days
-   * This is for manual triggering in development/testing
-   */
   async generateWeeklySlots(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -348,11 +292,6 @@ class DoctorAppointmentSlotsController {
     }
   }
 
-  /**
-   * POST /api/doctor/appointments/slots/generate/range
-   * Generate slots for a date range
-   * Body: { from_date, to_date } (YYYY-MM-DD format)
-   */
   async generateSlotsForRange(req, res, next) {
     try {
       const doctorId = req.user.user_id;
@@ -375,11 +314,6 @@ class DoctorAppointmentSlotsController {
     }
   }
 
-  /**
-   * POST /api/doctor/appointments/slots/generate/template/:id
-   * Generate slots for a specific template
-   * Body: { start_date, end_date } (YYYY-MM-DD format)
-   */
   async generateSlotsForTemplate(req, res, next) {
     try {
       const { id } = req.params;
@@ -402,10 +336,7 @@ class DoctorAppointmentSlotsController {
     }
   }
 
-  /**
-   * DELETE /api/doctor/appointments/slots/:id
-   * Deactivate a slot
-   */
+
   async deactivateSlot(req, res, next) {
     try {
       const { id } = req.params;
@@ -415,12 +346,10 @@ class DoctorAppointmentSlotsController {
         return res.status(404).json({ error: "Slot not found" });
       }
 
-      // Check authorization
       if (slot.doctor_id !== req.user.user_id) {
         return res.status(403).json({ error: "Unauthorized" });
       }
 
-      // Check if booked
       const isBooked = await appointmentsBookingSlotsRepository.isBooked(Number(id));
       if (isBooked) {
         return res.status(400).json({ error: "Cannot deactivate a booked slot" });

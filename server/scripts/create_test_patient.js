@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import bcrypt from "bcrypt";
 import prisma from "../src/prisma.js";
 
@@ -9,14 +8,12 @@ async function main() {
   const password = "dev";
   const roleName = "patient";
 
-  // ensure role exists
   let role = await prisma.roles.findFirst({ where: { role_name: roleName } });
   if (!role) {
     role = await prisma.roles.create({ data: { role_name: roleName } });
     console.log("Created role:", roleName);
   }
 
-  // create or find user
   let user = await prisma.users.findUnique({ where: { username } });
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -51,15 +48,13 @@ async function main() {
     console.log("User exists:", username);
   }
 
-  // attach a profile and email if missing
   const existingProfile = await prisma.users_profiles.findFirst({ where: { user_id: user.id } });
   if (!existingProfile) {
     const profile = await prisma.profiles.create({ data: { first_name: "Dev", last_name: "Patient" } });
     await prisma.users_profiles.create({ data: { user_id: user.id, profile_id: profile.id, email } });
     console.log("Attached profile and email to user");
   }
-
-  // ensure a hospital exists and link patient
+  
   let hospital = await prisma.hospitals.findFirst();
   if (!hospital) {
     hospital = await prisma.hospitals.create({ data: { hospital_name: "Dev Hospital", hospital_address: "123 Dev Lane", email: "dev@hospital.test" } });

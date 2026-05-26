@@ -19,7 +19,6 @@ const WEEK_DAYS = [
   "Saturday",
 ];
 
-/** Log labels shown in Access Logs (My Patients page only). */
 const MY_PATIENTS_ACTIONS = {
   SEARCH: "Search patients",
   ALLERGIES: "View allergies",

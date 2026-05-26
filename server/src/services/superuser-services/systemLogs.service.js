@@ -1,9 +1,6 @@
 import logsRepository from "../../repositories/logs.repository.js";
 
 class LogsService {
-  /**
-   * Fetches all audit logs and formats them to clean DTO structures
-   */
   async getAllLogs() {
     const logs = await logsRepository.findAll();
     

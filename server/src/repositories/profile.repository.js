@@ -1,22 +1,12 @@
 import prisma from "../prisma.js";
 
 class ProfilesRepository {
-  /*
-  |--------------------------------------------------------------------------
-  | CREATE
-  |--------------------------------------------------------------------------
-  */
   async create(data) {
     return prisma.profiles.create({
       data
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | FIND UNIQUE
-  |--------------------------------------------------------------------------
-  */
   async findById(id) {
     return prisma.profiles.findUnique({
       where: { id },
@@ -50,11 +40,6 @@ class ProfilesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | FIND MANY
-  |--------------------------------------------------------------------------
-  */
   async findAll() {
     return prisma.profiles.findMany({
       include: {
@@ -92,11 +77,6 @@ class ProfilesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | UPDATE
-  |--------------------------------------------------------------------------
-  */
   async update(id, data) {
     return prisma.profiles.update({
       where: { id },
@@ -113,22 +93,13 @@ class ProfilesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | DELETE
-  |--------------------------------------------------------------------------
-  */
+
   async delete(id) {
     return prisma.profiles.delete({
       where: { id }
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | USER RELATIONS
-  |--------------------------------------------------------------------------
-  */
   async attachUser(profileId, userId, email) {
     return prisma.users_profiles.create({
       data: {
@@ -191,11 +162,7 @@ class ProfilesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | PATIENT DETAILS
-  |--------------------------------------------------------------------------
-  */
+
   async getPatientFullProfile(userId) {
     return prisma.users.findUnique({
       where: {
@@ -227,11 +194,7 @@ class ProfilesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | DOCTOR DETAILS
-  |--------------------------------------------------------------------------
-  */
+
   async getDoctorFullProfile(userId) {
     return prisma.users.findUnique({
       where: {
@@ -266,11 +229,7 @@ class ProfilesRepository {
     });
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | DIRECTOR DETAILS
-  |--------------------------------------------------------------------------
-  */
+
   async findDirectorByPersonalNo(personalNo) {
     return prisma.profiles.findFirst({
       where: {

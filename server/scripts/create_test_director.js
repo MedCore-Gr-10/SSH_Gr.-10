@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import bcrypt from "bcrypt";
 import prisma from "../src/prisma.js";
 
@@ -9,21 +8,18 @@ async function main() {
   const password = "devdirector123";
   const roleName = "director";
 
-  // ensure roles exist
   let role = await prisma.roles.findFirst({ where: { role_name: roleName } });
   if (!role) {
     role = await prisma.roles.create({ data: { role_name: roleName } });
     console.log("Created role:", roleName);
   }
 
-  // ensure patient role exists
   let patientRole = await prisma.roles.findFirst({ where: { role_name: "patient" } });
   if (!patientRole) {
     patientRole = await prisma.roles.create({ data: { role_name: "patient" } });
     console.log("Created role: patient");
   }
 
-  // create or find user
   let user = await prisma.users.findUnique({ where: { username } });
   const hash_password = await bcrypt.hash(password, 10);
   if (!user) {
@@ -49,7 +45,6 @@ async function main() {
     console.log("User exists, password, role, and active status reset for:", username);
   }
 
-  // attach a profile and email if missing
   const existingProfile = await prisma.users_profiles.findFirst({ where: { user_id: user.id } });
   if (!existingProfile) {
     const profile = await prisma.profiles.create({ data: { first_name: "Dev", last_name: "Director" } });
@@ -57,7 +52,6 @@ async function main() {
     console.log("Attached profile and email to user");
   }
 
-  // link to a hospital (create one if missing)
   let hospital = await prisma.hospitals.findFirst();
   if (!hospital) {
     hospital = await prisma.hospitals.create({ data: { hospital_name: "Dev Hospital", hospital_address: "123 Dev Lane", email: "dev@hospital.test" } });
@@ -66,11 +60,9 @@ async function main() {
 
   const hospitalLink = await prisma.staff_hospitals_departments.findFirst({ where: { staff_id: user.id } });
   if (!hospitalLink) {
-    // ensure a department exists
     let dept = await prisma.departments.findFirst();
     if (!dept) dept = await prisma.departments.create({ data: { department_name: "Administration" } });
 
-    // ensure hospital-department join exists first
     let hospitalDepartment = await prisma.hospitals_departments.findFirst({
       where: { hospital_id: hospital.id, department_id: dept.id }
     });

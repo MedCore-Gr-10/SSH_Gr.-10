@@ -41,14 +41,12 @@ app.use("/api/superuser", superuserRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/requests", requestsRoutes);
 
-// 404 handler MUST be last
 app.use("/api", (req, res) => {
   res
     .status(404)
     .json({ error: `API route not found: ${req.method} ${req.originalUrl}` });
 });
 
-// error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res

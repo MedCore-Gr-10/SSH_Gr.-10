@@ -1,9 +1,5 @@
 import prisma from "../prisma.js";
 
-/**
- * Repository for managing recurring appointment templates
- * Handles CRUD operations and validation queries
- */
 class AppointmentsTemplatesRepository {
   
   /**

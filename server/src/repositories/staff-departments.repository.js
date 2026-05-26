@@ -1,11 +1,7 @@
 import prisma from "../prisma.js";
 
-// 1. E kthejmë nga objekt në Klasë duke përdorur fjalën kyçe "class"
 export class StaffDepartmentsRepository {
   
-  // 2. Heqim dypikat (:) dhe presjet (,) që përdoren në objekte, dhe i lëmë si metoda të pastra klase
-  
-  // Shton një anëtar të stafit në një spital dhe departament specifik
   async assignStaffToDepartment(data) {
     return await prisma.staff_hospitals_departments.create({
       data: {
@@ -24,7 +20,6 @@ export class StaffDepartmentsRepository {
     });
   }
 
-  // Gjen të gjitha relacionet e departamenteve për një anëtar stafi
   async replaceStaffDepartment(data) {
     const staffId = data.staff_id;
     const hospitalId = Number(data.hospital_id);
@@ -71,7 +66,6 @@ export class StaffDepartmentsRepository {
     });
   }
 
-  // Largon stafin nga një departament dhe spital i caktuar (përdor çelësin e përbërë)
   async removeStaffFromDepartment(staffId, hospitalId, departmentId) {
     return await prisma.staff_hospitals_departments.delete({
       where: {
@@ -84,7 +78,6 @@ export class StaffDepartmentsRepository {
     });
   }
 
-  // Numëron sa mjekë/staf ka një departament në një spital të caktuar
   async countStaffInDepartment(hospitalId, departmentId) {
     return await prisma.staff_hospitals_departments.count({
       where: {
@@ -93,7 +86,6 @@ export class StaffDepartmentsRepository {
       },
     });
   }
-} // Mbyllja e klasës
+} 
 
-// 3. Tani kjo linjë funksionon në mënyrë perfekte dhe pa asnjë gabim! 🚀
 export default new StaffDepartmentsRepository();
