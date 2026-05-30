@@ -94,6 +94,8 @@ class HospitalsRepository {
   }
 
   async linkDirectorToHospital(hospitalId, personalNo) {
+  hospitalId = Number(hospitalId);
+
   const profile = await prisma.profiles.findUnique({
     where: { personal_no: String(personalNo) },
     include: {
@@ -110,6 +112,11 @@ class HospitalsRepository {
   }
 
   const userId = profile.users_profiles[0].user_id;
+
+  const assignedHospital = await this.findHospitalByDirectorId(userId);
+  if (assignedHospital && assignedHospital.id !== hospitalId) {
+    throw new Error(`Director is already assigned to ${assignedHospital.hospital_name}. A director can only be appointed to one hospital.`);
+  }
 
   const defaultDepartment = await prisma.departments.upsert({
     where: { department_name: "General" },
@@ -134,13 +141,22 @@ class HospitalsRepository {
   await prisma.staff_hospitals_departments.deleteMany({
     where: { 
       hospital_id: hospitalId, 
-      department_id: defaultDepartment.id 
+      department_id: defaultDepartment.id,
+      staff_id: { not: userId }
     }
   });
 
 
-  return prisma.staff_hospitals_departments.create({
-    data: {
+  return prisma.staff_hospitals_departments.upsert({
+    where: {
+      staff_id_hospital_id_department_id: {
+        staff_id: userId,
+        hospital_id: hospitalId,
+        department_id: defaultDepartment.id
+      }
+    },
+    update: {},
+    create: {
       staff_id: userId,
       hospital_id: hospitalId,
       department_id: defaultDepartment.id

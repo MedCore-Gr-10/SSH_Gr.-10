@@ -12,6 +12,12 @@ class HospitalsService {
       throw new Error("Director with the provided personal number does not exist or does not have the 'director' role.");
     }
 
+    const directorUserId = directorProfile.users_profiles[0].user_id;
+    const assignedHospital = await hospitalsRepository.findHospitalByDirectorId(directorUserId);
+    if (assignedHospital) {
+      throw new Error(`Director is already assigned to ${assignedHospital.hospital_name}. A director can only be appointed to one hospital.`);
+    }
+
     const newHospital = await hospitalsRepository.create({
       hospital_name,
       hospital_address,
@@ -20,10 +26,12 @@ class HospitalsService {
     });
 
     if (departments && departments.length > 0) {
-      for (const deptId of departments) {
-        await hospitalsDepartmentsRepository.create({
+      const uniqueDepartmentIds = [...new Set(departments.map(Number))];
+
+      for (const deptId of uniqueDepartmentIds) {
+        await hospitalsDepartmentsRepository.upsert({
           hospital_id: newHospital.id,
-          department_id: Number(deptId)
+          department_id: deptId
         });
       }
     }
@@ -71,6 +79,12 @@ class HospitalsService {
       if (!directorProfile || !directorProfile.users_profiles || directorProfile.users_profiles.length === 0) {
         throw new Error("The new director personal number is invalid or not registered as a director.");
       }
+
+      const directorUserId = directorProfile.users_profiles[0].user_id;
+      const assignedHospital = await hospitalsRepository.findHospitalByDirectorId(directorUserId);
+      if (assignedHospital && assignedHospital.id !== hospitalId) {
+        throw new Error(`Director is already assigned to ${assignedHospital.hospital_name}. A director can only be appointed to one hospital.`);
+      }
     }
 
     const { departments, ...basicHospitalData } = data;
@@ -80,7 +94,7 @@ class HospitalsService {
       const currentDeptsFromDb = await hospitalsDepartmentsRepository.findByHospital(hospitalId);
       const currentDeptIds = currentDeptsFromDb.map(hd => hd.department_id);
 
-      const targetDeptIds = departments.map(Number);
+      const targetDeptIds = [...new Set(departments.map(Number))];
 
       const deptsToDelete = currentDeptIds.filter(id => !targetDeptIds.includes(id));
       for (const deptId of deptsToDelete) {
@@ -93,7 +107,7 @@ class HospitalsService {
 
       const deptsToAdd = targetDeptIds.filter(id => !currentDeptIds.includes(id));
       for (const deptId of deptsToAdd) {
-        await hospitalsDepartmentsRepository.create({
+        await hospitalsDepartmentsRepository.upsert({
           hospital_id: hospitalId,
           department_id: deptId
         });
