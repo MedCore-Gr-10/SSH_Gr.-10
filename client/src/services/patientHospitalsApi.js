@@ -1,36 +1,12 @@
-const getHeaders = () => {
-  const token = localStorage.getItem("token");
-
-  return {
-    "Content-Type": "application/json",
-    Authorization: token ? `Bearer ${token}` : "",
-  };
-};
-
-const readResponse = async (response) => {
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(payload.error || payload.message || `Request failed (${response.status})`);
-  }
-
-  return payload.data ?? payload;
-};
+import { apiRequest } from "./apiClient";
 
 export const getPatientHospitals = async () => {
-  const response = await fetch("/api/patient/hospitals", {
-    headers: getHeaders(),
-  });
-
-  return readResponse(response);
+  return apiRequest("/patient/hospitals");
 };
 
 export const updatePatientHospitals = async (hospitalIds) => {
-  const response = await fetch("/api/patient/hospitals", {
+  return apiRequest("/patient/hospitals", {
     method: "PUT",
-    headers: getHeaders(),
-    body: JSON.stringify({ hospitalIds }),
+    body: { hospitalIds },
   });
-
-  return readResponse(response);
 };
