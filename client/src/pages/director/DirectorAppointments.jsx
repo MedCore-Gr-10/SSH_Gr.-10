@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   getDirectorAppointments,
   getDirectorAppointmentSlots,
@@ -35,6 +35,39 @@ const getName = (user) => {
   return `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || user.username || "Unknown";
 };
 
+const getDatePart = (value) => {
+  if (!value) return "";
+  if (typeof value === "string") return value.split("T")[0];
+  return new Date(value).toISOString().split("T")[0];
+};
+
+const getTimePart = (value) => {
+  if (!value) return "00:00:00";
+  if (typeof value === "string" && value.includes("T")) {
+    return new Date(value).toISOString().slice(11, 19);
+  }
+  return String(value).slice(0, 8);
+};
+
+const getSlotDateTime = (slot, boundary = "end") => {
+  if (!slot?.appointment_date) return null;
+
+  const template = slot.appointments_templates;
+  const timeValue = boundary === "start"
+    ? slot.slot_start_time || template?.start_time
+    : slot.slot_end_time || template?.end_time || slot.slot_start_time || template?.start_time;
+  const datePart = getDatePart(slot.appointment_date);
+  const timePart = getTimePart(timeValue);
+  const dateTime = new Date(`${datePart}T${timePart}`);
+
+  return Number.isNaN(dateTime.getTime()) ? null : dateTime;
+};
+
+const isSlotPast = (slot) => {
+  const slotEnd = getSlotDateTime(slot, "end");
+  return slotEnd ? slotEnd <= new Date() : false;
+};
+
 export default function DirectorAppointments() {
   const [appointments, setAppointments] = useState([]);
   const [slots, setSlots] = useState([]);
@@ -43,14 +76,21 @@ export default function DirectorAppointments() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const editorRef = useRef(null);
   const loadData = async () => {
     try {
       const [appointmentData, slotData] = await Promise.all([
         getDirectorAppointments(),
         getDirectorAppointmentSlots(),
       ]);
-      setAppointments(appointmentData);
-      setSlots(slotData);
+      setAppointments(
+        appointmentData.filter(
+          (appointment) =>
+            appointment.appointment_is_complete !== true &&
+            !isSlotPast(appointment.appointments_booking_slots)
+        )
+      );
+      setSlots(slotData.filter((slot) => !isSlotPast(slot)));
     } catch (err) {
       setError(err.message);
     }
@@ -61,10 +101,28 @@ export default function DirectorAppointments() {
   }, []);
 
   const handleSelectAppointment = (appointment) => {
+    if (appointment.appointment_is_complete === true) {
+      setSelectedAppointment(null);
+      setSelectedSlotId("");
+      setMessage(null);
+      setError("Completed appointments cannot be edited.");
+      return;
+    }
+    if (isSlotPast(appointment.appointments_booking_slots)) {
+      setSelectedAppointment(null);
+      setSelectedSlotId("");
+      setMessage(null);
+      setError("Past appointments cannot be edited.");
+      return;
+    }
+
     setSelectedAppointment(appointment);
     setSelectedSlotId(appointment.appointment_booking_slot_id || "");
     setMessage(null);
     setError(null);
+    window.requestAnimationFrame(() => {
+      editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const handleReschedule = async (event) => {
@@ -108,6 +166,14 @@ export default function DirectorAppointments() {
       setError("Select an appointment to cancel.");
       return;
     }
+    if (appointment.appointment_is_complete === true) {
+      setError("Completed appointments cannot be canceled.");
+      return;
+    }
+    if (isSlotPast(appointment.appointments_booking_slots)) {
+      setError("Past appointments cannot be canceled.");
+      return;
+    }
 
     if (!window.confirm("Cancel this appointment?")) {
       return;
@@ -141,6 +207,8 @@ export default function DirectorAppointments() {
   };
 
   const getSlotStatus = (slot) => {
+    if (isSlotPast(slot)) return "Expired";
+
     const isCompleted = slot.appointments_made?.some(
       (appointment) => appointment.appointment_is_complete === true
     );
@@ -150,6 +218,17 @@ export default function DirectorAppointments() {
 
     if (isCompleted) return "Completed";
     return isBooked ? "Booked" : "Available";
+  };
+
+  const getSelectableSlots = () => {
+    if (!selectedAppointment) return [];
+
+    const currentSlotId = String(selectedAppointment.appointment_booking_slot_id);
+
+    return slots.filter((slot) => {
+      const slotId = String(slot.id);
+      return slotId === currentSlotId || (!isSlotPast(slot) && getSlotStatus(slot) === "Available");
+    });
   };
 
   return (
@@ -164,8 +243,8 @@ export default function DirectorAppointments() {
       <section className="director-appointments-overview">
         <div className="overview-cards">
           <div className="overview-card">
-            <h3>Booked Appointments</h3>
-            <p>{appointments.filter((item) => item.appointment_is_complete !== true).length}</p>
+            <h3>Current Appointments</h3>
+            <p>{appointments.length}</p>
           </div>
           <div className="overview-card">
             <h3>Appointment Slots</h3>
@@ -180,7 +259,7 @@ export default function DirectorAppointments() {
 
       <div className="director-appointments-grid">
         <section className="director-appointments-section content-scroll">
-          <h2>Booked Appointments</h2>
+          <h2>Current Appointments</h2>
           <table className="director-appointments-table">
             <thead>
               <tr>
@@ -194,7 +273,7 @@ export default function DirectorAppointments() {
             <tbody>
               {appointments.length === 0 ? (
                 <tr>
-                  <td colSpan="5">No booked appointments found.</td>
+                  <td colSpan="5">No current appointments found.</td>
                 </tr>
               ) : (
                 appointments.map((appointment) => {
@@ -202,6 +281,9 @@ export default function DirectorAppointments() {
                   const slot = appointment.appointments_booking_slots;
                   const doctorName = getName(slot?.users);
                   const slotLabel = slot ? renderSlotLabel(slot) : "No slot assigned";
+                  const isCompleted = appointment.appointment_is_complete === true;
+                  const isPast = isSlotPast(slot);
+                  const isLocked = isCompleted || isPast;
 
                   return (
                     <tr key={appointment.id}>
@@ -209,17 +291,21 @@ export default function DirectorAppointments() {
                       <td data-label="Doctor">{doctorName}</td>
                       <td data-label="Slot">{slotLabel}</td>
                       <td data-label="Status">
-                        {appointment.appointment_is_complete
-                            ? "Completed"
-                            : "Confirmed"}
+                        {isCompleted ? "Completed" : isPast ? "Past" : "Confirmed"}
                       </td>
                       <td data-label="Actions">
-                        <button className="edit-button" onClick={() => handleSelectAppointment(appointment)}>
-                          Edit
-                        </button>
-                        <button className="cancel-button" onClick={() => handleCancel(appointment)}>
-                          Cancel
-                        </button>
+                        {isLocked ? (
+                          <span className="status-inactive">Locked</span>
+                        ) : (
+                          <>
+                            <button className="edit-button" onClick={() => handleSelectAppointment(appointment)}>
+                              Edit
+                            </button>
+                            <button className="cancel-button" onClick={() => handleCancel(appointment)}>
+                              Cancel
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   );
@@ -248,7 +334,7 @@ export default function DirectorAppointments() {
                       {formatTime(slot.slot_end_time || slot.appointments_templates?.end_time)}
                     </span>
                   </div>
-                  <span className={getSlotStatus(slot) === "Booked" ? "slot-booked" : "slot-available"}>
+                  <span className={getSlotStatus(slot) === "Available" ? "slot-available" : "slot-booked"}>
                     {getSlotStatus(slot)}
                   </span>
                 </div>
@@ -257,7 +343,7 @@ export default function DirectorAppointments() {
           )}
         </section>
 
-        <section className="director-appointments-section content-scroll">
+        <section className="director-appointments-section content-scroll" ref={editorRef}>
           <h2>{selectedAppointment ? "Reschedule appointment" : "Select an appointment"}</h2>
           {selectedAppointment ? (
             <form className="director-appointments-form" onSubmit={handleReschedule}>
@@ -275,7 +361,7 @@ export default function DirectorAppointments() {
                 Choose new slot
                 <select value={selectedSlotId} onChange={(e) => setSelectedSlotId(e.target.value)}>
                   <option value="">Select an available slot</option>
-                  {slots.map((slot) => (
+                  {getSelectableSlots().map((slot) => (
                     <option key={slot.id} value={slot.id}>
                       {renderSlotLabel(slot)}
                     </option>
@@ -293,7 +379,7 @@ export default function DirectorAppointments() {
               </div>
             </form>
           ) : (
-            <p>Select an appointment from the left table to reschedule or cancel it.</p>
+            <p>Select a current appointment from the left table to reschedule or cancel it.</p>
           )}
 
           {message && <div className="director-message success">{message}</div>}

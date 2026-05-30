@@ -19,6 +19,17 @@
 .slots-list {
   display: grid;
   gap: 12px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.director-appointments-section.content-scroll {
+  max-height: 520px;
+}
+
+.director-appointments-section.content-scroll .director-appointments-table {
+  min-width: 720px;
 }
 
 .slot-row {
