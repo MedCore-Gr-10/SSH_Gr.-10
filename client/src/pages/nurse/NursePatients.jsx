@@ -11,7 +11,7 @@ import {
   matchesPatientSearch,
   patientLabel,
   patientPersonalNo,
-} from "./nursePatientUtils.js";
+} from "../../utils/patientUtils.js";
 import "../doctor/DoctorStaffSchedule.css";
 import "./Nurse.css";
 
