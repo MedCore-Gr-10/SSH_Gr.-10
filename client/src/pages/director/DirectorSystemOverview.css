@@ -24,6 +24,9 @@
 .director-log-list {
   display: grid;
   gap: 14px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
 .director-log-item {

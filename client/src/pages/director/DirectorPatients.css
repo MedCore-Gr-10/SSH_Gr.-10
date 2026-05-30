@@ -4,6 +4,14 @@
   align-items: start;
 }
 
+.director-patients-grid > .director-section:first-child .content-scroll {
+  max-height: 520px;
+}
+
+.director-patients-grid > .director-section:first-child .director-patient-table {
+  min-width: 720px;
+}
+
 .director-patient-table td:last-child {
   white-space: nowrap;
 }

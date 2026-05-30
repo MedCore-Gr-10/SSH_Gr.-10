@@ -6,6 +6,11 @@
 
 .director-departments-page .content-scroll {
   margin-top: 24px;
+  max-height: 520px;
+}
+
+.director-departments-page .content-scroll .departments-table {
+  min-width: 720px;
 }
 
 .departments-table td:last-child {

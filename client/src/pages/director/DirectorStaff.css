@@ -1,7 +1,26 @@
 @import "./DirectorShared.css";
 
+section.director-staff-section.content-scroll {
+  gap: 22px;
+  padding: 28px;
+  max-height: 520px;
+}
+
+section.director-staff-section.content-scroll .director-staff-table {
+  min-width: 720px;
+}
+
 .director-staff-section h2 {
   flex: 0 0 auto;
+  margin-bottom: 0;
+}
+
+.director-staff-table {
+  margin-top: 2px;
+}
+
+.director-staff-form {
+  gap: 18px;
 }
 
 .director-staff-table td:last-child {
@@ -10,4 +29,8 @@
 
 .director-staff-table td button {
   margin: 2px 8px 2px 0;
+}
+
+.director-staff-actions {
+  padding-top: 4px;
 }
