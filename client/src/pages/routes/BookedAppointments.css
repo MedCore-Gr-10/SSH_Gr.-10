@@ -218,6 +218,10 @@
   width: min(680px, 100%);
 }
 
+.doctor-booked-detail-modal {
+  width: min(720px, 100%);
+}
+
 .doctor-booked-modal-header {
   display: flex;
   align-items: flex-start;
@@ -346,7 +350,7 @@
   border: 1px solid #edf2f7;
   border-radius: 12px;
   padding: 14px;
-  background: #ffffff;
+  background: #f8fafc;
 }
 
 .doctor-booked-detail-grid span,
@@ -390,7 +394,7 @@
   border: 1px solid #edf2f7;
   border-radius: 12px;
   padding: 14px;
-  background: #ffffff;
+  background: #f8fafc;
 }
 
 .doctor-booked-detail-section li strong {
@@ -405,6 +409,14 @@
   color: #4a5568;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.doctor-booked-detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #edf2f7;
+  margin-top: 24px;
+  padding-top: 18px;
 }
 
 @media (max-width: 720px) {

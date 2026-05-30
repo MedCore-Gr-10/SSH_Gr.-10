@@ -116,6 +116,17 @@ class DirectorStaffScheduleService {
       throw new Error("Staff member is not assigned to this hospital and department");
     }
 
+    const existingSchedule = await staffScheduleRepository.findStaffScheduleByDay(
+      staff_id,
+      hospitalId,
+      day_of_week
+    );
+    if (existingSchedule) {
+      const error = new Error("This staff member already has a schedule for this day.");
+      error.statusCode = 400;
+      throw error;
+    }
+
     const schedule = await staffScheduleRepository.create({
       staff_id,
       hospital_id: hospitalId,
@@ -161,6 +172,20 @@ class DirectorStaffScheduleService {
 
     if (data.department_id) {
       await this.ensureHospitalDepartment(hospitalId, data.department_id);
+    }
+
+    const nextStaffId = data.staff_id || schedule.staff_id;
+    const nextDayOfWeek = data.day_of_week || schedule.day_of_week;
+    const existingSchedule = await staffScheduleRepository.findStaffScheduleByDay(
+      nextStaffId,
+      hospitalId,
+      nextDayOfWeek,
+      schedule.id
+    );
+    if (existingSchedule) {
+      const error = new Error("This staff member already has a schedule for this day.");
+      error.statusCode = 400;
+      throw error;
     }
 
     const updateData = {};

@@ -168,6 +168,17 @@ class StaffWorkingSchedulesRepository {
     });
   }
 
+  async findStaffScheduleByDay(staffId, hospitalId, dayOfWeek, excludeId = null) {
+    return prisma.staff_working_schedules.findFirst({
+      where: {
+        staff_id: staffId,
+        hospital_id: Number(hospitalId),
+        day_of_week: dayOfWeek,
+        ...(excludeId ? { id: { not: Number(excludeId) } } : {}),
+      },
+    });
+  }
+
   async update(id, data) {
     return prisma.staff_working_schedules.update({
       where: { id },
