@@ -1,5 +1,5 @@
 import React from 'react';
-import '../CSScomponents/SidebarButton.css';
+import './SidebarButton.css';
 
 function SidebarButton({ label }) {
   return (

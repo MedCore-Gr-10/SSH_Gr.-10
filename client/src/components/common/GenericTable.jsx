@@ -1,5 +1,5 @@
 import React from "react";
-import "./../CSScomponents/GenericTable.css";
+import "./GenericTable.css";
 
 export default function GenericTable({ columns, data, onMoreClick }) {
   return (
@@ -8,7 +8,7 @@ export default function GenericTable({ columns, data, onMoreClick }) {
         <tr>
           {columns.map((col, index) => (
             <th key={index}>{col.header}</th>
-          ))}<th>More</th>{/* Kjo kllapë është ngjitur me <th> për të shmangur whitespace error */}
+          ))}<th>More</th>{ }
         </tr>
       </thead>
       <tbody>
