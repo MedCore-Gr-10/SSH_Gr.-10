@@ -2,6 +2,20 @@ import { useEffect, useState } from "react";
 import { getDoctorDashboard } from "../../services/doctorDashboardApi.js";
 import "./DoctorDashboard.css";
 
+const formatTime = (value) => {
+  if (!value) return "-";
+
+  if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(value)) {
+    const [hour, minute] = value.split(":");
+    return `${hour.padStart(2, "0")}:${minute}`;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
+};
+
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,7 +61,7 @@ export default function Dashboard() {
         {data.todaySchedule.map((s) => (
           <div key={s.id} className="list-item">
             <span>
-              {s.slot_start_time} - {s.slot_end_time}
+              {formatTime(s.slot_start_time)} - {formatTime(s.slot_end_time)}
             </span>
           </div>
         ))}

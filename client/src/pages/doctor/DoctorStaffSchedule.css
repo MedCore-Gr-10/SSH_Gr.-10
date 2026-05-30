@@ -76,7 +76,6 @@
 }
 
 .doctor-staff-calendar-section,
-.doctor-staff-now-section,
 .doctor-staff-day-section {
   border: 1px solid #edf2f7;
   border-radius: 16px;
@@ -166,49 +165,6 @@
   color: #4a5568;
   font-size: 12px;
   line-height: 1.4;
-}
-
-.doctor-staff-now-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-}
-
-.doctor-staff-now-card {
-  display: grid;
-  gap: 6px;
-  border: 1px solid rgba(16, 185, 129, 0.18);
-  border-left: 4px solid #10b981;
-  border-radius: 10px;
-  padding: 14px;
-  background: rgba(16, 185, 129, 0.06);
-}
-
-.doctor-staff-now-card strong {
-  color: #1a202c;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.doctor-staff-now-card span {
-  color: #2d3748;
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.doctor-staff-now-card small {
-  color: #047857;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.doctor-staff-now-empty {
-  border: 1px dashed #edf2f7;
-  border-radius: 10px;
-  padding: 18px;
-  color: #718096;
-  background: #fafafa;
-  font-size: 14px;
 }
 
 .doctor-staff-today-button {
@@ -420,7 +376,6 @@
   }
 
   .doctor-staff-calendar-section,
-  .doctor-staff-now-section,
   .doctor-staff-day-section {
     padding: 16px;
   }

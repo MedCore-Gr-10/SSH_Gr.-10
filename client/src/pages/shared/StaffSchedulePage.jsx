@@ -70,25 +70,6 @@ const getDepartment = (schedule) =>
 const shiftText = (schedule) =>
   `${formatTime(schedule.start_time)} - ${formatTime(schedule.end_time)}`;
 
-const getCurrentMinute = () => {
-  const now = new Date();
-  return now.getHours() * 60 + now.getMinutes();
-};
-
-const isWorkingNow = (schedule) => {
-  if (schedule.day_of_week !== getTodayDay()) return false;
-
-  const start = timeValue(schedule.start_time);
-  const end = timeValue(schedule.end_time);
-  const current = getCurrentMinute();
-
-  if (end < start) {
-    return current >= start || current <= end;
-  }
-
-  return current >= start && current <= end;
-};
-
 const normalize = (value) => String(value || "").toLowerCase();
 
 const pluralizeRole = (role, count) => {
@@ -240,11 +221,6 @@ export default function StaffSchedulePage({
     [filteredSchedules],
   );
 
-  const workingNowSchedules = useMemo(
-    () => activeHospitalSchedules.filter(isWorkingNow),
-    [activeHospitalSchedules],
-  );
-
   return (
     <div className="doctor-staff-schedule-page">
       <div className="doctor-staff-schedule-header">
@@ -263,7 +239,7 @@ export default function StaffSchedulePage({
           ) : (
             <>
               <strong>{selectedDaySchedules.length}</strong>
-              <span>working {selectedDay}</span>
+              <span>scheduled {selectedDay}</span>
             </>
           )}
         </div>
@@ -305,42 +281,9 @@ export default function StaffSchedulePage({
       )}
 
       {showStaff && (
-      <section className="doctor-staff-now-section">
-        <div className="doctor-staff-section-heading">
-          <h2>Working Right Now</h2>
-          <button
-            className="doctor-staff-today-button"
-            type="button"
-            onClick={() => setSelectedDay(getTodayDay())}
-          >
-            Today
-          </button>
-        </div>
-
-        {workingNowSchedules.length === 0 ? (
-          <div className="doctor-staff-now-empty">
-            No active shifts are marked as working right now.
-          </div>
-        ) : (
-          <div className="doctor-staff-now-grid">
-            {workingNowSchedules.map((schedule) => (
-              <div key={schedule.id} className="doctor-staff-now-card">
-                <strong>{getStaffName(schedule)}</strong>
-                <span>
-                  {getStaffRole(schedule)} - {getDepartment(schedule)}
-                </span>
-                <small>{shiftText(schedule)}</small>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-      )}
-
-      {showStaff && (
       <section className="doctor-staff-day-section">
         <div className="doctor-staff-section-heading">
-          <h2>Who Is Working</h2>
+          <h2>Staff Shifts</h2>
           <span>{selectedDay}</span>
         </div>
 
