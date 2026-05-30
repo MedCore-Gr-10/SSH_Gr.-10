@@ -3,7 +3,7 @@ import {
   getDoctorSlots,
   saveDoctorAppointmentRecord,
 } from "../../services/doctorAppointmentsApi.js";
-import "../CSSpages/sidebar-pages/BookedAppointments.css";
+import "../routes/BookedAppointments.css";
 
 const formatDate = (value) => {
   if (!value) return "Unknown date";
@@ -29,7 +29,7 @@ const formatTime = (value) => {
   return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
 };
 
-// 🔹 patient helpers (same as your working file)
+
 const getPatientProfileLink = (appointment) =>
   appointment?.users?.users_profiles?.[0] || null;
 
@@ -257,76 +257,115 @@ export default function DoctorBookedAppointments() {
         )}
       </section>
 
-      {/* 🔥 MODAL */}
+      { }
       {selectedAppointment && (
         <div
           className="doctor-booked-modal-backdrop"
           onClick={() => setSelectedAppointment(null)}
         >
           <div
-            className="doctor-booked-modal"
+            className="doctor-booked-modal doctor-booked-detail-modal"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2>{getPatientName(selectedAppointment)}</h2>
-            <p>{getPatientEmail(selectedAppointment)}</p>
+            <div className="doctor-booked-modal-header">
+              <div>
+                <h2>{getPatientName(selectedAppointment)}</h2>
+                <p>{getPatientEmail(selectedAppointment)}</p>
+              </div>
+              <button type="button" onClick={() => setSelectedAppointment(null)}>
+                X
+              </button>
+            </div>
 
-            <hr />
+            <div className="doctor-booked-detail-grid">
+              <div>
+                <span>Date</span>
+                <strong>{formatDate(selectedAppointment.slot?.appointment_date)}</strong>
+              </div>
+              <div>
+                <span>Time</span>
+                <strong>
+                  {formatTime(selectedAppointment.slot?.slot_start_time)} -{" "}
+                  {formatTime(selectedAppointment.slot?.slot_end_time)}
+                </strong>
+              </div>
+              <div>
+                <span>Phone</span>
+                <strong>{selectedProfile?.phone_number || "Not recorded"}</strong>
+              </div>
+              <div>
+                <span>Gender</span>
+                <strong>{selectedProfile?.gender || "Not recorded"}</strong>
+              </div>
+              <div>
+                <span>Birth</span>
+                <strong>
+                  {selectedProfile?.birth
+                    ? formatDate(selectedProfile.birth)
+                    : "Not recorded"}
+                </strong>
+              </div>
+              <div>
+                <span>Status</span>
+                <strong>
+                  {selectedAppointment.appointment_is_complete
+                    ? "Completed"
+                    : "Booked"}
+                </strong>
+              </div>
+            </div>
 
-            <p>
-              <strong>Date:</strong>{" "}
-              {formatDate(selectedAppointment.slot?.appointment_date)}
-            </p>
+            <section className="doctor-booked-detail-section">
+              <h3>Allergies</h3>
+              {selectedAllergies.length === 0 ? (
+                <p>No allergies recorded.</p>
+              ) : (
+                <ul>
+                  {selectedAllergies.map((allergy) => (
+                    <li key={allergy.id}>
+                      <span>{allergy.allergy_type || "Allergy"}</span>
+                      <strong>{allergy.allergy_name}</strong>
+                      <p>
+                        {allergy.reaction_symptoms || "No reaction recorded"} -{" "}
+                        {allergy.severity || "Severity not recorded"}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
 
-            <p>
-              <strong>Time:</strong>{" "}
-              {formatTime(selectedAppointment.slot?.slot_start_time)} -{" "}
-              {formatTime(selectedAppointment.slot?.slot_end_time)}
-            </p>
+            <section className="doctor-booked-detail-section">
+              <h3>Insurance</h3>
+              {selectedInsurance.length === 0 ? (
+                <p>No insurance recorded.</p>
+              ) : (
+                <ul>
+                  {selectedInsurance.map((insurance) => (
+                    <li key={insurance.id}>
+                      <span>Provider</span>
+                      <strong>{insurance.provider || "Unknown provider"}</strong>
+                      <p>
+                        Policy {insurance.policy_number || "not recorded"}
+                        {insurance.coverage_percent
+                          ? ` - ${insurance.coverage_percent}% coverage`
+                          : ""}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
 
-            <p>
-              <strong>Phone:</strong>{" "}
-              {selectedProfile?.phone_number || "Not recorded"}
-            </p>
-
-            <p>
-              <strong>Gender:</strong>{" "}
-              {selectedProfile?.gender || "Not recorded"}
-            </p>
-
-            <p>
-              <strong>Birth:</strong>{" "}
-              {selectedProfile?.birth
-                ? formatDate(selectedProfile.birth)
-                : "Not recorded"}
-            </p>
-
-            <hr />
-
-            <h3>Allergies</h3>
-            {selectedAllergies.length === 0 ? (
-              <p>No allergies recorded.</p>
-            ) : (
-              selectedAllergies.map((a) => (
-                <div key={a.id}>
-                  <strong>{a.allergy_name}</strong>
-                </div>
-              ))
-            )}
-
-            <h3>Insurance</h3>
-            {selectedInsurance.length === 0 ? (
-              <p>No insurance recorded.</p>
-            ) : (
-              selectedInsurance.map((i) => (
-                <div key={i.id}>
-                  <strong>{i.provider}</strong>
-                </div>
-              ))
-            )}
-
-            <button onClick={() => setSelectedAppointment(null)}>
-              Close
-            </button>
+            <div className="doctor-booked-detail-actions">
+              <button
+                type="button"
+                className="doctor-booked-secondary-button"
+                onClick={() => setSelectedAppointment(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

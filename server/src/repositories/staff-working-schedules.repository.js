@@ -102,6 +102,15 @@ class StaffWorkingSchedulesRepository {
       where: {
         hospital_id: hospitalId,
         active_schedule: true,
+        staff_hospitals_departments: {
+          users: {
+            roles: {
+              role_name: {
+                in: ["doctor", "nurse"],
+              },
+            },
+          },
+        },
       },
       include: {
         staff_hospitals_departments: {
@@ -156,6 +165,17 @@ class StaffWorkingSchedulesRepository {
           }
         }
       }
+    });
+  }
+
+  async findStaffScheduleByDay(staffId, hospitalId, dayOfWeek, excludeId = null) {
+    return prisma.staff_working_schedules.findFirst({
+      where: {
+        staff_id: staffId,
+        hospital_id: Number(hospitalId),
+        day_of_week: dayOfWeek,
+        ...(excludeId ? { id: { not: Number(excludeId) } } : {}),
+      },
     });
   }
 

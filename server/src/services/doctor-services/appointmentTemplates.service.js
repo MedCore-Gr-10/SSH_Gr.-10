@@ -49,6 +49,22 @@ class DoctorAppointmentTemplatesService {
     return 0;
   }
 
+  #formatTime(value) {
+    if (!value) return "";
+    const text = String(value);
+
+    if (/^\d{1,2}:\d{2}/.test(text)) {
+      return text.slice(0, 5);
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return text.slice(0, 5);
+    }
+
+    return date.toISOString().slice(11, 16);
+  }
+
   /**
    * Helper: Check if time range is within working schedule
    * @param {Object} workingSchedule - Staff's working schedule for day
@@ -70,7 +86,7 @@ class DoctorAppointmentTemplatesService {
     if (!startWithinSchedule || !endWithinSchedule) {
       throw new Error(
         `Template times must be within working schedule ` +
-        `(${workingSchedule.start_time} - ${workingSchedule.end_time})`
+        `(${this.#formatTime(workingSchedule.start_time)} - ${this.#formatTime(workingSchedule.end_time)})`
       );
     }
   }
@@ -94,7 +110,7 @@ class DoctorAppointmentTemplatesService {
       if ((newStart < existEnd) && (newEnd > existStart)) {
         throw new Error(
           `Time slot overlaps with existing template ` +
-          `(${template.start_time} - ${template.end_time})`
+          `(${this.#formatTime(template.start_time)} - ${this.#formatTime(template.end_time)})`
         );
       }
     }

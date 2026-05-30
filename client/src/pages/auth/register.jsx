@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../../services/api";
+import { registerUser } from "../../services/authApi";
 import { useAuth } from "../../context/authContext";
 import MedCoreLogo from "./MedCoreLogo.jsx";
 import {

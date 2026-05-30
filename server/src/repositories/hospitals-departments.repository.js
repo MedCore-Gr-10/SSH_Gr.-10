@@ -8,6 +8,25 @@ class HospitalsDepartmentsRepository {
     });
   }
 
+  async upsert(data) {
+    const hospitalId = Number(data.hospital_id);
+    const departmentId = Number(data.department_id);
+
+    return prisma.hospitals_departments.upsert({
+      where: {
+        hospital_id_department_id: {
+          hospital_id: hospitalId,
+          department_id: departmentId
+        }
+      },
+      update: {},
+      create: {
+        hospital_id: hospitalId,
+        department_id: departmentId
+      }
+    });
+  }
+
   async findByHospital(hospitalId) {
     return prisma.hospitals_departments.findMany({
       where: { hospital_id: hospitalId },

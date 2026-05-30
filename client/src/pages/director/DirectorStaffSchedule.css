@@ -8,6 +8,14 @@
   margin-bottom: 18px;
 }
 
+.director-staff-schedule-table-section.content-scroll {
+  max-height: 520px;
+}
+
+.director-staff-schedule-table-section.content-scroll .director-staff-schedule-table {
+  min-width: 720px;
+}
+
 .director-staff-schedule-table td:last-child {
   white-space: nowrap;
 }

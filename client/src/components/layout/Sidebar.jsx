@@ -1,6 +1,6 @@
 import React from "react";
 import "./Sidebar.css";
-import SidebarButton from "../JSXcomponents/SidebarButton.jsx";
+import SidebarButton from "./SidebarButton.jsx";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/authContext.jsx";
 import MedCoreLogo2 from "../../assets/MedCoreLogo-2.png";

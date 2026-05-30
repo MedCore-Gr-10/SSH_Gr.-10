@@ -1,21 +1,4 @@
-const getHeaders = () => {
-  const token = localStorage.getItem("token");
-
-  return {
-    "Content-Type": "application/json",
-    Authorization: token ? `Bearer ${token}` : "",
-  };
-};
-
-const readResponse = async (response) => {
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(payload.error || payload.message || `Request failed (${response.status})`);
-  }
-
-  return payload.data ?? payload;
-};
+import { apiRequest } from "./apiClient";
 
 export const searchPatientAppointments = async (filters) => {
   const params = new URLSearchParams();
@@ -27,51 +10,29 @@ export const searchPatientAppointments = async (filters) => {
   });
 
   const query = params.toString();
-  const response = await fetch(`/api/patient/appointments/search${query ? `?${query}` : ""}`, {
-    headers: getHeaders(),
-  });
-
-  return readResponse(response);
+  return apiRequest(`/patient/appointments/search${query ? `?${query}` : ""}`);
 };
 
 export const getPatientAppointmentFilters = async () => {
-  const response = await fetch("/api/patient/appointments/filters", {
-    headers: getHeaders(),
-  });
-
-  return readResponse(response);
+  return apiRequest("/patient/appointments/filters");
 };
 
 export const bookPatientAppointment = async (slotId) => {
-  const response = await fetch(`/api/patient/appointments/${slotId}/book`, {
+  return apiRequest(`/patient/appointments/${slotId}/book`, {
     method: "POST",
-    headers: getHeaders(),
   });
-
-  return readResponse(response);
 };
 
 export const getPatientBookedAppointments = async () => {
-  const response = await fetch("/api/patient/appointments/booked", {
-    headers: getHeaders(),
-  });
-
-  return readResponse(response);
+  return apiRequest("/patient/appointments/booked");
 };
 
 export const cancelPatientAppointment = async (appointmentId) => {
-  const response = await fetch(`/api/patient/appointments/${appointmentId}`, {
+  return apiRequest(`/patient/appointments/${appointmentId}`, {
     method: "DELETE",
-    headers: getHeaders(),
   });
-
-  return readResponse(response);
 };
 
 export const getPatientStaffSchedules = async () => {
-  const response = await fetch("/api/patient/appointments/staff-schedules", {
-    headers: getHeaders(),
-  });
-
-  return readResponse(response);
+  return apiRequest("/patient/appointments/staff-schedules");
 };

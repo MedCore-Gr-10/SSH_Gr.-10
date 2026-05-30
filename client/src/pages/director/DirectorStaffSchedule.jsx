@@ -139,6 +139,14 @@ export default function DirectorStaffSchedule() {
     return value;
   };
 
+  const hasDuplicateStaffDay = () =>
+    scheduleList.some(
+      (schedule) =>
+        schedule.id !== selectedScheduleId &&
+        schedule.staff_id === formValues.staff_id &&
+        schedule.day_of_week === formValues.day_of_week
+    );
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
@@ -146,6 +154,10 @@ export default function DirectorStaffSchedule() {
     setMessage(null);
 
     try {
+      if (hasDuplicateStaffDay()) {
+        throw new Error("This staff member already has a schedule for this day.");
+      }
+
       const payload = {
         ...formValues,
         start_time: normalizeTime(formValues.start_time),
