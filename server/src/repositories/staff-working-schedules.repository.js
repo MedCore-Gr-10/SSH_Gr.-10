@@ -102,6 +102,15 @@ class StaffWorkingSchedulesRepository {
       where: {
         hospital_id: hospitalId,
         active_schedule: true,
+        staff_hospitals_departments: {
+          users: {
+            roles: {
+              role_name: {
+                in: ["doctor", "nurse"],
+              },
+            },
+          },
+        },
       },
       include: {
         staff_hospitals_departments: {

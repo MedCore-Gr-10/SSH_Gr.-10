@@ -98,6 +98,11 @@ const pluralizeRole = (role, count) => {
   return `${role}s`;
 };
 
+const isNormalClinicalStaff = (schedule) => {
+  const role = getStaffRole(schedule).toLowerCase();
+  return role === "doctor" || role === "nurse";
+};
+
 export default function StaffSchedulePage({
   view = "full",
   fetchOwnSchedules,
@@ -156,6 +161,7 @@ export default function StaffSchedulePage({
     () =>
       hospitalSchedules
         .filter((schedule) => schedule.active_schedule !== false)
+        .filter(isNormalClinicalStaff)
         .sort((a, b) => timeValue(a.start_time) - timeValue(b.start_time)),
     [hospitalSchedules],
   );

@@ -60,7 +60,7 @@ class DirectorStaffScheduleService {
       throw new Error("Hospital ID is required to list schedules");
     }
 
-    const schedules = await staffScheduleRepository.findByHospital(hospitalId);
+    const schedules = await staffScheduleRepository.findActiveHospitalSchedules(hospitalId);
 
     await logsRepository.create({
       user_id: currentUserId,
