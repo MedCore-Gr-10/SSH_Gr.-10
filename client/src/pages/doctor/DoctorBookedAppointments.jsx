@@ -3,7 +3,7 @@ import {
   getDoctorSlots,
   saveDoctorAppointmentRecord,
 } from "../../services/doctorAppointmentsApi.js";
-import "../CSSpages/sidebar-pages/BookedAppointments.css";
+import "../routes/BookedAppointments.css";
 
 const formatDate = (value) => {
   if (!value) return "Unknown date";
@@ -29,7 +29,7 @@ const formatTime = (value) => {
   return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
 };
 
-// 🔹 patient helpers (same as your working file)
+
 const getPatientProfileLink = (appointment) =>
   appointment?.users?.users_profiles?.[0] || null;
 
@@ -257,7 +257,7 @@ export default function DoctorBookedAppointments() {
         )}
       </section>
 
-      {/* 🔥 MODAL */}
+      { }
       {selectedAppointment && (
         <div
           className="doctor-booked-modal-backdrop"

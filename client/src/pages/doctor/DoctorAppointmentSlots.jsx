@@ -126,7 +126,7 @@ export default function DoctorAppointmentSlots() {
 
   useEffect(() => {
     loadPageData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   }, []);
 
   const handleCheckAvailableSlots = async () => {
